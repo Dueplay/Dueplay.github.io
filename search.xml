@@ -4,6 +4,41 @@
   
     
     <entry>
+      <title>hello</title>
+      <link href="/2022/08/19/hello/"/>
+      <url>/2022/08/19/hello/</url>
+      
+        <content type="html"><![CDATA[<p>Helloween</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 网络编程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+            <tag> c </tag>
+            
+            <tag> libevent </tag>
+            
+            <tag> epoll </tag>
+            
+            <tag> select </tag>
+            
+            <tag> reactor </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>qt项目打包步骤</title>
       <link href="/2022/08/19/qt%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85/"/>
       <url>/2022/08/19/qt%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85/</url>
@@ -89,6 +124,47 @@
         <content type="html"><![CDATA[<p>数据类型：</p><p>1.数值型</p><p>字节byte&#x3D;8bit&#x3D;八位</p><p>short</p><p>int</p><p>long</p><p>float</p><p>double</p><p><img src="C:\Users\asus\AppData\Roaming\Typora\typora-user-images\image-20210115122516023.png" alt="image-20210115122516023"></p><p>拿byte来说，共八位，第一位代表正负号，1为负，0为正，范围是-128到127</p><p>原码，反码，补码概念：</p><p>正数的原，反，补均是本身</p><p>负数的反码：除了符号位，其余取反</p><p>负数的补码：反码+1</p><p>eg：负数10011110  反码：11100001，补码:11100010</p><p>内存中存的是数据的补码,以补码来进行运算。</p><p>00011110+11100010&#x3D;0  十进制：30+（-30）</p><p>在计算机系统中，数值一律用补码来存储，主要原因是：</p><ul><li><p>统一了零的编码</p></li><li><p>将符号位和其它位统一处理</p></li><li><p>将减法运算转变为加法运算</p></li><li><p>两个用补码表示的数相加时，如果最高位(符号位)有进位，则进位被舍弃</p><p>2.float</p><p>101.110&#x3D;5.75</p><p><code>1*2e2+0*2e1+1*2e0+1*2e-1+1*2e-2+0*2e-3</code></p><p>定义：</p><p>float f1 &#x3D; 234.5f</p><p><img src="C:\Users\asus\AppData\Roaming\Typora\typora-user-images\image-20210115205903752.png" alt="image-20210115205903752"></p><p>32位的浮点数中，S是浮点数的符号位，占1位，安排在最高位，S&#x3D;0表示正数，S&#x3D;1表示负数。M是尾数，放在低位部分，占用23位，小数点位置放在尾数域最左（最高）有效位的右边。E是阶码，占用8位，阶符采用隐含方式，，即采用移码方法来表示正负指数。移码方法对两个指数大小的比较和对阶操作都比较方便，因为阶码域值大者其指数值也大。采用这种方式时，将浮点数的指数真值e变成阶码E时，应将指数e加上一个固定的偏移值127（01111111），即E&#x3D;e+127。</p></li></ul>]]></content>
       
       
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>测试</title>
+      <link href="/2022/08/07/%E6%B5%8B%E8%AF%95/"/>
+      <url>/2022/08/07/%E6%B5%8B%E8%AF%95/</url>
+      
+        <content type="html"><![CDATA[<p>1.hello</p><ol start="2"><li></li><li></li><li></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+            <tag> c++ </tag>
+            
+            <tag> 数据库 </tag>
+            
+            <tag> fastcgi </tag>
+            
+            <tag> fastdfs </tag>
+            
+            <tag> nginx </tag>
+            
+            <tag> redis </tag>
+            
+            <tag> mysql </tag>
+            
+            <tag> opensll加密,编码解码 </tag>
+            
+        </tags>
       
     </entry>
     
