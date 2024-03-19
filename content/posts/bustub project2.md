@@ -39,7 +39,7 @@ editPost:
 
 B+ 树索引在 Bustub 中的位置如图所示:
 
-![image-20231210192752111](../imgs\image-20231210192752111.png)
+![image-20231210192752111](../imgs/image-20231210192752111.png)
 
 B+树种需要的page都需要使用在 Project 1 中实现的 buffer pool manager 来获取。
 
@@ -56,7 +56,7 @@ task1 主要实现leaf page和internal page这两个类，都继承自BPlusTreeP
 
 首先介绍一下page的内存布局
 
-![image-20231210193702035](../imgs\image-20231210193702035.png)
+![image-20231210193702035](../imgs/image-20231210193702035.png)
 
 其中，`data_` 是实际存放 page 数据的地方，大小为 `BUSTUB_PAGE_SIZE`，为 4KB。其他的成员是 page 的 metadata。
 
@@ -76,7 +76,7 @@ page_id_t page_id_; // 4 Byte
 // 24 Byte in total
 ```
 
-![image-20231210194157821](../imgs\image-20231210194157821.png)
+![image-20231210194157821](../imgs/image-20231210194157821.png)
 
 page data 的 4KB 中，24Byte 用于存放 header，剩下的则用于存放 tree page 的数据，即 KV 对。
 
@@ -107,11 +107,11 @@ class C {
 
 这个大小为 1 的数组的作用就比较清楚了。利用 flexible array 的特性来自动填充 page data 4KB 减掉 header 24byte 后剩余的内存。剩下的这些内存用来存放 KV 对。
 
-![image-20231210195129528](../imgs\image-20231210195129528.png)
+![image-20231210195129528](../imgs/image-20231210195129528.png)
 
 internal page 中，KV 对的 K 是能够比较大小的索引，V 是 page id，用来指向下一层的节点。Project 中要求，第一个 Key 为空。主要是因为在 internal page 中，n 个 key 可以将数轴划分为 n+1 个区域，也就对应着 n+1 个 value。实际上你也可以把最后一个 key 当作是空的。
 
-![image-20231210200025382](../imgs\image-20231210200025382.png)
+![image-20231210200025382](../imgs/image-20231210200025382.png)
 
 通过比较 key 的大小选中下一层的节点。实际上等号的位置也可以改变，总之，只要是合法的 B+ 树，即节点大小需要满足最大最小值的限制，各种实现细节都是自由的。
 
@@ -198,7 +198,7 @@ INDEX_TEMPLATE_ARGUMENTS auto BPLUSTREE_TYPE::FetchBPlusTreePage(page_id_t page_
 
 假如有一棵 4 阶的 B+ 树：
 
-![image-20231210210827043](../imgs\image-20231210210827043.png)
+![image-20231210210827043](../imgs/image-20231210210827043.png)
 
 **Delete**
 

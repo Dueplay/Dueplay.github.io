@@ -41,7 +41,7 @@ buffer pool是负责在内存和磁盘之间移动页面(数据库文件是以�
 
 第一个任务是需要实现一个可拓展hash table，这个hash table的作用是负责管理page_id到buffer pool中页面id(frame_id)的映射。buffer pool管理N个页面的内存空间，一个页面的内存空间就叫做frame。需要读取一个页面时，就将一个frame分配这个页面，然后用hash table记录这个映射关系。
 
-![image-20231201165826536](..\image-20231201165826536.png)
+![image-20231201165826536](../imgs/image-20231201165826536.png)
 
 在实现之前需要理解一些可拓展哈希表中的概念：[参考文献]([Extendible Hashing (Dynamic approach to DBMS) - GeeksforGeeks](https://www.geeksforgeeks.org/extendible-hashing-dynamic-approach-to-dbms/))
 
@@ -52,7 +52,7 @@ buffer pool是负责在内存和磁盘之间移动页面(数据库文件是以�
 - **桶分裂**：当桶的元素超过了特定的大小，那么桶分裂成两个部分。
 - **目录扩容**：当桶溢出时，可能会有目录扩容。当溢出桶的局部深度等于全局深度时，目录扩容被执行。
 
-![image-20231201172128528](..\image-20231201172128528.png)
+![image-20231201172128528](../imgs/image-20231201172128528.png)
 
 首先需要实现的是Bucket，Bucket采用的std::list<pair<K,V>>来作为存储数据的数据结构，stl可以让我们很方便的实现数据的增删查改。查找一个key可以通过std::find_if或者遍历这个list，插入时需要判断是否超出这个桶的大小。
 
