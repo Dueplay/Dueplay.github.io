@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>CMU15-445 Project3 Query Execution | Cookie&#39;s Blog</title>
+<meta name="keywords" content="Database">
+<meta name="description" content="Building the Query Execution Engine for Bustub.">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/cmu15-445-project3-query-execution/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="CMU15-445 Project3 Query Execution" />
+<meta property="og:description" content="Building the Query Execution Engine for Bustub." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/cmu15-445-project3-query-execution/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-11-26T22:57:31&#43;08:00" />
+<meta property="article:modified_time" content="2022-11-26T22:57:31&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="CMU15-445 Project3 Query Execution"/>
+<meta name="twitter:description" content="Building the Query Execution Engine for Bustub."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CMU15-445 Project3 Query Execution",
+      "item": "http://localhost:1313/posts/cmu15-445-project3-query-execution/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CMU15-445 Project3 Query Execution",
+  "name": "CMU15-445 Project3 Query Execution",
+  "description": "Building the Query Execution Engine for Bustub.",
+  "keywords": [
+    "Database"
+  ],
+  "articleBody": "来记录一下 Bustub Query Execution 的实现过程。\n在阅读本文前，墙裂推荐阅读 Project 3 开发者迟先生的这篇文章： BusTub 养成记：从课程项目到 SQL 数据库 可以更清晰地了解到 Bustub SQL 层的设计过程。\nResources https://15445.courses.cs.cmu.edu/fall2022 课程官网 https://github.com/cmu-db/bustub Bustub Github Repo https://www.gradescope.com/ 自动测评网站 GradeScope，course entry code: PXWVR5 https://discord.gg/YF7dMCg Discord 论坛，课程交流用 bilibili 有搬运的课程视频，自寻。 https://15445.courses.cs.cmu.edu/fall2022/bustub/ 在你的浏览器上运行 Bustub！ 请不要将实现代码公开，尊重 Andy 和 TAs 的劳动成果！\nOverview Andy 在 Lecture 中说，Query Optimization 是数据库最难的部分，Transaction 是第二难的部分。总体来说，Project 3 的难度不算大，但和 Project 2 的难点恰好相反：Project 2 的难点在于从零实现 B+ 树，一切都得靠自己。Project 3 的难点在于读代码，理解查询引擎的原理，具体实现起来其实比较简单。\n这是课程官网的一张图，清晰地介绍了 Bustub 的整体架构。在 Project 3 中，我们需要实现一系列 Executors，以及为 Optimizer 添加新功能。\nTask1：Access Method Executors. 包含 SeqScan、Insert、Delete、IndexScan 四个算子。 Task2：Aggregation and Join Executors. 包含 Aggregation、NestedLoopJoin、NestedIndexJoin 三个算子。 Task3：Sort + Limit Executors and Top-N Optimization. 包含 Sort、Limit、TopN 三个算子，以及实现将 Sort + Limit 优化为 TopN 算子。 Leaderboard Task：为 Optimizer 实现新的优化规则，包括 Hash Join、Join Reordering、Filter Push Down、Column Pruning 等等，让三条诡异的 sql 语句执行地越快越好。 Talking Casually 在正式开始记录 Project 3 的具体实现之前，我想随便聊聊 Bustub 整体的结构与运行流程。在迷迷糊糊地通过 Project 3 的所有 tests 后，我意识到这其实是了解数据库到底是如何执行 sql 语句的最佳时机。Project 1\u00262 都比较局部，而在这里，一个能真正执行 sql 语句的数据库已经构建起来了。先暂时抛开 transaction，来看看一条 sql 语句在 Bustub 中的旅行。\nParser 一条 sql 语句，首先经过 Parser 生成一棵抽象语法树 AST。具体如何生成，请参考编译原理。Parser 不是数据库的核心部分，也不是性能瓶颈，因此除非热爱编译原理，或者想通过实现一个 sql Parser 对编译原理进行实践，否则一般都会采用第三方库。Bustub 中采用了 libpg_query 库将 sql 语句 parse 为 AST。\nBinder 在得到 AST 后，还需要将这些词语绑定到数据库实体上，这就是 Binder 的工作。例如有这样一条 sql：\nSELECT colA FROM table1; 其中 SELECT 和 FROM 是关键字，colA 和 table1 是标识符。Binder 遍历 AST，将这些词语绑定到相应的实体上。实体是 Bustub 可以理解的各种 c++ 类。绑定完成后，得到的结果是一棵 Bustub 可以直接理解的树。把它叫做 Bustub AST。\nPlanner 得到 Bustub AST 后，Planner 遍历这棵树，生成初步的查询计划。查询计划也是一棵树的形式。例如这条 sql：\nSELECT t1.y, t2.x FROM t1 INNER JOIN t2 ON t1.x = t2.y; 对应的原始的查询计划是\n查询计划规定了数据的流向。数据从树叶流向树根，自底向上地流动，在根节点输出结果。\nOptimizer 由 Planner 得到初步的查询计划后，再将查询计划交给 Optimizer 进行修改优化，生成优化过后的最终查询计划。Optimizer 主要有两种实现方式：\nRule-based. Optimizer 遍历初步查询计划，根据已经定义好的一系列规则，对 PlanNode 进行一系列的修改、聚合等操作。例如我们在 Task 3 中将要实现的，将 Limit + Sort 合并为 TopN。这种 Optimizer 不需要知道数据的具体内容，仅是根据预先定义好的规则修改 Plan Node。 Cost-based. 这种 Optimizer 首先需要读取数据，利用统计学模型来预测不同形式但结果等价的查询计划的 cost。最终选出 cost 最小的查询计划作为最终的查询计划。 Bustub 的 Optimizer 采用第一种实现方式。MIT6.830 的 SimpleDB 则是采用第二种方式，有兴趣也可以看看。\n另外值得一提的是，一般来说，Planner 生成的是 Logical Plan Node，代表抽象的 Plan。Optimizer 则生成 Physical Plan Node，代表具体执行的 Plan。一个比较典型的例子是 Join。在 Planner 生成的查询计划中，Join 就是 Join。在 Optimizer 生成的查询计划中，Join 会被优化成具体的 HashJoin 或 NestedIndexJoin 等等。在 Bustub 中，并不区分 Logical Plan Node 和 Physical Plan Node。Planner 会直接生成 Physical Plan Node。\nExecutor 在拿到 Optimizer 生成的具体的查询计划后，就可以生成真正执行查询计划的一系列算子了。算子也是我们在 Project 3 中需要实现的主要内容。生成算子的步骤很简单，遍历查询计划树，将树上的 PlanNode 替换成对应的 Executor。算子的执行模型也大致分为三种：\nIterator Model，或 Pipeline Model，或火山模型。每个算子都有 Init() 和 Next() 两个方法。Init() 对算子进行初始化工作。Next() 则是向下层算子请求下一条数据。当 Next() 返回 false 时，则代表下层算子已经没有剩余数据，迭代结束。可以看到，火山模型一次调用请求一条数据，占用内存较小，但函数调用开销大，特别是虚函数调用造成 cache miss 等问题。 Materialization Model. 所有算子立即计算出所有结果并返回。和 Iterator Model 相反。这种模型的弊端显而易见，当数据量较大时，内存占用很高。但减少了函数调用的开销。比较适合查询数据量较小的 OLTP workloads。 Vectorization Model. 对上面两种模型的中和，一次调用返回一批数据。利于 SIMD 加速。目前比较先进的 OLAP 数据库都采用这种模型。 Bustub 采用的是 Iterator Model。\n此外，算子的执行方向也有两种：\nTop-to-Bottom. 从根节点算子开始，不断地 pull 下层算子的数据。 Bottom-to-Top. 从叶子节点算子开始，向上层算子 push 自己的数据。 Bustub 采用 Top-to-Bottom。\n在根节点算子处，就得到了我们想要查询的数据，一条 sql 语句完成了它的使命。\n另外，我们在 Project 1 中实现的 Buffer Pool 和在 Project 2 中实现的 B+Tree Index 在哪里？实际上就在一系列算子下。例如 SeqScan 算子，需要遍历 table，首先通过数据库的 catalog 找到对应的 table，一个 table 由许多 page 组成，在访问 page 时，就用到了 Buffer Pool。在 Optimizer 中，假如发现 Sort 算子在对 indexed attribute 排序，会将 Sort 算子优化为 IndexScan 算子，这样就用到了 B+Tree Index。\nBustub Query Execution 的大致结构就是这样，还有很多设计上的细节没有提到，比如 Tuple、Value、AbstractExpression 等等。接下来在具体实现中边看边聊。\nTask 1 Access Method Executors Task 1 包含 4 个算子，SeqScan、Insert、Delete 和 IndexScan。\nSeqScan 读取给定 table 中的所有 tuple，仅会出现在查询计划的叶子节点处。直接使用已经提供的 TableIterator。实现起来挺简单的。此外主要想聊聊 Bustub 中 table 的结构。\n首先，Bustub 有一个 Catalog。Catalog 提供了一系列 API，例如 CreateTable()、GetTable() 等等。Catalog 维护了几张 hashmap，保存了 table id 和 table name 到 table info 的映射关系。table id 由 Catalog 在新建 table 时自动分配，table name 则由用户指定。\n这里的 table info 包含了一张 table 的 metadata，有 schema、name、id 和指向 table heap 的指针。系统的其他部分想要访问一张 table 时，先使用 name 或 id 从 Catalog 得到 table info，再访问 table info 中的 table heap。\ntable heap 是管理 table 数据的结构，包含 InsertTuple()、MarkDelete() 一系列 table 相关操作。table heap 本身并不直接存储 tuple 数据，tuple 数据都存放在 table page 中。table heap 可能由多个 table page 组成，仅保存其第一个 table page 的 page id。需要访问某个 table page 时，通过 page id 经由 buffer pool 访问。\ntable page 是实际存储 table 数据的结构，父类是 page。相较于 page，table page 多了一些新的方法。table page 在 data 的开头存放了 next page id、prev page id 等信息，将多个 table page 连成一个双向链表，便于整张 table 的遍历操作。当需要新增 tuple 时，table heap 会找到当前属于自己的最后一张 table page，尝试插入，若最后一张 table page 已满，则新建一张 table page 插入 tuple。table page 低地址存放 header，tuple 从高地址也就是 table page 尾部开始插入。\ntuple 对应数据表中的一行数据。每个 tuple 都由 RID 唯一标识。RID 由 page id + slot num 构成。tuple 由 value 组成，value 的个数和类型由 table info 中的 schema 指定。\nvalue 则是某个字段具体的值，value 本身还保存了类型信息。\n需要注意的是，executor 本身并不保存查询计划的信息，应该通过 executor 的成员 plan 来得知该如何进行本次计算，例如 SeqScanExecutor 需要向 SeqScanPlanNode 询问自己该扫描哪张表。\n所有要用到的系统资源，例如 Catalog，Buffer Pool 等，都由 ExecutorContext 提供。\nInsert \u0026 Delete Insert 和 Delete 这两个算子实现起来基本一样，也比较特殊，是唯二的写算子。数据库最主要的操作就是增查删改。Bustub sql 层暂时不支持 UPDATE。Insert 和 Delete 一定是查询计划的根节点，且仅需返回一个代表修改行数的 tuple。\nInsert 和 Delete 时，记得要更新与 table 相关的所有 index。index 与 table 类似，同样由 Catalog 管理。需要注意的是，由于可以对不同的字段建立 index，一个 table 可能对应多个 index，所有的 index 都需要更新。\nInsert 时，直接将 tuple 追加至 table 尾部。Delete 时，并不是直接删除，而是将 tuple 标记为删除状态，也就是逻辑删除。（在事务提交后，再进行物理删除，Project 3 中无需实现）\nInsert \u0026 Delete 的 Next() 只会返回一个包含一个 integer value 的 tuple，表示 table 中有多少行受到了影响。\nIndexScan 使用我们在 Project 2 中实现的 B+Tree Index Iterator，遍历 B+ 树叶子节点。由于我们实现的是非聚簇索引，在叶子节点只能获取到 RID，需要拿着 RID 去 table 查询对应的 tuple。\n在完成 Task 1 的四个算子后，可以用已提供的 sqllogictest 工具和已提供的一些 sql 来检验自己的算子是否实现正确。\n关于 Task 1 的具体实现的确没太多可说的，基本是把官网的 instruction 翻译了一遍。后面几个 task 难度会稍大一点点，也会讲讲更具体的实现。\nTask 2 Aggregation \u0026 Join Executors Task 2 包含了 3 个算子，Aggregation、NestedLoopJoin 和 NestedIndexJoin。\nAggregation Aggregation 算子就稍微复杂一点了。先看看 AggregationExecutor 的成员：\n/** The aggregation plan node */ const AggregationPlanNode *plan_; /** The child executor that produces tuples over which the aggregation is computed */ std::unique_ptr\u003cAbstractExecutor\u003e child_; /** Simple aggregation hash table */ SimpleAggregationHashTable aht_; /** Simple aggregation hash table iterator */ SimpleAggregationHashTable::Iterator aht_iterator_; 主要说说这个 SimpleAggregationHashTable。Aggregation 是 pipeline breaker。也就是说，Aggregation 算子会打破 iteration model 的规则。原因是，在 Aggregation 的 Init() 函数中，我们就要将所有结果全部计算出来。原因很简单，比如下面这条 sql：\nSELECT t.x, max(t.y) FROM t GROUP BY t.x; 结果的每条 tuple 都是一个 t.x 的聚合，而要得到同一个 t.x 对应的 max(t.y)，必须要遍历整张表。因此，Aggregation 需要在 Init() 中直接计算出全部结果，将结果暂存，再在 Next() 中一条一条地 emit。而 SimpleAggregationHashTable 就是计算并保存 Aggregation 结果的数据结构。\nSimpleAggregationHashTable 维护一张 hashmap，键为 AggregateKey，值为 AggregateValue，均为 std::vector。key 代表 group by 的字段的数组，value 则是需要 aggregate 的字段的数组。在下层算子传来一个 tuple 时，将 tuple 的 group by 字段和 aggregate 字段分别提取出来，调用 InsertCombine() 将 group by 和 aggregate 的映射关系存入 SimpleAggregationHashTable。若当前 hashmap 中没有 group by 的记录，则创建初值；若已有记录，则按 aggregate 规则逐一更新所有的 aggregate 字段，例如取 max/min，求 sum 等等。例如下面这条 sql：\nSELECT min(t.z), max(t.z), sum(t.z) FROM t GROUP BY t.x, t.y; group by（AggregateKey）为 {t.x, t.y}，aggregate（AggregateValue）为 {t.z, t.z, t.z}。aggregate 规则为 {min, max, sum}。\n需要额外注意的是 count(column) 和 count(*) 的区别，以及对空值的处理。另外，不需要考虑 hashmap 过大的情况，即整张 hashmap 可以驻留在内存中，不需要通过 Buffer Pool 调用 page 来存储。\n在 Init() 中计算出整张 hashmap 后，在 Next() 中直接利用 hashmap iterator 将结果依次取出。Aggregation 输出的 schema 形式为 group-bys + aggregates。\nNestedLoopJoin Project 3 中只要求实现 NestedLoopJoin，HashJoin 不做强制要求，而是放在了 Leaderboard Optional 里。实际上实现一个 in-memory 的 HashJoin 也不难。Join 应该是经典的数据库性能瓶颈。Andy 在 Lecture 里也详细地量化地对比了各种 Join 的 costs，有兴趣可以看看。\nNestedLoopJoin 算法本身并不难，但比较容易掉进坑里。伪代码大概是这样：\nfor outer_tuple in outer_table: for inner_tuple in inner_table: if inner_tuple matched outer_tuple: emit 有了这个例子，很容易把代码写成：\nwhile (left_child-\u003eNext(\u0026left_tuple)){ while (right_child-\u003eNext(\u0026right_tuple)){ if (left_tuple matches right_tuple){ *tuple = ...; // assemble left \u0026 right together return true; } } } return false; 一开始看起来似乎没什么问题。然而很快可以发现有一个严重的错误，right child 在 left child 的第一次循环中就被消耗完了，之后只会返回 false。解决方法很简单，在 Init() 里先把 right child 里的所有 tuple 取出来暂存在一个数组里就好，之后直接访问这个数组。\nwhile (left_child-\u003eNext(\u0026left_tuple)){ for (auto right_tuple : right_tuples){ if (left_tuple matches right_tuple){ *tuple = ...; // assemble left \u0026 right together return true; } } } return false; 看起来好像又没什么问题。然而，同一列是可能存在 duplicate value 的。在上层算子每次调用 NestedLoopJoin 的 Next() 时，NestedLoopJoin 都会向下层算子请求新的 left tuple。但有可能上一个 left tuple 还没有和 right child 中所有能匹配的 tuple 匹配完（只匹配了第一个）。\n例如这两张表：\nt1 t2\r--------- ---------\r| x | | x |\r--------- ---------\r| 1 | | 1 |\r| 2 | | 1 |\r| 3 | | 2 |\r--------- --------- 现在执行\nSELECT * FROM t1 INNER JOIN t2 ON t1.x = t2.x; t1 中的 1 只会和 t2 的第一个 1 匹配，产生一行输出。再下一次调用 Next() 时，左边会直接选取 2 开始尝试匹配。\n解决方法也很简单，在算子里暂存 left tuple，每次调用 Next() 时，先用暂存的 left tuple 尝试匹配。并且要记录上一次右表匹配到的位置，不要每次都直接从右表第一行开始匹配了。右表遍历完还没有匹配结果，再去找左表要下一个 tuple。\n说来说去，实际上就是注意迭代器要保存上下文信息。\nINNER JOIN 和 LEFT JOIN 按规则实现就好，差不多。LEFT JOIN 注意处理空值。\n还有一个小问题，怎么判断两个 tuple 是否匹配？这里就要第一次遇到 Project 3 里另一个重要的类 AbstractExpression 了。\nAbstractExpression 抽象了 sql 中的各种表达式，包括 ArithmeticExpression、ColumnValueExpression、ComparisonExpression、ConstantValueExpression 和 LogicExpression。这都是什么？看下面这条 sql：\nSELECT * FROM t1 WHERE t1.x = t1.y + 1 AND t1.y \u003e 0; 重点关注 WHERE 后的表达式 t1.x = t1.y + 1 AND t1.y \u003e 0。看这下面这张图：\n其实就是一颗表达式树。AbstractExpression 就是表达式树的节点。sql 中的所有表达式都会被 parse 为表达式树，在 Binder 中进行绑定。上面的 JOIN 中也存在表达式 t1.x = t2.x。AbstractExpression 里最重要的方法就是 Evaluate()，返回值是 value。调用 Evaluate()，参数为 tuple 和 tuple 对应的 schema，返回从这个 tuple 中提取数据后代入表达式计算得到的结果。\n在 NestedLoopJoin 里，我们要用到的是 EvaluateJoin()，也差不多，只不过输入的是左右两个 tuple 和 schema。返回值是表示 true 或 false 的 value。true 则代表成功匹配。\n到这里，NestedLoopJoin 就成功实现了。Join 输出的 schema 为 left schema + right schema。\n后来我看了一下 RisingLight 里的实现，我这个 rustacean 萌新的第一反应是惊为天人。大致是这样：\npub async fn Execute(){ for left_tuple in left_table { for right_tuple in right_table { if matches { yield AssembleOutput(); } } } } 这是一个生成器，当执行到 yield 时，函数会暂时中断，从生成器回到调用者。而调用者再次进入生成器时，可以直接回到上次中断的地方。再配合 stream，就利用 rust 的无栈协程和异步编程完美地实现了一个 NestedLoopJoin 算子，比手动保存上下文信息优雅太多了。\n后来仔细想想，Go 也可以有类似的写法：\nfunc Executor(out_ch, left_ch, right_ch chan Tuple) { // fetch right tuples from right_ch right_tuples := []Tuple{} for right_tuple := range right_ch { right_tuples = append(right_tuples, right_tuple) } for left_tuple := range left_ch { for _, right_tuple := range right_tuples { if matches { out_ch \u003c- AssembleOutput(); } } } close(out_ch) } 每个算子都是一个 goroutine，通过 channel 实现异步的计算，好像也不错。\nNestedIndexJoin 在进行 equi-join 时，如果发现 JOIN ON 右边的字段上建了 index，则 Optimizer 会将 NestedLoopJoin 优化为 NestedIndexJoin。具体实现和 NestedLoopJoin 差不多，只是在尝试匹配右表 tuple 时，会拿 join key 去 B+Tree Index 里进行查询。如果查询到结果，就拿着查到的 RID 去右表获取 tuple 然后装配成结果输出。其他的就不再多说了。\nTask 3 Sort + Limit Executors and Top-N Optimization Task 3 中要实现 3 个算子，Sort、Limit 和 TopN，以及将 Limit + Sort 在 Optimizer 中优化为 TopN。\nSort Sort 也是 pipeline breaker。在 Init() 中读取所有下层算子的 tuple，并按 ORDER BY 的字段升序或降序排序。Sort 算子说起来比较简单，实现也比较简单，主要需要自定义 std::sort()。\nstd::sort() 的第三个参数可以传入自定义的比较函数。直接传入一个 lambda 匿名函数。由于要访问成员 plan_ 来获取排序的字段，lambda 需要捕获 this 指针。另外，排序字段可以有多个，按先后顺序比较。第一个不相等，直接得到结果；相等，则比较第二个。不会出现所有字段全部相等的情况。\nstd::sort(sorted_tuples_.begin(), sorted_tuples_.end(), [this](const Tuple \u0026a, const Tuple \u0026b) { for (auto [order_by_type, expr] : plan_-\u003eGetOrderBy()) { // compare and return ... } UNREACHABLE(\"doesn't support duplicate key\"); }); Limit 和 SeqScan 基本一模一样，只不过在内部维护一个 count，记录已经 emit 了多少 tuple。当下层算子空了或 count 达到规定上限后，不再返回新的 tuple。\nTopN 仅需返回最大/最小的 n 个 tuple。一开始想着要实现一个 fixed-size priority queue，即 queue 大小超过限制时自动抛弃最后一个元素以减小内存占用，但后来实在不想自己重写一遍二叉堆，就开摆了。直接用 std::priority_queue 加自定义比较函数，然后在 Init() 中遍历下层算子所有 tuple，全部塞进优先队列后截取前 n 个。再 Next() 里一个一个输出。（是不是和 Limit + Sort 没什么区别？都是 O(nlogn)\nSort + Limit As TopN 这是 Project 3 里最后一个必做的小问。终于不是实现算子了，而是在 Optimizer 里增加一条规则，将 Sort + Limit 优化为 TopN。先看看 Optimizer 是如何执行优化规则的：\nauto Optimizer::OptimizeCustom(const AbstractPlanNodeRef \u0026plan) -\u003e AbstractPlanNodeRef { auto p = plan; p = OptimizeMergeProjection(p); p = OptimizeMergeFilterNLJ(p); p = OptimizeNLJAsIndexJoin(p); p = OptimizeNLJAsHashJoin(p); // Enable this rule after you have implemented hash join. p = OptimizeOrderByAsIndexScan(p); p = OptimizeSortLimitAsTopN(p); // what we should add return p; } 可以看到，让未经优化的原始 plan 树依次经历多条规则，来生成优化过的 plan。我们的任务就是新增一条规则。看看其他规则是怎么实现的，例如 NLJAsIndexJoin：\nauto Optimizer::OptimizeNLJAsIndexJoin(const AbstractPlanNodeRef \u0026plan) -\u003e AbstractPlanNodeRef { std::vector\u003cAbstractPlanNodeRef\u003e children; for (const auto \u0026child : plan-\u003eGetChildren()) { children.emplace_back(OptimizeNLJAsIndexJoin(child)); } auto optimized_plan = plan-\u003eCloneWithChildren(std::move(children)); if (optimized_plan-\u003eGetType() == PlanType::NestedLoopJoin) { // apply the rule and return } return optimized_plan; } 可以看到，实际上就是对 plan tree 进行后序遍历，自底向上地适用规则，改写节点。遍历到某个节点时，通过 if 语句来判断当前节点的类型是否符合我们要优化的类型，若符合则进行优化。\n大致了解如何对 plan 进行优化后，就可以开始写我们的优化规则了。需要特别注意的是，能优化为一个 TopN 算子的形式是，上层节点为 Limit，下层节点为 Sort，不能反过来。同样，我们对 plan tree 进行后续遍历，在遇到 Limit 时，判断其下层节点是否为 Sort，若为 Sort，则将这两个节点替换为一个 TopN。还是比较好实现的，只是代码看起来可能有点复杂。\n到这里，Project 3 中必做的部分就结束了。还剩下选做的 Leaderboard Task。本来也不是 CMU 的学生，就不分什么必做选做了，感兴趣的话都推荐试一试。我个人感觉 Leaderboard Task 还是很好玩的，就是代码写起来有点难受，corner case 比较多。\nLeaderboard Task Leaderboard Task 包含三条极其诡异的 sql，我们要做的就是增加新的优化规则，让这三条 sql 执行地越快越好。分三个部分：\nQuery 1: Where’s the Index? Query 2: Too Many Joins! Query 3: The Mad Data Scientist Query 1: Where’s the Index? 首先来看一看需要我们优化的 sql：\ncreate index t1x on t1_50k(x); select count(*), max(t1_50k.x), max(t1_50k.y), max(__mock_t2_100k.x), max(__mock_t2_100k.y), max(__mock_t3_1k.x), max(__mock_t3_1k.y) from ( t1_50k inner join __mock_t2_100k on t1_50k.x = __mock_t2_100k.x ) inner join __mock_t3_1k on __mock_t2_100k.y = __mock_t3_1k.y; 稍微把表名替换一下：\ncreate index t1x on t1(x); select count(*), max(t1.x), max(t1.y), max(t2.x), max(t2.y), max(t3.x), max(t3.y) from ( t1 inner join t2 on t1.x = t2.x ) inner join t3 on t2.y = t3.y; 看的我有点精神恍惚，实际上就是三张表 Join 再 Aggregate 一下。主要优化方向是把 NestedLoopJoin 替换为 HashJoin、Join Reorder 让小表驱动大表，以及正确识别 t1.x 上的索引。\n先说 HashJoin。实际上仅需考虑 in-memory 情况时，HashJoin 并不难实现。主要分为两个步骤，Build 和 Probe。Build 阶段在 Init() 进行，遍历左表建立 hashmap。Probe 阶段在 Next() 进行，遍历右表探测是否有 match 的 tuple。需要注意 HashJoin 只能用于优化 equi-join。\n具体实现起来，对于我这种对 modern c++ 极不熟悉的人来说，难点反而在怎么正确构造出这个 hashmap 让编译通过。hashmap 的键应该为 value，但 value 没有重载 operator==，也没有实现自定义 hash 函数，不能直接作为键。\n一开始，我想用 src/include/common/util/hash_util.h 里的 HashValue 函数将 value hash 为 hash_t 类型，然后把 hash_t 作为键。hashmap 直接用 std::unordered_map。但遇到了哈希冲突的问题，还是绕不过要重载 operator==。直接重载 value 的 operator== 是行不通的，autograder 无法识别。因此我定义了 ValueKey 类型把 value 包裹起来，为 ValueKey 重载 == 并实现 hash 函数。这样就可以直接用 ValueKey 作为 hashmap 的键了。至于 operator== 的具体实现，需要关注一下 Value 类的结构，取出 value 的 raw data 并 cast 为正确类型进行比较。同样，hash 函数也是对 raw data 进行 hash。\nhashmap 的值是什么？注意不是 tuple，而是 tuple 数组。同样，因为可能存在 duplicate。\nHashJoin 的实现大致如此，接下来是 Join Reorder。\nJoin Reorder 其实比较简单，可以调用 EstimatedCardinality() 来估计 table 的大小，然后根据大小来调整 plan tree 里连续 join 的顺序即可。\n最后是 Correctly Pick up Index。在原始 NLJAsIndexJoin 里，始终只会尝试为右表匹配 index，左表则被忽略。因此，可以新建一条规则，如果左表有 index，右表没有，且为 equi-join，则把左右顺序替换一下，即有索引的左表换到右边，便于之后正确识别索引。然而我在实现后发现，这是一个负优化（，可能大部分情况下还是 HashJoin 比较靠谱。\nQuery 2: Too Many Joins! 先看看 sql：\nselect count(*), max(__mock_t4_1m.x), max(__mock_t4_1m.y), max(__mock_t5_1m.x), max(__mock_t5_1m.y), max(__mock_t6_1m.x), max(__mock_t6_1m.y) from (select * from __mock_t4_1m, __mock_t5_1m where __mock_t4_1m.x = __mock_t5_1m.x), __mock_t6_1m where (__mock_t6_1m.y = __mock_t5_1m.y) and (__mock_t4_1m.y \u003e= 1000000) and (__mock_t4_1m.y \u003c 1500000) and (__mock_t6_1m.x \u003c 150000) and (__mock_t6_1m.x \u003e= 100000); 更精神恍惚了，简化一下：\nselect count(*), max(t4.x), max(t4.y), max(t5.x), max(t5.y), max(t6.x), max(t6.y) from (select * from t4, t5 where t4.x = t5.x), t6 where (t6.y = t5.y) and (t4.y \u003e= 1000000) and (t4.y \u003c 1500000) and (t6.x \u003c 150000) and (t6.x \u003e= 100000); 这大概是个什么东西呢，大概是所有的 JOIN 全部写成了 FULL JOIN，然后把所有 Filter 放在了 plan tree 的顶端。原始执行计划是这样的：\n需要优化的内容还是比较明显的，Filter Push-down，将 Filter 尽可能地下推至数据源处。需要注意不是所有的 Filter 都可以下推。在本例中，我们只需要把 Filter 正确下推至 Join 算子下就可以了。最终产生的优化方案大致是这样：\n注意要将 Filter 的 predicate 语句正确分类，下推至正确的分支。\n在实现 Filter Push-down 时，一开始我和之前一样，进行后序遍历，自底向上地改写，但是发现这样似乎不能将 Filter 完全地下推，因为一个 Filter 被下推一次后，就无法被再次访问到了，只能被下推一次。因此这次我改用了先序遍历，自顶向下地改写。当下推一个 Filter 后，由于是向下遍历，Filter 还能被再次访问到，可以被继续下推。\n需要注意的时，我们下推的不是整个 Filter 节点，实际上是节点中的 predicate。我的做法是遍历表达式树，提取 predicate 中的所有 comparison，判断表达式的两边是否一个是 column value，一个是 const value，只有这样的 predicate 可以被下推（也存在其他形式的可以下推的 predicate，由于在这里只是对 optimizer 的体验，也只用优化预先给出的 sql，可以稍微简化一下算法，不用考虑太多的 corner case），再将所有的 predicate 重新组合为 logic expression，生成新的 Filter，根据 column value 的 idx 来选择下推的分支。\n两边都为 column value 且分别代表左右两个下层算子的某一列的 Filter 可以被结合到 Join 节点中作为 Join 条件。这一步的规则已经被实现好了，因此这种 Filter 我们让其停留在原地即可。\nQuery 3: The Mad Data Scientist 看看 sql：\nselect v, d1, d2 from ( select v, max(v1) as d1, max(v1) + max(v1) + max(v2) as d2, min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2), min(v1), max(v2), min(v2), max(v1) + min(v1), max(v2) + min(v2) from __mock_t7 left join (select v4 from __mock_t8 where 1 == 2) on v \u003c v4 group by v ) 很怀疑迟先生在写这条 sql 时的精神状态。\n实际上，我们只用 SELECT v, d1, d2，其余的数据都是多余的，无需计算。因此我们需要实现 Column Pruning 优化。\n我实现的 Column Pruning 包括两个部分：\n遇到连续的两个 Projection，合并为 1 个，只取上层 Projection 所需列。 遇到 Projection + Aggregation，改写 aggregates，截取 Projection 中需要的项目，其余直接抛弃。 同样地，我个人认为 Column Pruning 也是自顶向下地改写比较方便。具体实现是收集 Projection 里的所有 column，然后改写下层节点，仅保留上层需要 project 的 column。这里的 column 不一定是表中的 column，而是一种广义的 column，例如 SELECT t1.x + t1.y FROM t1 中的 t1.x + t1.y。\n另外，我们注意到这条 sql 里有一个永为假的 predicate where 1 == 2。对于这种 Filter，我们可以将其优化为 DummyScan，即第一次调用 Next() 就返回 false。可以用一个空的 Value 算子实现。\nSummary 至此，Project 3 就全部完成了。总的来说体验还是很好的，实现了一系列算子，也实现了一系列的优化规则，对查询引擎有了更清晰的认识。\n同样地，有很多实现上具体的细节也忽略掉了，比如如何装配一个中间 tuple，类型系统的设计，table page 的设计等等。这些都与主线关系不大，也就不再唠叨了。\n另外，在测试的过程中，意外发现 Bustub 的 OR 语句无法正确执行，一路找 bug 找上去发现是 Binder 中的一个小 typo，向 Bustub 提了 PR，也被 merge 了。算是为开源课程做了一点微微微小的贡献吧。\n",
+  "wordCount" : "2108",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2022-11-26T22:57:31+08:00",
+  "dateModified": "2022-11-26T22:57:31+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/cmu15-445-project3-query-execution/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      CMU15-445 Project3 Query Execution
+    </h1>
+    <div class="post-description">
+      Building the Query Execution Engine for Bustub.
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2022-11-26 22:57:31 &#43;0800 CST&#39;&gt;2022-11-26&lt;/span&gt;&amp;nbsp;·&amp;nbsp;10 min&amp;nbsp;·&amp;nbsp;2108 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/el-even-11/blog/content/posts/CMU15-445-Project3-Query-Execution.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#talking-casually">Talking Casually</a>
+      <ul>
+        <li><a href="#parser">Parser</a></li>
+        <li><a href="#binder">Binder</a></li>
+        <li><a href="#planner">Planner</a></li>
+        <li><a href="#optimizer">Optimizer</a></li>
+        <li><a href="#executor">Executor</a></li>
+      </ul>
+    </li>
+    <li><a href="#task-1-access-method-executors">Task 1 Access Method Executors</a>
+      <ul>
+        <li><a href="#seqscan">SeqScan</a></li>
+        <li><a href="#insert--delete">Insert &amp; Delete</a></li>
+        <li><a href="#indexscan">IndexScan</a></li>
+      </ul>
+    </li>
+    <li><a href="#task-2-aggregation--join-executors">Task 2 Aggregation &amp; Join Executors</a>
+      <ul>
+        <li><a href="#aggregation">Aggregation</a></li>
+        <li><a href="#nestedloopjoin">NestedLoopJoin</a></li>
+        <li><a href="#nestedindexjoin">NestedIndexJoin</a></li>
+      </ul>
+    </li>
+    <li><a href="#task-3-sort--limit-executors-and-top-n-optimization">Task 3 Sort + Limit Executors and Top-N Optimization</a>
+      <ul>
+        <li><a href="#sort">Sort</a></li>
+        <li><a href="#limit">Limit</a></li>
+        <li><a href="#topn">TopN</a></li>
+        <li><a href="#sort--limit-as-topn">Sort + Limit As TopN</a></li>
+      </ul>
+    </li>
+    <li><a href="#leaderboard-task">Leaderboard Task</a>
+      <ul>
+        <li><a href="#query-1-wheres-the-index">Query 1: Where&rsquo;s the Index?</a></li>
+        <li><a href="#query-2-too-many-joins">Query 2: Too Many Joins!</a></li>
+        <li><a href="#query-3-the-mad-data-scientist">Query 3: The Mad Data Scientist</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>来记录一下 Bustub Query Execution 的实现过程。</p>
+<p>在阅读本文前，墙裂推荐阅读 Project 3 开发者迟先生的这篇文章：
+<a href="https://zhuanlan.zhihu.com/p/570917775">BusTub 养成记：从课程项目到 SQL 数据库</a>
+可以更清晰地了解到 Bustub SQL 层的设计过程。</p>
+<h2 id="resources">Resources<a hidden class="anchor" aria-hidden="true" href="#resources">#</a></h2>
+<ul>
+<li><a href="https://15445.courses.cs.cmu.edu/fall2022">https://15445.courses.cs.cmu.edu/fall2022</a> 课程官网</li>
+<li><a href="https://github.com/cmu-db/bustub">https://github.com/cmu-db/bustub</a> Bustub Github Repo</li>
+<li><a href="https://www.gradescope.com/">https://www.gradescope.com/</a> 自动测评网站 GradeScope，course entry code: PXWVR5</li>
+<li><a href="https://discord.gg/YF7dMCg">https://discord.gg/YF7dMCg</a> Discord 论坛，课程交流用</li>
+<li>bilibili 有搬运的课程视频，自寻。</li>
+<li><a href="https://15445.courses.cs.cmu.edu/fall2022/bustub/">https://15445.courses.cs.cmu.edu/fall2022/bustub/</a> 在你的浏览器上运行 Bustub！</li>
+</ul>
+<p><strong>请不要将实现代码公开，尊重 Andy 和 TAs 的劳动成果！</strong></p>
+<h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>Andy 在 Lecture 中说，Query Optimization 是数据库最难的部分，Transaction 是第二难的部分。总体来说，Project 3 的难度不算大，但和 Project 2 的难点恰好相反：Project 2 的难点在于从零实现 B+ 树，一切都得靠自己。Project 3 的难点在于读代码，理解查询引擎的原理，具体实现起来其实比较简单。</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-1.svg" alt=""  />
+</p>
+<p>这是课程官网的一张图，清晰地介绍了 Bustub 的整体架构。在 Project 3 中，我们需要实现一系列 Executors，以及为 Optimizer 添加新功能。</p>
+<ul>
+<li>Task1：Access Method Executors. 包含 SeqScan、Insert、Delete、IndexScan 四个算子。</li>
+<li>Task2：Aggregation and Join Executors. 包含 Aggregation、NestedLoopJoin、NestedIndexJoin 三个算子。</li>
+<li>Task3：Sort + Limit Executors and Top-N Optimization. 包含 Sort、Limit、TopN 三个算子，以及实现将 Sort + Limit 优化为 TopN 算子。</li>
+<li>Leaderboard Task：为 Optimizer 实现新的优化规则，包括 Hash Join、Join Reordering、Filter Push Down、Column Pruning 等等，让三条诡异的 sql 语句执行地越快越好。</li>
+</ul>
+<h2 id="talking-casually">Talking Casually<a hidden class="anchor" aria-hidden="true" href="#talking-casually">#</a></h2>
+<p>在正式开始记录 Project 3 的具体实现之前，我想随便聊聊 Bustub 整体的结构与运行流程。在迷迷糊糊地通过 Project 3 的所有 tests 后，我意识到这其实是了解数据库到底是如何执行 sql 语句的最佳时机。Project 1&amp;2 都比较局部，而在这里，一个能真正执行 sql 语句的数据库已经构建起来了。先暂时抛开 transaction，来看看一条 sql 语句在 Bustub 中的旅行。</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-2.png" alt=""  />
+</p>
+<h3 id="parser">Parser<a hidden class="anchor" aria-hidden="true" href="#parser">#</a></h3>
+<p>一条 sql 语句，首先经过 Parser 生成一棵抽象语法树 AST。具体如何生成，请参考编译原理。Parser 不是数据库的核心部分，也不是性能瓶颈，因此除非热爱编译原理，或者想通过实现一个 sql Parser 对编译原理进行实践，否则一般都会采用第三方库。Bustub 中采用了 libpg_query 库将 sql 语句 parse 为 AST。</p>
+<h3 id="binder">Binder<a hidden class="anchor" aria-hidden="true" href="#binder">#</a></h3>
+<p>在得到 AST 后，还需要将这些词语绑定到数据库实体上，这就是 Binder 的工作。例如有这样一条 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">colA</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">table1</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>其中 <code>SELECT</code> 和 <code>FROM</code> 是关键字，<code>colA</code> 和 <code>table1</code> 是标识符。Binder 遍历 AST，将这些词语绑定到相应的实体上。实体是 Bustub 可以理解的各种 c++ 类。绑定完成后，得到的结果是一棵 Bustub 可以直接理解的树。把它叫做 Bustub AST。</p>
+<h3 id="planner">Planner<a hidden class="anchor" aria-hidden="true" href="#planner">#</a></h3>
+<p>得到 Bustub AST 后，Planner 遍历这棵树，生成初步的查询计划。查询计划也是一棵树的形式。例如这条 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">t2</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t1</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">t2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t2</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>对应的原始的查询计划是</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-3.png" alt=""  />
+</p>
+<p>查询计划规定了数据的流向。数据从树叶流向树根，自底向上地流动，在根节点输出结果。</p>
+<h3 id="optimizer">Optimizer<a hidden class="anchor" aria-hidden="true" href="#optimizer">#</a></h3>
+<p>由 Planner 得到初步的查询计划后，再将查询计划交给 Optimizer 进行修改优化，生成优化过后的最终查询计划。Optimizer 主要有两种实现方式：</p>
+<ol>
+<li>Rule-based. Optimizer 遍历初步查询计划，根据已经定义好的一系列规则，对 PlanNode 进行一系列的修改、聚合等操作。例如我们在 Task 3 中将要实现的，将 Limit + Sort 合并为 TopN。这种 Optimizer 不需要知道数据的具体内容，仅是根据预先定义好的规则修改 Plan Node。</li>
+<li>Cost-based. 这种 Optimizer 首先需要读取数据，利用统计学模型来预测不同形式但结果等价的查询计划的 cost。最终选出 cost 最小的查询计划作为最终的查询计划。</li>
+</ol>
+<p>Bustub 的 Optimizer 采用第一种实现方式。MIT6.830 的 SimpleDB 则是采用第二种方式，有兴趣也可以看看。</p>
+<p>另外值得一提的是，一般来说，Planner 生成的是 Logical Plan Node，代表抽象的 Plan。Optimizer 则生成 Physical Plan Node，代表具体执行的 Plan。一个比较典型的例子是 Join。在 Planner 生成的查询计划中，Join 就是 Join。在 Optimizer 生成的查询计划中，Join 会被优化成具体的 HashJoin 或 NestedIndexJoin 等等。在 Bustub 中，并不区分 Logical Plan Node 和 Physical Plan Node。Planner 会直接生成 Physical Plan Node。</p>
+<h3 id="executor">Executor<a hidden class="anchor" aria-hidden="true" href="#executor">#</a></h3>
+<p>在拿到 Optimizer 生成的具体的查询计划后，就可以生成真正执行查询计划的一系列算子了。算子也是我们在 Project 3 中需要实现的主要内容。生成算子的步骤很简单，遍历查询计划树，将树上的 PlanNode 替换成对应的 Executor。算子的执行模型也大致分为三种：</p>
+<ol>
+<li>Iterator Model，或 Pipeline Model，或火山模型。每个算子都有 <code>Init()</code> 和 <code>Next()</code> 两个方法。<code>Init()</code> 对算子进行初始化工作。<code>Next()</code> 则是向下层算子请求下一条数据。当 <code>Next()</code> 返回 false 时，则代表下层算子已经没有剩余数据，迭代结束。可以看到，火山模型一次调用请求一条数据，占用内存较小，但函数调用开销大，特别是虚函数调用造成 cache miss 等问题。</li>
+<li>Materialization Model. 所有算子立即计算出所有结果并返回。和 Iterator Model 相反。这种模型的弊端显而易见，当数据量较大时，内存占用很高。但减少了函数调用的开销。比较适合查询数据量较小的 OLTP workloads。</li>
+<li>Vectorization Model. 对上面两种模型的中和，一次调用返回一批数据。利于 SIMD 加速。目前比较先进的 OLAP 数据库都采用这种模型。</li>
+</ol>
+<p>Bustub 采用的是 Iterator Model。</p>
+<p>此外，算子的执行方向也有两种：</p>
+<ol>
+<li>Top-to-Bottom. 从根节点算子开始，不断地 pull 下层算子的数据。</li>
+<li>Bottom-to-Top. 从叶子节点算子开始，向上层算子 push 自己的数据。</li>
+</ol>
+<p>Bustub 采用 Top-to-Bottom。</p>
+<p>在根节点算子处，就得到了我们想要查询的数据，一条 sql 语句完成了它的使命。</p>
+<p>另外，我们在 Project 1 中实现的 Buffer Pool 和在 Project 2 中实现的 B+Tree Index 在哪里？实际上就在一系列算子下。例如 SeqScan 算子，需要遍历 table，首先通过数据库的 catalog 找到对应的 table，一个 table 由许多 page 组成，在访问 page 时，就用到了 Buffer Pool。在 Optimizer 中，假如发现 Sort 算子在对 indexed attribute 排序，会将 Sort 算子优化为 IndexScan 算子，这样就用到了 B+Tree Index。</p>
+<p>Bustub Query Execution 的大致结构就是这样，还有很多设计上的细节没有提到，比如 Tuple、Value、AbstractExpression 等等。接下来在具体实现中边看边聊。</p>
+<h2 id="task-1-access-method-executors">Task 1 Access Method Executors<a hidden class="anchor" aria-hidden="true" href="#task-1-access-method-executors">#</a></h2>
+<p>Task 1 包含 4 个算子，SeqScan、Insert、Delete 和 IndexScan。</p>
+<h3 id="seqscan">SeqScan<a hidden class="anchor" aria-hidden="true" href="#seqscan">#</a></h3>
+<p>读取给定 table 中的所有 tuple，仅会出现在查询计划的叶子节点处。直接使用已经提供的 <code>TableIterator</code>。实现起来挺简单的。此外主要想聊聊 Bustub 中 table 的结构。</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-4.png" alt=""  />
+</p>
+<p>首先，Bustub 有一个 Catalog。Catalog 提供了一系列 API，例如 <code>CreateTable()</code>、<code>GetTable()</code> 等等。Catalog 维护了几张 hashmap，保存了 table id 和 table name 到 table info 的映射关系。table id 由 Catalog 在新建 table 时自动分配，table name 则由用户指定。</p>
+<p>这里的 table info 包含了一张 table 的 metadata，有 schema、name、id 和指向 table heap 的指针。系统的其他部分想要访问一张 table 时，先使用 name 或 id 从 Catalog 得到 table info，再访问 table info 中的 table heap。</p>
+<p>table heap 是管理 table 数据的结构，包含 <code>InsertTuple()</code>、<code>MarkDelete()</code> 一系列 table 相关操作。table heap 本身并不直接存储 tuple 数据，tuple 数据都存放在 table page 中。table heap 可能由多个 table page 组成，仅保存其第一个 table page 的 page id。需要访问某个 table page 时，通过 page id 经由 buffer pool 访问。</p>
+<p>table page 是实际存储 table 数据的结构，父类是 page。相较于 page，table page 多了一些新的方法。table page 在 data 的开头存放了 next page id、prev page id 等信息，将多个 table page 连成一个双向链表，便于整张 table 的遍历操作。当需要新增 tuple 时，table heap 会找到当前属于自己的最后一张 table page，尝试插入，若最后一张 table page 已满，则新建一张 table page 插入 tuple。table page 低地址存放 header，tuple 从高地址也就是 table page 尾部开始插入。</p>
+<p>tuple 对应数据表中的一行数据。每个 tuple 都由 RID 唯一标识。RID 由 page id + slot num 构成。tuple 由 value 组成，value 的个数和类型由 table info 中的 schema 指定。</p>
+<p>value 则是某个字段具体的值，value 本身还保存了类型信息。</p>
+<p>需要注意的是，executor 本身并不保存查询计划的信息，应该通过 executor 的成员 plan 来得知该如何进行本次计算，例如 SeqScanExecutor 需要向 SeqScanPlanNode 询问自己该扫描哪张表。</p>
+<p>所有要用到的系统资源，例如 Catalog，Buffer Pool 等，都由 <code>ExecutorContext</code> 提供。</p>
+<h3 id="insert--delete">Insert &amp; Delete<a hidden class="anchor" aria-hidden="true" href="#insert--delete">#</a></h3>
+<p>Insert 和 Delete 这两个算子实现起来基本一样，也比较特殊，是唯二的写算子。数据库最主要的操作就是增查删改。Bustub sql 层暂时不支持 UPDATE。Insert 和 Delete 一定是查询计划的根节点，且仅需返回一个代表修改行数的 tuple。</p>
+<p>Insert 和 Delete 时，记得要更新与 table 相关的所有 index。index 与 table 类似，同样由 Catalog 管理。需要注意的是，由于可以对不同的字段建立 index，一个 table 可能对应多个 index，所有的 index 都需要更新。</p>
+<p>Insert 时，直接将 tuple 追加至 table 尾部。Delete 时，并不是直接删除，而是将 tuple 标记为删除状态，也就是逻辑删除。（在事务提交后，再进行物理删除，Project 3 中无需实现）</p>
+<p>Insert &amp; Delete 的 <code>Next()</code> 只会返回一个包含一个 integer value 的 tuple，表示 table 中有多少行受到了影响。</p>
+<h3 id="indexscan">IndexScan<a hidden class="anchor" aria-hidden="true" href="#indexscan">#</a></h3>
+<p>使用我们在 Project 2 中实现的 B+Tree Index Iterator，遍历 B+ 树叶子节点。由于我们实现的是非聚簇索引，在叶子节点只能获取到 RID，需要拿着 RID 去 table 查询对应的 tuple。</p>
+<p>在完成 Task 1 的四个算子后，可以用已提供的 sqllogictest 工具和已提供的一些 sql 来检验自己的算子是否实现正确。</p>
+<p>关于 Task 1 的具体实现的确没太多可说的，基本是把官网的 instruction 翻译了一遍。后面几个 task 难度会稍大一点点，也会讲讲更具体的实现。</p>
+<h2 id="task-2-aggregation--join-executors">Task 2 Aggregation &amp; Join Executors<a hidden class="anchor" aria-hidden="true" href="#task-2-aggregation--join-executors">#</a></h2>
+<p>Task 2 包含了 3 个算子，Aggregation、NestedLoopJoin 和 NestedIndexJoin。</p>
+<h3 id="aggregation">Aggregation<a hidden class="anchor" aria-hidden="true" href="#aggregation">#</a></h3>
+<p>Aggregation 算子就稍微复杂一点了。先看看 <code>AggregationExecutor</code> 的成员：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cm">/** The aggregation plan node */</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="n">AggregationPlanNode</span> <span class="o">*</span><span class="n">plan_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** The child executor that produces tuples over which the aggregation is computed */</span>
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">AbstractExecutor</span><span class="o">&gt;</span> <span class="n">child_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** Simple aggregation hash table */</span>
+</span></span><span class="line"><span class="cl"><span class="n">SimpleAggregationHashTable</span> <span class="n">aht_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/** Simple aggregation hash table iterator */</span>
+</span></span><span class="line"><span class="cl"><span class="n">SimpleAggregationHashTable</span><span class="o">::</span><span class="n">Iterator</span> <span class="n">aht_iterator_</span><span class="p">;</span>
+</span></span></code></pre></div><p>主要说说这个 <code>SimpleAggregationHashTable</code>。Aggregation 是 pipeline breaker。也就是说，Aggregation 算子会打破 iteration model 的规则。原因是，在 Aggregation 的 <code>Init()</code> 函数中，我们就要将所有结果全部计算出来。原因很简单，比如下面这条 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">x</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>结果的每条 tuple 都是一个 <code>t.x</code> 的聚合，而要得到同一个 <code>t.x</code> 对应的 <code>max(t.y)</code>，必须要遍历整张表。因此，Aggregation 需要在 <code>Init()</code> 中直接计算出全部结果，将结果暂存，再在 <code>Next()</code> 中一条一条地 emit。而 <code>SimpleAggregationHashTable</code> 就是计算并保存 Aggregation 结果的数据结构。</p>
+<p><code>SimpleAggregationHashTable</code> 维护一张 hashmap，键为 <code>AggregateKey</code>，值为 <code>AggregateValue</code>，均为 <code>std::vector&lt;Value&gt;</code>。key 代表 group by 的字段的数组，value 则是需要 aggregate 的字段的数组。在下层算子传来一个 tuple 时，将 tuple 的 group by 字段和 aggregate 字段分别提取出来，调用 <code>InsertCombine()</code> 将 group by 和 aggregate 的映射关系存入 <code>SimpleAggregationHashTable</code>。若当前 hashmap 中没有 group by 的记录，则创建初值；若已有记录，则按 aggregate 规则逐一更新所有的 aggregate 字段，例如取 max/min，求 sum 等等。例如下面这条 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">z</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">z</span><span class="p">),</span><span class="w"> </span><span class="k">sum</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>group by（AggregateKey）为 <code>{t.x, t.y}</code>，aggregate（AggregateValue）为 <code>{t.z, t.z, t.z}</code>。aggregate 规则为 <code>{min, max, sum}</code>。</p>
+<p>需要额外注意的是 <code>count(column)</code> 和 <code>count(*)</code> 的区别，以及对空值的处理。另外，不需要考虑 hashmap 过大的情况，即整张 hashmap 可以驻留在内存中，不需要通过 Buffer Pool 调用 page 来存储。</p>
+<p>在 <code>Init()</code> 中计算出整张 hashmap 后，在 <code>Next()</code> 中直接利用 hashmap iterator 将结果依次取出。Aggregation 输出的 schema 形式为 group-bys + aggregates。</p>
+<h3 id="nestedloopjoin">NestedLoopJoin<a hidden class="anchor" aria-hidden="true" href="#nestedloopjoin">#</a></h3>
+<p>Project 3 中只要求实现 NestedLoopJoin，HashJoin 不做强制要求，而是放在了 Leaderboard Optional 里。实际上实现一个 in-memory 的 HashJoin 也不难。Join 应该是经典的数据库性能瓶颈。Andy 在 Lecture 里也详细地量化地对比了各种 Join 的 costs，有兴趣可以看看。</p>
+<p>NestedLoopJoin 算法本身并不难，但比较容易掉进坑里。伪代码大概是这样：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">for</span> <span class="n">outer_tuple</span> <span class="n">in</span> <span class="nl">outer_table</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">inner_tuple</span> <span class="n">in</span> <span class="nl">inner_table</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">inner_tuple</span> <span class="n">matched</span> <span class="nl">outer_tuple</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">emit</span>
+</span></span></code></pre></div><p>有了这个例子，很容易把代码写成：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="n">left_child</span><span class="o">-&gt;</span><span class="n">Next</span><span class="p">(</span><span class="o">&amp;</span><span class="n">left_tuple</span><span class="p">)){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="n">right_child</span><span class="o">-&gt;</span><span class="n">Next</span><span class="p">(</span><span class="o">&amp;</span><span class="n">right_tuple</span><span class="p">)){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">left_tuple</span> <span class="n">matches</span> <span class="n">right_tuple</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">tuple</span> <span class="o">=</span> <span class="p">...;</span>   <span class="c1">// assemble left &amp; right together
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span></code></pre></div><p>一开始看起来似乎没什么问题。然而很快可以发现有一个严重的错误，right child 在 left child 的第一次循环中就被消耗完了，之后只会返回 false。解决方法很简单，在 <code>Init()</code> 里先把 right child 里的所有 tuple 取出来暂存在一个数组里就好，之后直接访问这个数组。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="n">left_child</span><span class="o">-&gt;</span><span class="n">Next</span><span class="p">(</span><span class="o">&amp;</span><span class="n">left_tuple</span><span class="p">)){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="nl">right_tuple</span> <span class="p">:</span> <span class="n">right_tuples</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">left_tuple</span> <span class="n">matches</span> <span class="n">right_tuple</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">            <span class="o">*</span><span class="n">tuple</span> <span class="o">=</span> <span class="p">...;</span>   <span class="c1">// assemble left &amp; right together
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span></code></pre></div><p>看起来好像又没什么问题。然而，同一列是可能存在 duplicate value 的。在上层算子每次调用 NestedLoopJoin 的 <code>Next()</code> 时，NestedLoopJoin 都会向下层算子请求新的 left tuple。但有可能上一个 left tuple 还没有和 right child 中所有能匹配的 tuple 匹配完（只匹配了第一个）。</p>
+<p>例如这两张表：</p>
+<pre tabindex="0"><code>   t1          t2
+---------   ---------
+|   x   |   |   x   |
+---------   ---------
+|   1   |   |   1   |
+|   2   |   |   1   |
+|   3   |   |   2   |
+---------   ---------
+</code></pre><p>现在执行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t1</span><span class="w"> </span><span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">t2</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t2</span><span class="p">.</span><span class="n">x</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>t1 中的 1 只会和 t2 的第一个 1 匹配，产生一行输出。再下一次调用 <code>Next()</code> 时，左边会直接选取 2 开始尝试匹配。</p>
+<p>解决方法也很简单，在算子里暂存 left tuple，每次调用 <code>Next()</code> 时，先用暂存的 left tuple 尝试匹配。并且要记录上一次右表匹配到的位置，不要每次都直接从右表第一行开始匹配了。右表遍历完还没有匹配结果，再去找左表要下一个 tuple。</p>
+<p>说来说去，实际上就是注意迭代器要保存上下文信息。</p>
+<p>INNER JOIN 和 LEFT JOIN 按规则实现就好，差不多。LEFT JOIN 注意处理空值。</p>
+<p>还有一个小问题，怎么判断两个 tuple 是否匹配？这里就要第一次遇到 Project 3 里另一个重要的类 <code>AbstractExpression</code> 了。</p>
+<p><code>AbstractExpression</code> 抽象了 sql 中的各种表达式，包括 <code>ArithmeticExpression</code>、<code>ColumnValueExpression</code>、<code>ComparisonExpression</code>、<code>ConstantValueExpression</code> 和 <code>LogicExpression</code>。这都是什么？看下面这条 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t1</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>重点关注 <code>WHERE</code> 后的表达式 <code>t1.x = t1.y + 1 AND t1.y &gt; 0</code>。看这下面这张图：</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-5.png" alt=""  />
+</p>
+<p>其实就是一颗表达式树。<code>AbstractExpression</code> 就是表达式树的节点。sql 中的所有表达式都会被 parse 为表达式树，在 Binder 中进行绑定。上面的 JOIN 中也存在表达式 <code>t1.x = t2.x</code>。<code>AbstractExpression</code> 里最重要的方法就是 <code>Evaluate()</code>，返回值是 value。调用 <code>Evaluate()</code>，参数为 tuple 和 tuple 对应的 schema，返回从这个 tuple 中提取数据后代入表达式计算得到的结果。</p>
+<p>在 NestedLoopJoin 里，我们要用到的是 <code>EvaluateJoin()</code>，也差不多，只不过输入的是左右两个 tuple 和 schema。返回值是表示 true 或 false 的 value。true 则代表成功匹配。</p>
+<p>到这里，NestedLoopJoin 就成功实现了。Join 输出的 schema 为 left schema + right schema。</p>
+<p>后来我看了一下 <a href="https://github.com/risinglightdb/risinglight/blob/main/src/executor_v2/nested_loop_join.rs">RisingLight</a> 里的实现，我这个 rustacean 萌新的第一反应是惊为天人。大致是这样：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">pub</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">Execute</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">left_tuple</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">left_table</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">right_tuple</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">right_table</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">matches</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="kr">yield</span><span class="w"> </span><span class="n">AssembleOutput</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>这是一个生成器，当执行到 yield 时，函数会暂时中断，从生成器回到调用者。而调用者再次进入生成器时，可以直接回到上次中断的地方。再配合 stream，就利用 rust 的无栈协程和异步编程完美地实现了一个 NestedLoopJoin 算子，比手动保存上下文信息优雅太多了。</p>
+<p>后来仔细想想，Go 也可以有类似的写法：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Executor</span><span class="p">(</span><span class="nx">out_ch</span><span class="p">,</span> <span class="nx">left_ch</span><span class="p">,</span> <span class="nx">right_ch</span> <span class="kd">chan</span> <span class="nx">Tuple</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// fetch right tuples from right_ch
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">right_tuples</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">Tuple</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">right_tuple</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">right_ch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">right_tuples</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">right_tuples</span><span class="p">,</span> <span class="nx">right_tuple</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">left_tuple</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">left_ch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">right_tuple</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">right_tuples</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="nx">matches</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">out_ch</span> <span class="o">&lt;-</span> <span class="nf">AssembleOutput</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">close</span><span class="p">(</span><span class="nx">out_ch</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>每个算子都是一个 goroutine，通过 channel 实现异步的计算，好像也不错。</p>
+<h3 id="nestedindexjoin">NestedIndexJoin<a hidden class="anchor" aria-hidden="true" href="#nestedindexjoin">#</a></h3>
+<p>在进行 equi-join 时，如果发现 JOIN ON 右边的字段上建了 index，则 Optimizer 会将 NestedLoopJoin 优化为 NestedIndexJoin。具体实现和 NestedLoopJoin 差不多，只是在尝试匹配右表 tuple 时，会拿 join key 去 B+Tree Index 里进行查询。如果查询到结果，就拿着查到的 RID 去右表获取 tuple 然后装配成结果输出。其他的就不再多说了。</p>
+<h2 id="task-3-sort--limit-executors-and-top-n-optimization">Task 3 Sort + Limit Executors and Top-N Optimization<a hidden class="anchor" aria-hidden="true" href="#task-3-sort--limit-executors-and-top-n-optimization">#</a></h2>
+<p>Task 3 中要实现 3 个算子，Sort、Limit 和 TopN，以及将 Limit + Sort 在 Optimizer 中优化为 TopN。</p>
+<h3 id="sort">Sort<a hidden class="anchor" aria-hidden="true" href="#sort">#</a></h3>
+<p>Sort 也是 pipeline breaker。在 <code>Init()</code> 中读取所有下层算子的 tuple，并按 ORDER BY 的字段升序或降序排序。Sort 算子说起来比较简单，实现也比较简单，主要需要自定义 <code>std::sort()</code>。</p>
+<p><code>std::sort()</code> 的第三个参数可以传入自定义的比较函数。直接传入一个 lambda 匿名函数。由于要访问成员 <code>plan_</code> 来获取排序的字段，lambda 需要捕获 this 指针。另外，排序字段可以有多个，按先后顺序比较。第一个不相等，直接得到结果；相等，则比较第二个。不会出现所有字段全部相等的情况。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">sort</span><span class="p">(</span><span class="n">sorted_tuples_</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">sorted_tuples_</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="k">const</span> <span class="n">Tuple</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tuple</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="p">[</span><span class="n">order_by_type</span><span class="p">,</span> <span class="n">expr</span><span class="p">]</span> <span class="o">:</span> <span class="n">plan_</span><span class="o">-&gt;</span><span class="n">GetOrderBy</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// compare and return ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">UNREACHABLE</span><span class="p">(</span><span class="s">&#34;doesn&#39;t support duplicate key&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></div><h3 id="limit">Limit<a hidden class="anchor" aria-hidden="true" href="#limit">#</a></h3>
+<p>和 SeqScan 基本一模一样，只不过在内部维护一个 count，记录已经 emit 了多少 tuple。当下层算子空了或 count 达到规定上限后，不再返回新的 tuple。</p>
+<h3 id="topn">TopN<a hidden class="anchor" aria-hidden="true" href="#topn">#</a></h3>
+<p>仅需返回最大/最小的 n 个 tuple。一开始想着要实现一个 fixed-size priority queue，即 queue 大小超过限制时自动抛弃最后一个元素以减小内存占用，但后来实在不想自己重写一遍二叉堆，就开摆了。直接用 <code>std::priority_queue</code> 加自定义比较函数，然后在 <code>Init()</code> 中遍历下层算子所有 tuple，全部塞进优先队列后截取前 n 个。再 <code>Next()</code> 里一个一个输出。（是不是和 Limit + Sort 没什么区别？都是 O(nlogn)</p>
+<h3 id="sort--limit-as-topn">Sort + Limit As TopN<a hidden class="anchor" aria-hidden="true" href="#sort--limit-as-topn">#</a></h3>
+<p>这是 Project 3 里最后一个必做的小问。终于不是实现算子了，而是在 Optimizer 里增加一条规则，将 Sort + Limit 优化为 TopN。先看看 Optimizer 是如何执行优化规则的：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">Optimizer</span><span class="o">::</span><span class="n">OptimizeCustom</span><span class="p">(</span><span class="k">const</span> <span class="n">AbstractPlanNodeRef</span> <span class="o">&amp;</span><span class="n">plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractPlanNodeRef</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">p</span> <span class="o">=</span> <span class="n">plan</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeMergeProjection</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeMergeFilterNLJ</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeNLJAsIndexJoin</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeNLJAsHashJoin</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>  <span class="c1">// Enable this rule after you have implemented hash join.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeOrderByAsIndexScan</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">OptimizeSortLimitAsTopN</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>  <span class="c1">// what we should add
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>可以看到，让未经优化的原始 plan 树依次经历多条规则，来生成优化过的 plan。我们的任务就是新增一条规则。看看其他规则是怎么实现的，例如 <code>NLJAsIndexJoin</code>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">Optimizer</span><span class="o">::</span><span class="n">OptimizeNLJAsIndexJoin</span><span class="p">(</span><span class="k">const</span> <span class="n">AbstractPlanNodeRef</span> <span class="o">&amp;</span><span class="n">plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractPlanNodeRef</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">AbstractPlanNodeRef</span><span class="o">&gt;</span> <span class="n">children</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">child</span> <span class="p">:</span> <span class="n">plan</span><span class="o">-&gt;</span><span class="n">GetChildren</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">children</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">(</span><span class="n">OptimizeNLJAsIndexJoin</span><span class="p">(</span><span class="n">child</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">optimized_plan</span> <span class="o">=</span> <span class="n">plan</span><span class="o">-&gt;</span><span class="n">CloneWithChildren</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">children</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">optimized_plan</span><span class="o">-&gt;</span><span class="n">GetType</span><span class="p">()</span> <span class="o">==</span> <span class="n">PlanType</span><span class="o">::</span><span class="n">NestedLoopJoin</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// apply the rule and return
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">optimized_plan</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>可以看到，实际上就是对 plan tree 进行后序遍历，自底向上地适用规则，改写节点。遍历到某个节点时，通过 if 语句来判断当前节点的类型是否符合我们要优化的类型，若符合则进行优化。</p>
+<p>大致了解如何对 plan 进行优化后，就可以开始写我们的优化规则了。需要特别注意的是，能优化为一个 TopN 算子的形式是，上层节点为 Limit，下层节点为 Sort，不能反过来。同样，我们对 plan tree 进行后续遍历，在遇到 Limit 时，判断其下层节点是否为 Sort，若为 Sort，则将这两个节点替换为一个 TopN。还是比较好实现的，只是代码看起来可能有点复杂。</p>
+<p>到这里，Project 3 中必做的部分就结束了。还剩下选做的 Leaderboard Task。本来也不是 CMU 的学生，就不分什么必做选做了，感兴趣的话都推荐试一试。我个人感觉 Leaderboard Task 还是很好玩的，就是代码写起来有点难受，corner case 比较多。</p>
+<h2 id="leaderboard-task">Leaderboard Task<a hidden class="anchor" aria-hidden="true" href="#leaderboard-task">#</a></h2>
+<p>Leaderboard Task 包含三条极其诡异的 sql，我们要做的就是增加新的优化规则，让这三条 sql 执行地越快越好。分三个部分：</p>
+<ul>
+<li>Query 1: Where&rsquo;s the Index?</li>
+<li>Query 2: Too Many Joins!</li>
+<li>Query 3: The Mad Data Scientist</li>
+</ul>
+<h3 id="query-1-wheres-the-index">Query 1: Where&rsquo;s the Index?<a hidden class="anchor" aria-hidden="true" href="#query-1-wheres-the-index">#</a></h3>
+<p>首先来看一看需要我们优化的 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">t1x</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">t1_50k</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t1_50k</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t1_50k</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t2_100k</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t2_100k</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t3_1k</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t3_1k</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t1_50k</span><span class="w"> </span><span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">__mock_t2_100k</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">t1_50k</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__mock_t2_100k</span><span class="p">.</span><span class="n">x</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">__mock_t3_1k</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">__mock_t2_100k</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__mock_t3_1k</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>稍微把表名替换一下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">t1x</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">t1</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t2</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t2</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t3</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t3</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t1</span><span class="w"> </span><span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">t2</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">t1</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t2</span><span class="p">.</span><span class="n">x</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">t3</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">t2</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t3</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>看的我有点精神恍惚，实际上就是三张表 Join 再 Aggregate 一下。主要优化方向是把 NestedLoopJoin 替换为 HashJoin、Join Reorder 让小表驱动大表，以及正确识别 t1.x 上的索引。</p>
+<p>先说 HashJoin。实际上仅需考虑 in-memory 情况时，HashJoin 并不难实现。主要分为两个步骤，Build 和 Probe。Build 阶段在 <code>Init()</code> 进行，遍历左表建立 hashmap。Probe 阶段在 <code>Next()</code> 进行，遍历右表探测是否有 match 的 tuple。需要注意 HashJoin 只能用于优化 equi-join。</p>
+<p>具体实现起来，对于我这种对 modern c++ 极不熟悉的人来说，难点反而在怎么正确构造出这个 hashmap 让编译通过。hashmap 的键应该为 value，但 value 没有重载 <code>operator==</code>，也没有实现自定义 hash 函数，不能直接作为键。</p>
+<p>一开始，我想用 <code>src/include/common/util/hash_util.h</code> 里的 <code>HashValue</code> 函数将 value hash 为 <code>hash_t</code> 类型，然后把 <code>hash_t</code> 作为键。hashmap 直接用 <code>std::unordered_map</code>。但遇到了哈希冲突的问题，还是绕不过要重载 <code>operator==</code>。直接重载 value 的 <code>operator==</code> 是行不通的，autograder 无法识别。因此我定义了 <code>ValueKey</code> 类型把 value 包裹起来，为 <code>ValueKey</code> 重载 == 并实现 hash 函数。这样就可以直接用 ValueKey 作为 hashmap 的键了。至于 <code>operator==</code> 的具体实现，需要关注一下 <code>Value</code> 类的结构，取出 value 的 raw data 并 cast 为正确类型进行比较。同样，hash 函数也是对 raw data 进行 hash。</p>
+<p>hashmap 的值是什么？注意不是 tuple，而是 tuple 数组。同样，因为可能存在 duplicate。</p>
+<p>HashJoin 的实现大致如此，接下来是 Join Reorder。</p>
+<p>Join Reorder 其实比较简单，可以调用 <code>EstimatedCardinality()</code> 来估计 table 的大小，然后根据大小来调整 plan tree 里连续 join 的顺序即可。</p>
+<p>最后是 Correctly Pick up Index。在原始 NLJAsIndexJoin 里，始终只会尝试为右表匹配 index，左表则被忽略。因此，可以新建一条规则，如果左表有 index，右表没有，且为 equi-join，则把左右顺序替换一下，即有索引的左表换到右边，便于之后正确识别索引。然而我在实现后发现，这是一个负优化（，可能大部分情况下还是 HashJoin 比较靠谱。</p>
+<h3 id="query-2-too-many-joins">Query 2: Too Many Joins!<a hidden class="anchor" aria-hidden="true" href="#query-2-too-many-joins">#</a></h3>
+<p>先看看 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t4_1m</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t4_1m</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t5_1m</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t5_1m</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t6_1m</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">__mock_t6_1m</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">__mock_t4_1m</span><span class="p">,</span><span class="w"> </span><span class="n">__mock_t5_1m</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">__mock_t4_1m</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__mock_t5_1m</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">__mock_t6_1m</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="n">__mock_t6_1m</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__mock_t5_1m</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">__mock_t4_1m</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1000000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">__mock_t4_1m</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1500000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">__mock_t6_1m</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">150000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">__mock_t6_1m</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">100000</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><p>更精神恍惚了，简化一下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t4</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t4</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t5</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t5</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t6</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">t6</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">t4</span><span class="p">,</span><span class="w"> </span><span class="n">t5</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">t4</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t5</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">t6</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="n">t6</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t5</span><span class="p">.</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">t4</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1000000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">t4</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1500000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">t6</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">150000</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="n">t6</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">100000</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><p>这大概是个什么东西呢，大概是所有的 JOIN 全部写成了 FULL JOIN，然后把所有 Filter 放在了 plan tree 的顶端。原始执行计划是这样的：</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-6.png" alt=""  />
+</p>
+<p>需要优化的内容还是比较明显的，Filter Push-down，将 Filter 尽可能地下推至数据源处。需要注意不是所有的 Filter 都可以下推。在本例中，我们只需要把 Filter 正确下推至 Join 算子下就可以了。最终产生的优化方案大致是这样：</p>
+<p><img loading="lazy" src="../../imgs/15-445-3-7.png" alt=""  />
+</p>
+<p>注意要将 Filter 的 predicate 语句正确分类，下推至正确的分支。</p>
+<p>在实现 Filter Push-down 时，一开始我和之前一样，进行后序遍历，自底向上地改写，但是发现这样似乎不能将 Filter 完全地下推，因为一个 Filter 被下推一次后，就无法被再次访问到了，只能被下推一次。因此这次我改用了先序遍历，自顶向下地改写。当下推一个 Filter 后，由于是向下遍历，Filter 还能被再次访问到，可以被继续下推。</p>
+<p>需要注意的时，我们下推的不是整个 Filter 节点，实际上是节点中的 predicate。我的做法是遍历表达式树，提取 predicate 中的所有 comparison，判断表达式的两边是否一个是 column value，一个是 const value，只有这样的 predicate 可以被下推（也存在其他形式的可以下推的 predicate，由于在这里只是对 optimizer 的体验，也只用优化预先给出的 sql，可以稍微简化一下算法，不用考虑太多的 corner case），再将所有的 predicate 重新组合为 logic expression，生成新的 Filter，根据 column value 的 idx 来选择下推的分支。</p>
+<p>两边都为 column value 且分别代表左右两个下层算子的某一列的 Filter 可以被结合到 Join 节点中作为 Join 条件。这一步的规则已经被实现好了，因此这种 Filter 我们让其停留在原地即可。</p>
+<h3 id="query-3-the-mad-data-scientist">Query 3: The Mad Data Scientist<a hidden class="anchor" aria-hidden="true" href="#query-3-the-mad-data-scientist">#</a></h3>
+<p>看看 sql：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">d1</span><span class="p">,</span><span class="w"> </span><span class="n">d2</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">d1</span><span class="p">,</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">d2</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v1</span><span class="p">),</span><span class="w"> </span><span class="k">max</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="k">min</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">from</span><span class="w"> </span><span class="n">__mock_t7</span><span class="w"> </span><span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="p">(</span><span class="k">select</span><span class="w"> </span><span class="n">v4</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">__mock_t8</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">v4</span><span class="w"> </span><span class="k">group</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">v</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><p>很怀疑迟先生在写这条 sql 时的精神状态。</p>
+<p>实际上，我们只用 <code>SELECT v, d1, d2</code>，其余的数据都是多余的，无需计算。因此我们需要实现 Column Pruning 优化。</p>
+<p>我实现的 Column Pruning 包括两个部分：</p>
+<ol>
+<li>遇到连续的两个 Projection，合并为 1 个，只取上层 Projection 所需列。</li>
+<li>遇到 Projection + Aggregation，改写 aggregates，截取 Projection 中需要的项目，其余直接抛弃。</li>
+</ol>
+<p>同样地，我个人认为 Column Pruning 也是自顶向下地改写比较方便。具体实现是收集 Projection 里的所有 column，然后改写下层节点，仅保留上层需要 project 的 column。这里的 column 不一定是表中的 column，而是一种广义的 column，例如 <code>SELECT t1.x + t1.y FROM t1</code> 中的 <code>t1.x + t1.y</code>。</p>
+<p>另外，我们注意到这条 sql 里有一个永为假的 predicate <code>where 1 == 2</code>。对于这种 Filter，我们可以将其优化为 DummyScan，即第一次调用 <code>Next()</code> 就返回 false。可以用一个空的 Value 算子实现。</p>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h2>
+<p>至此，Project 3 就全部完成了。总的来说体验还是很好的，实现了一系列算子，也实现了一系列的优化规则，对查询引擎有了更清晰的认识。</p>
+<p>同样地，有很多实现上具体的细节也忽略掉了，比如如何装配一个中间 tuple，类型系统的设计，table page 的设计等等。这些都与主线关系不大，也就不再唠叨了。</p>
+<p>另外，在测试的过程中，意外发现 Bustub 的 OR 语句无法正确执行，一路找 bug 找上去发现是 Binder 中的一个小 typo，向 Bustub 提了 PR，也被 merge 了。算是为开源课程做了一点微微微小的贡献吧。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/database/">Database</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cmu15-445-project4-concurrency-control/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>CMU15-445 Project4 Concurrency Control</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/cmu15-445-project2-b&#43;tree-index/">
+    <span class="title">Next »</span>
+    <br>
+    <span>CMU15-445 Project2 B&#43;Tree Index</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

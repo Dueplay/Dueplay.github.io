@@ -1,0 +1,409 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>cmake Tutorial | Cookie's Blog</title>
+<meta name=keywords content="cmake"><meta name=description content="介绍cmake的使用"><meta name=author content="Me"><link rel=canonical href=https://canonical.url/to/page><link crossorigin=anonymous href=/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css integrity="sha256-7I2jZsovtkdTfMt6j2+ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as=style><script defer crossorigin=anonymous src=/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY=" onload=hljs.initHighlightingOnLoad()></script><link rel=icon href=https://dueplay.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=https://dueplay.github.io/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=https://dueplay.github.io/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=https://dueplay.github.io/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=https://dueplay.github.io/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://dueplay.github.io/posts/cmake/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script><script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-4XHWHM02GB",{anonymize_ip:!1})}</script><meta property="og:title" content="cmake Tutorial"><meta property="og:description" content="介绍cmake的使用"><meta property="og:type" content="article"><meta property="og:url" content="https://dueplay.github.io/posts/cmake/"><meta property="og:image" content="https://dueplay.github.io/%3Cimage%20path/url%3E"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-03-25T14:42:01+08:00"><meta property="article:modified_time" content="2023-03-25T14:42:01+08:00"><meta property="og:site_name" content="ExampleSite"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://dueplay.github.io/%3Cimage%20path/url%3E"><meta name=twitter:title content="cmake Tutorial"><meta name=twitter:description content="介绍cmake的使用"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://dueplay.github.io/posts/"},{"@type":"ListItem","position":2,"name":"cmake Tutorial","item":"https://dueplay.github.io/posts/cmake/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"cmake Tutorial","name":"cmake Tutorial","description":"介绍cmake的使用","keywords":["cmake"],"articleBody":"文件目录结构 $ tree . ├── add.c ├── div.c ├── head.h ├── main.c ├── mult.c └── sub.c # 指定使用的 cmake 的最低版本，可选，非必须，如果不加可能会有警告 cmake_minimum_required(VERSION 3.0) # 定义工程名称，并可指定工程的版本、工程描述、web主页地址、支持的语言 project(CALC) # 定义工程会生成一个可执行程序，语法add_executable(可执行程序名 源文件名称) add_executable(app add.c div.c main.c mult.c sub.c) # 定义变量，语法: set(VAR VALUE [CACHE TYPE DOCSTRING [FORCE]]).[]里是可选的 # eg.将文件名对应字符串存起来。 # 方式1: 各个源文件之间使用空格间隔 # set(SRC_LIST add.c div.c main.c mult.c sub.c) # 方式2: 各个源文件之间使用分号 ; 间隔 set(SRC_LIST add.c;div.c;main.c;mult.c;sub.c) add_executable(app ${SRC_LIST}) # 指定c++标准 # 使用g++时: $ g++ *.cpp -std=c++11 -o app # C++标准对应有一宏叫做DCMAKE_CXX_STANDARD，在CMake中想要指定C++标准有两种方式： # 在cmakelists.txt中通过 set 命令指定 # 增加-std=c++11 set(CMAKE_CXX_STANDARD 11) # 增加-std=c++14 set(CMAKE_CXX_STANDARD 14) # 增加-std=c++17 set(CMAKE_CXX_STANDARD 17) # 在执行 cmake 命令的时候指定出这个宏的值，-D表示定义宏 #增加-std=c++11 cmake CMakeLists.txt文件路径 -DCMAKE_CXX_STANDARD=11 #增加-std=c++14 cmake CMakeLists.txt文件路径 -DCMAKE_CXX_STANDARD=14 #增加-std=c++17 cmake CMakeLists.txt文件路径 -DCMAKE_CXX_STANDARD=17 # 指定输出的路径，在CMake中指定可执行程序输出的路径，也对应一个宏，叫做EXECUTABLE_OUTPUT_PATH，它的值还是通过set命令进行设置 set(HOME /home/gxj/Linux/Sort) set(EXECUTABLE_OUTPUT_PATH ${HOME}/bin) # 第一行：定义一个变量用于存储一个绝对路径 # 第二行：将拼接好的路径值设置给EXECUTABLE_OUTPUT_PATH宏 # 如果这个路径中的子目录不存在，会自动生成，无需自己手动创建 # 使用相对路径时，./表示生成的makefile所在目录 # 搜索文件 # 如果一个项目里边的源文件很多，在编写CMakeLists.txt文件的时候不可能将项目目录的各个文件一一罗列出来，这样太麻烦也不现实。所以，在CMake中为我们提供了搜索文件的命令，可以使用aux_source_directory命令或者file命令。 # 使用aux_source_directory 命令可以查找某个路径下的所有源文件，命令格式为： aux_source_directory(\u003c dir \u003e \u003c variable \u003e) dir：要搜索的目录 variable：将从dir目录下搜索到的源文件列表存储到该变量中 # 搜索 src 目录下的源文件 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SRC_LIST) add_executable(app ${SRC_LIST}) # 使用file 命令 (当然，除了搜索以外通过 file 还可以做其他事情) file(GLOB/GLOB_RECURSE 变量名 要搜索的文件路径和文件类型) GLOB: 将指定目录下搜索到的满足条件的所有文件名生成一个列表，并将其存储到变量中。 GLOB_RECURSE：递归搜索指定目录，将搜索到的满足条件的文件名生成一个列表，并将其存储到变量中。 搜索当前目录的src目录下所有的源文件，并存储到变量中 file(GLOB MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp) file(GLOB MAIN_HEAD ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h) CMAKE_CURRENT_SOURCE_DIR 宏表示当前访问的 CMakeLists.txt 文件所在的路径。 要搜索的文件路径和类型可加双引号，也可不加: file(GLOB MAIN_HEAD \"${CMAKE_CURRENT_SOURCE_DIR}/src/*.h\") # 包含头文件 # 在编译项目源文件的时候，很多时候都需要将源文件对应的头文件路径指定出来，这样才能保证在编译过程中编译器能够找到这些头文件，并顺利通过编译。在CMake中设置要包含的目录也很简单，通过include_directories命令 include_directories(headpath) # 指定就是头文件的路径为项目根目录下面的include include_directories(${PROJECT_SOURCE_DIR}/include) PROJECT_SOURCE_DIR宏对应的值就是我们在使用cmake命令时，后面紧跟的目录，一般是工程的根目录。 # 制作动态库或静态库，源代码并不需要将他们编译生成可执行程序，而是生成一些静态库或动态库提供给第三方使用，下面来是在cmake中生成这两类库文件的方法。 # 在cmake中，如果要制作静态库，需要使用的命令如下：静态库名字分为三部分：lib+库名字+.a，此处只需要指定出库的名字就可以了 add_library(库名称 STATIC 源文件1 [源文件2] ...) # eg include_directories(${PROJECT_SOURCE_DIR}/include) file(GLOB SRC_LIST \"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp\") add_library(calc STATIC ${SRC_LIST}) # 要制作动态库，需要使用的命令如下，动态库名字分为三部分：lib+库名字+.so，此处只需要指定出库的名字就可以了，另外两部分在生成该文件的时候会自动填充。 add_library(库名称 SHARED 源文件1 [源文件2] ...) add_library(calc SHARED ${SRC_LIST}) # 指定库输出的路径 # 方式1 - 适用于动态库 对于生成的库文件来说和可执行程序一样都可以指定输出路径。由于在Linux下生成的动态库默认是有执行权限的，所以可以按照生成可执行程序的方式去指定它生成的目录： # 设置动态库生成路径，其实就是通过set命令给EXECUTABLE_OUTPUT_PATH宏设置了一个路径，这个路径就是可执行文件生成的路径 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib) add_library(calc SHARED ${SRC_LIST}) # 方式2 - 都适用 由于在Linux下生成的静态库默认不具有可执行权限，所以在指定静态库生成的路径的时候就不能使用EXECUTABLE_OUTPUT_PATH宏了，而应该使用LIBRARY_OUTPUT_PATH，这个宏对应静态库文件和动态库文件都适用。 # 设置动态库/静态库生成路径 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib) # 生成动态库 #add_library(calc SHARED ${SRC_LIST}) # 生成静态库 add_library(calc STATIC ${SRC_LIST}) # 包含库文件 # 链接静态库的命令如下：参数1：指定出要链接的静态库的名字，可以是全名 libxxx.a，也可以是掐头（lib）去尾（.a）之后的名字 xxx。参数2-N：要链接的其它静态库的名字 link_libraries(","wordCount":"869","inLanguage":"en","image":"https://dueplay.github.io/%3Cimage%20path/url%3E","datePublished":"2023-03-25T14:42:01+08:00","dateModified":"2023-03-25T14:42:01+08:00","author":{"@type":"Person","name":"Me"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://dueplay.github.io/posts/cmake/"},"publisher":{"@type":"Organization","name":"Cookie's Blog","logo":{"@type":"ImageObject","url":"https://dueplay.github.io/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://dueplay.github.io/ accesskey=h title="Home (Alt + H)">Home</a>
+<span class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><ul class=lang-switch><li>|</li></ul></span></div><ul id=menu><li><a href=https://dueplay.github.io/archives/ title=⏱archives><span>⏱archives</span></a></li><li><a href=https://dueplay.github.io/search/ title=🔍Search><span>🔍Search</span></a></li><li><a href=https://dueplay.github.io/tags/ title=🔖Tags><span>🔖Tags</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=https://dueplay.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://dueplay.github.io/posts/>Posts</a></div><h1 class=post-title>cmake Tutorial</h1><div class=post-description>介绍cmake的使用</div><div class=post-meta>&lt;span title='2023-03-25 14:42:01 +0800 +0800'>2023-03-25&lt;/span>&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;869 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href=https://github.com/Dueplay/blog/content/posts/cmake.md rel="noopener noreferrer" target=_blank>Suggest Changes</a></div></header><div class=toc><details><summary accesskey=c title="(Alt + C)"><span class=details>Table of Contents</span></summary><div class=inner><nav id=TableOfContents><ul><li><ul><li><a href=#文件目录结构>文件目录结构</a></li><li><a href=#执行cmake>执行cmake</a></li><li><a href=#cmake-311-fetchcontent模块>CMake 3.11 FetchContent模块</a></li></ul></li></ul></nav></div></details></div><div class=post-content><h3 id=文件目录结构>文件目录结构<a hidden class=anchor aria-hidden=true href=#文件目录结构>#</a></h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ tree
+</span></span><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├── add.c
+</span></span><span class=line><span class=cl>├── div.c
+</span></span><span class=line><span class=cl>├── head.h
+</span></span><span class=line><span class=cl>├── main.c
+</span></span><span class=line><span class=cl>├── mult.c
+</span></span><span class=line><span class=cl>└── sub.c
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmake data-lang=cmake><span class=line><span class=cl><span class=c># 指定使用的 cmake 的最低版本，可选，非必须，如果不加可能会有警告
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 定义工程名称，并可指定工程的版本、工程描述、web主页地址、支持的语言
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>project</span><span class=p>(</span><span class=s>CALC</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 定义工程会生成一个可执行程序，语法add_executable(可执行程序名 源文件名称)
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span> <span class=s>add.c</span> <span class=s>div.c</span> <span class=s>main.c</span> <span class=s>mult.c</span> <span class=s>sub.c</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 定义变量，语法: set(VAR VALUE [CACHE TYPE DOCSTRING [FORCE]]).[]里是可选的
+</span></span></span><span class=line><span class=cl><span class=c># eg.将文件名对应字符串存起来。
+</span></span></span><span class=line><span class=cl><span class=c># 方式1: 各个源文件之间使用空格间隔
+</span></span></span><span class=line><span class=cl><span class=c># set(SRC_LIST add.c  div.c   main.c  mult.c  sub.c)
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 方式2: 各个源文件之间使用分号 ; 间隔
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>SRC_LIST</span> <span class=s>add.c;div.c;main.c;mult.c;sub.c</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span>  <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定c++标准
+</span></span></span><span class=line><span class=cl><span class=c># 使用g++时: $ g++ *.cpp -std=c++11 -o app
+</span></span></span><span class=line><span class=cl><span class=c># C++标准对应有一宏叫做DCMAKE_CXX_STANDARD，在CMake中想要指定C++标准有两种方式：
+</span></span></span><span class=line><span class=cl><span class=c># 在cmakelists.txt中通过 set 命令指定
+</span></span></span><span class=line><span class=cl><span class=c># 增加-std=c++11
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>CMAKE_CXX_STANDARD</span> <span class=s>11</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 增加-std=c++14
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>CMAKE_CXX_STANDARD</span> <span class=s>14</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 增加-std=c++17
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>CMAKE_CXX_STANDARD</span> <span class=s>17</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 在执行 cmake 命令的时候指定出这个宏的值，-D表示定义宏
+</span></span></span><span class=line><span class=cl><span class=c>#增加-std=c++11
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>cmake</span> <span class=err>CMakeLists.txt文件路径</span> <span class=err>-DCMAKE_CXX_STANDARD=11
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c>#增加-std=c++14
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>cmake</span> <span class=err>CMakeLists.txt文件路径</span> <span class=err>-DCMAKE_CXX_STANDARD=14
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c>#增加-std=c++17
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>cmake</span> <span class=err>CMakeLists.txt文件路径</span> <span class=err>-DCMAKE_CXX_STANDARD=17
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定输出的路径，在CMake中指定可执行程序输出的路径，也对应一个宏，叫做EXECUTABLE_OUTPUT_PATH，它的值还是通过set命令进行设置
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>HOME</span> <span class=s>/home/gxj/Linux/Sort</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>set</span><span class=p>(</span><span class=s>EXECUTABLE_OUTPUT_PATH</span> <span class=o>${</span><span class=nv>HOME</span><span class=o>}</span><span class=s>/bin</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 第一行：定义一个变量用于存储一个绝对路径
+</span></span></span><span class=line><span class=cl><span class=c># 第二行：将拼接好的路径值设置给EXECUTABLE_OUTPUT_PATH宏
+</span></span></span><span class=line><span class=cl><span class=c># 如果这个路径中的子目录不存在，会自动生成，无需自己手动创建
+</span></span></span><span class=line><span class=cl><span class=c># 使用相对路径时，./表示生成的makefile所在目录
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 搜索文件
+</span></span></span><span class=line><span class=cl><span class=c># 如果一个项目里边的源文件很多，在编写CMakeLists.txt文件的时候不可能将项目目录的各个文件一一罗列出来，这样太麻烦也不现实。所以，在CMake中为我们提供了搜索文件的命令，可以使用aux_source_directory命令或者file命令。
+</span></span></span><span class=line><span class=cl><span class=c># 使用aux_source_directory 命令可以查找某个路径下的所有源文件，命令格式为：
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>aux_source_directory</span><span class=p>(</span><span class=s>&lt;</span> <span class=s>dir</span> <span class=s>&gt;</span> <span class=s>&lt;</span> <span class=s>variable</span> <span class=s>&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>dir：要搜索的目录
+</span></span></span><span class=line><span class=cl><span class=err>variable：将从dir目录下搜索到的源文件列表存储到该变量中
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 搜索 src 目录下的源文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>aux_source_directory</span><span class=p>(</span><span class=o>${</span><span class=nv>CMAKE_CURRENT_SOURCE_DIR</span><span class=o>}</span><span class=s>/src</span> <span class=s>SRC_LIST</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span>  <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 使用file 命令 (当然，除了搜索以外通过 file 还可以做其他事情)
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB/GLOB_RECURSE</span> <span class=s>变量名</span> <span class=s>要搜索的文件路径和文件类型</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>GLOB:</span> <span class=err>将指定目录下搜索到的满足条件的所有文件名生成一个列表，并将其存储到变量中。
+</span></span></span><span class=line><span class=cl><span class=err>GLOB_RECURSE：递归搜索指定目录，将搜索到的满足条件的文件名生成一个列表，并将其存储到变量中。
+</span></span></span><span class=line><span class=cl><span class=err>搜索当前目录的src目录下所有的源文件，并存储到变量中
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>MAIN_SRC</span> <span class=o>${</span><span class=nv>CMAKE_CURRENT_SOURCE_DIR</span><span class=o>}</span><span class=s>/src/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>MAIN_HEAD</span> <span class=o>${</span><span class=nv>CMAKE_CURRENT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include/*.h</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>CMAKE_CURRENT_SOURCE_DIR</span> <span class=err>宏表示当前访问的</span> <span class=err>CMakeLists.txt</span> <span class=err>文件所在的路径。
+</span></span></span><span class=line><span class=cl><span class=err>要搜索的文件路径和类型可加双引号，也可不加:
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>MAIN_HEAD</span> <span class=s2>&#34;${CMAKE_CURRENT_SOURCE_DIR}/src/*.h&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含头文件
+</span></span></span><span class=line><span class=cl><span class=c># 在编译项目源文件的时候，很多时候都需要将源文件对应的头文件路径指定出来，这样才能保证在编译过程中编译器能够找到这些头文件，并顺利通过编译。在CMake中设置要包含的目录也很简单，通过include_directories命令
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include_directories</span><span class=p>(</span><span class=s>headpath</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定就是头文件的路径为项目根目录下面的include
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>PROJECT_SOURCE_DIR宏对应的值就是我们在使用cmake命令时，后面紧跟的目录，一般是工程的根目录。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 制作动态库或静态库，源代码并不需要将他们编译生成可执行程序，而是生成一些静态库或动态库提供给第三方使用，下面来是在cmake中生成这两类库文件的方法。
+</span></span></span><span class=line><span class=cl><span class=c># 在cmake中，如果要制作静态库，需要使用的命令如下：静态库名字分为三部分：lib+库名字+.a，此处只需要指定出库的名字就可以了
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_library</span><span class=p>(</span><span class=s>库名称</span> <span class=s>STATIC</span> <span class=s>源文件1</span> <span class=s>[源文件2]</span> <span class=s>...</span><span class=p>)</span> <span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># eg
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_LIST</span> <span class=s2>&#34;${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_library</span><span class=p>(</span><span class=s>calc</span> <span class=s>STATIC</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 要制作动态库，需要使用的命令如下，动态库名字分为三部分：lib+库名字+.so，此处只需要指定出库的名字就可以了，另外两部分在生成该文件的时候会自动填充。
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_library</span><span class=p>(</span><span class=s>库名称</span> <span class=s>SHARED</span> <span class=s>源文件1</span> <span class=s>[源文件2]</span> <span class=s>...</span><span class=p>)</span> <span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_library</span><span class=p>(</span><span class=s>calc</span> <span class=s>SHARED</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定库输出的路径
+</span></span></span><span class=line><span class=cl><span class=c># 方式1 - 适用于动态库
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>对于生成的库文件来说和可执行程序一样都可以指定输出路径。由于在Linux下生成的动态库默认是有执行权限的，所以可以按照生成可执行程序的方式去指定它生成的目录：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 设置动态库生成路径，其实就是通过set命令给EXECUTABLE_OUTPUT_PATH宏设置了一个路径，这个路径就是可执行文件生成的路径
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>EXECUTABLE_OUTPUT_PATH</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/lib</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_library</span><span class=p>(</span><span class=s>calc</span> <span class=s>SHARED</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 方式2 - 都适用
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>由于在Linux下生成的静态库默认不具有可执行权限，所以在指定静态库生成的路径的时候就不能使用EXECUTABLE_OUTPUT_PATH宏了，而应该使用LIBRARY_OUTPUT_PATH，这个宏对应静态库文件和动态库文件都适用。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 设置动态库/静态库生成路径
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>LIBRARY_OUTPUT_PATH</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/lib</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 生成动态库
+</span></span></span><span class=line><span class=cl><span class=c>#add_library(calc SHARED ${SRC_LIST})
+</span></span></span><span class=line><span class=cl><span class=c># 生成静态库
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_library</span><span class=p>(</span><span class=s>calc</span> <span class=s>STATIC</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含库文件
+</span></span></span><span class=line><span class=cl><span class=c># 链接静态库的命令如下：参数1：指定出要链接的静态库的名字，可以是全名 libxxx.a，也可以是掐头（lib）去尾（.a）之后的名字 xxx。参数2-N：要链接的其它静态库的名字
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>link_libraries</span><span class=p>(</span><span class=s>&lt;static</span> <span class=s>lib&gt;</span> <span class=s>[&lt;static</span> <span class=s>lib&gt;...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>如果该静态库不是系统提供的（自己制作或者使用第三方提供的静态库）可能出现静态库找不到的情况，此时可以将静态库的路径也指定出来：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>link_directories</span><span class=p>(</span><span class=s>&lt;lib</span> <span class=s>path&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含静态库路径
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>link_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/lib</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 链接静态库
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>link_libraries</span><span class=p>(</span><span class=s>calc</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 链接动态库，使用 target_link_libraries 命令就可以链接动态库，也可以链接静态库文件。
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>target_link_libraries</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&lt;target&gt;</span> 
+</span></span><span class=line><span class=cl>    <span class=s>&lt;PRIVATE|PUBLIC|INTERFACE&gt;</span> <span class=s>&lt;item&gt;...</span> 
+</span></span><span class=line><span class=cl>    <span class=s>[&lt;PRIVATE|PUBLIC|INTERFACE&gt;</span> <span class=s>&lt;item&gt;...]...</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>target：指定要加载动态库的文件的名字该文件可能是一个源文件,or动态库文件or可执行文件
+</span></span></span><span class=line><span class=cl><span class=err>PRIVATE|PUBLIC|INTERFACE：动态库的访问权限，默认为PUBLIC
+</span></span></span><span class=line><span class=cl><span class=err>如果各个动态库之间没有依赖关系，无需做任何设置，三者没有没有区别，一般无需指定，使用默认的</span> <span class=err>PUBLIC</span> <span class=err>即可。
+</span></span></span><span class=line><span class=cl><span class=err>PUBLIC：在public后面的库会被Link到前面的target中，并且里面的符号也会被导出，提供给第三方使用。
+</span></span></span><span class=line><span class=cl><span class=err>PRIVATE：在private后面的库仅被link到前面的target中，并且终结掉，第三方不能感知你调了啥库
+</span></span></span><span class=line><span class=cl><span class=err>INTERFACE：在interface后面引入的库不会被链接到前面的target中，只会导出符号。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>动态库的链接和静态库是完全不同的：
+</span></span></span><span class=line><span class=cl><span class=err>静态库会在生成可执行程序的链接阶段被打包到可执行程序中，所以可执行程序启动，静态库就被加载到内存中了。
+</span></span></span><span class=line><span class=cl><span class=err>动态库在生成可执行程序的链接阶段不会被打包到可执行程序中，当可执行程序被启动并且调用了动态库中的函数的时候，动态库才会被加载到内存
+</span></span></span><span class=line><span class=cl><span class=err>因此，在cmake中指定要链接的动态库的时候，应该将命令写到生成了可执行文件之后：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加并指定最终生成的可执行程序名
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定可执行程序要链接的动态库名字
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>target_link_libraries</span><span class=p>(</span><span class=s>app</span> <span class=s>pthread</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>app:</span> <span class=err>对应的是最终生成的可执行程序的名字
+</span></span></span><span class=line><span class=cl><span class=err>pthread：这是可执行程序要加载的动态库，这个库是系统提供的线程库，全名为libpthread.so，在指定的时候一般会掐头（lib）去尾（.so）。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 链接第三方动态库，假设在测试文件main.cpp中既使用了自己制作的动态库libcalc.so又使用了系统提供的线程库，此时CMakeLists.txt文件可以这样写：、
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>project</span><span class=p>(</span><span class=s>TEST</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_LIST</span> <span class=o>${</span><span class=nv>CMAKE_CURRENT_SOURCE_DIR</span><span class=o>}</span><span class=s>/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>include_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>target_link_libraries</span><span class=p>(</span><span class=s>app</span> <span class=s>pthread</span> <span class=s>calc</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>pthread、calc都是可执行程序app要链接的动态库的名字。当可执行程序app生成之后并执行该文件，会提示有如下错误信息：
+</span></span></span><span class=line><span class=cl><span class=err>error</span> <span class=err>while</span> <span class=err>loading</span> <span class=err>shared</span> <span class=err>libraries:</span> <span class=err>libcalc.so:</span> <span class=err>cannot</span> <span class=err>open</span> <span class=err>shared</span> <span class=err>object</span> <span class=err>file:</span> <span class=err>No</span> <span class=err>such</span> <span class=err>file</span> <span class=err>or</span> <span class=err>directory
+</span></span></span><span class=line><span class=cl><span class=err>这是因为可执行程序启动之后，去加载calc这个动态库，但是不知道这个动态库被放到了什么位置，所以就加载失败了，在</span> <span class=err>CMake</span> <span class=err>中可以在生成可执行程序之前，通过命令指定出要链接的动态库的位置，指定静态库位置使用的也是这个命令：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>link_directories</span><span class=p>(</span><span class=s>path</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>修改之后的CMakeLists.txt文件应该是这样的：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>project</span><span class=p>(</span><span class=s>TEST</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_LIST</span> <span class=o>${</span><span class=nv>CMAKE_CURRENT_SOURCE_DIR</span><span class=o>}</span><span class=s>/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定源文件或者动态库对应的头文件路径
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定要链接的动态库的路径
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>link_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/lib</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加并生成一个可执行程序
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span> <span class=o>${</span><span class=nv>SRC_LIST</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 指定要链接的动态库
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>target_link_libraries</span><span class=p>(</span><span class=s>app</span> <span class=s>pthread</span> <span class=s>calc</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 日志，在CMake中可以用message显示一条消息
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>[STATUS|WARNING|AUTHOR_WARNING|FATAL_ERROR|SEND_ERROR]</span> <span class=s2>&#34;message to display&#34;</span> <span class=s>...</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>(无)</span> <span class=err>：重要消息
+</span></span></span><span class=line><span class=cl><span class=err>STATUS</span> <span class=err>：非重要消息
+</span></span></span><span class=line><span class=cl><span class=err>WARNING：CMake</span> <span class=err>警告,</span> <span class=err>会继续执行
+</span></span></span><span class=line><span class=cl><span class=err>AUTHOR_WARNING：CMake</span> <span class=nb>警告</span> <span class=p>(</span><span class=s>dev</span><span class=p>)</span><span class=err>,</span> <span class=err>会继续执行
+</span></span></span><span class=line><span class=cl><span class=err>SEND_ERROR：CMake</span> <span class=err>错误,</span> <span class=err>继续执行，但是会跳过生成的步骤
+</span></span></span><span class=line><span class=cl><span class=err>FATAL_ERROR：CMake</span> <span class=err>错误,</span> <span class=err>终止所有处理过程
+</span></span></span><span class=line><span class=cl><span class=err>CMake的命令行工具会在stdout上显示STATUS消息，在stderr上显示其他所有消息。CMake的GUI会在它的log区域显示所有消息。
+</span></span></span><span class=line><span class=cl><span class=err>CMake警告和错误消息的文本显示使用的是一种简单的标记语言。文本没有缩进，超过长度的行会回卷，段落之间以新行做为分隔符。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 输出一般日志信息
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>STATUS</span> <span class=s2>&#34;source path: ${PROJECT_SOURCE_DIR}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 输出警告信息
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>WARNING</span> <span class=s2>&#34;source path: ${PROJECT_SOURCE_DIR}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 输出错误信息
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>FATAL_ERROR</span> <span class=s2>&#34;source path: ${PROJECT_SOURCE_DIR}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 变量操作
+</span></span></span><span class=line><span class=cl><span class=c># 追加 -使用set拼接
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>如果使用set进行字符串拼接，对应的命令格式如下：
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>set</span><span class=p>(</span><span class=s>变量名1</span> <span class=o>${</span><span class=nv>变量名1</span><span class=o>}</span> <span class=o>${</span><span class=nv>变量名2</span><span class=o>}</span> <span class=s>...</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将从第二个参数开始往后所有的字符串进行拼接，最后将结果存储到第一个参数中，如果第一个参数中原来有数据会对原数据就行覆盖。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># eg
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>TEMP</span> <span class=s2>&#34;hello,world&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_1</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/src1/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_2</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/src2/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 追加(拼接),将src1，src2，temp拼接为一个str存到src1中
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>set</span><span class=p>(</span><span class=s>SRC_1</span> <span class=o>${</span><span class=nv>SRC_1</span><span class=o>}</span> <span class=o>${</span><span class=nv>SRC_2</span><span class=o>}</span> <span class=o>${</span><span class=nv>TEMP</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>message</span><span class=p>(</span><span class=s>STATUS</span> <span class=s2>&#34;message: ${SRC_1}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 使用list拼接
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>list</span><span class=p>(</span><span class=s>APPEND</span> <span class=s>&lt;list&gt;</span> <span class=s>[&lt;element&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>list命令的功能比set要强大，字符串拼接只是它的其中一个功能，所以需要在它第一个参数的位置指定出我们要做的操作，APPEND表示进行数据追加，后边的参数和set就一样了。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 追加(拼接),APPEND后面同set的参数一致
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>list</span><span class=p>(</span><span class=s>APPEND</span> <span class=s>SRC_1</span> <span class=o>${</span><span class=nv>SRC_1</span><span class=o>}</span> <span class=o>${</span><span class=nv>SRC_2</span><span class=o>}</span> <span class=o>${</span><span class=nv>TEMP</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>message</span><span class=p>(</span><span class=s>STATUS</span> <span class=s2>&#34;message: ${SRC_1}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>使用set命令可以创建一个list。一个在list内部是一个由分号;分割的一组字符串。例如，</span><span class=nb>set</span><span class=p>(</span><span class=s>var</span> <span class=s>a</span> <span class=s>b</span> <span class=s>c</span> <span class=s>d</span> <span class=s>e</span><span class=p>)</span><span class=err>命令将会创建一个list:a;b;c;d;e，但是最终打印变量值的时候得到的是abcde。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>set</span><span class=p>(</span><span class=s>tmp1</span> <span class=s>a;b;c;d;e</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>set</span><span class=p>(</span><span class=s>tmp2</span> <span class=s>a</span> <span class=s>b</span> <span class=s>c</span> <span class=s>d</span> <span class=s>e</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>message</span><span class=p>(</span><span class=o>${</span><span class=nv>tmp1</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>message</span><span class=p>(</span><span class=o>${</span><span class=nv>tmp2</span><span class=o>}</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>输出的结果:
+</span></span></span><span class=line><span class=cl><span class=err>abcde
+</span></span></span><span class=line><span class=cl><span class=err>abcde
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 字符串移除
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>在当前这么目录有五个源文件，其中main.cpp是一个测试文件。如果我们想要把计算器相关的源文件生成一个动态库给别人使用，那么只需要add.cpp、div.cp、mult.cpp、sub.cpp这四个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去，想要实现这个功能，也可以使用list
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>REMOVE_ITEM</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;value&gt;</span> <span class=s>[&lt;value&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>通过上面的命令原型可以看到删除和追加数据类似，只不过是第一个参数变成了REMOVE_ITEM。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>project</span><span class=p>(</span><span class=s>TEST</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>set</span><span class=p>(</span><span class=s>TEMP</span> <span class=s2>&#34;hello,world&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>file</span><span class=p>(</span><span class=s>GLOB</span> <span class=s>SRC_1</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/*.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 移除前日志
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>STATUS</span> <span class=s2>&#34;message: ${SRC_1}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 移除 main.cpp
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>list</span><span class=p>(</span><span class=s>REMOVE_ITEM</span> <span class=s>SRC_1</span> <span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/main.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 移除后日志
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>message</span><span class=p>(</span><span class=s>STATUS</span> <span class=s2>&#34;message: ${SRC_1}&#34;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>可以看到，在第8行把将要移除的文件的名字指定给list就可以了。但是一定要注意通过</span> <span class=err>file</span> <span class=err>命令搜索源文件的时候得到的是文件的绝对路径（在list中每个文件对应的路径都是一个item，并且都是绝对路径），那么在移除的时候也要将该文件的绝对路径指定出来才可以，否是移除操作不会成功。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>关于list命令还有其它功能，但是并不常用，在此就不一一进行举例介绍了。
+</span></span></span><span class=line><span class=cl><span class=err>获取</span> <span class=err>list</span> <span class=err>的长度。
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>LENGTH</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;output</span> <span class=s>variable&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>LENGTH：子命令LENGTH用于读取列表长度
+</span></span></span><span class=line><span class=cl><span class=err>&lt;list&gt;：当前操作的列表
+</span></span></span><span class=line><span class=cl><span class=err>&lt;output</span> <span class=err>variable&gt;：新创建的变量，用于存储列表的长度。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>读取列表中指定索引的的元素，可以指定多个索引
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>GET</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;element</span> <span class=s>index&gt;</span> <span class=s>[&lt;element</span> <span class=s>index&gt;</span> <span class=s>...]</span> <span class=s>&lt;output</span> <span class=s>variable&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>&lt;list&gt;：当前操作的列表
+</span></span></span><span class=line><span class=cl><span class=err>&lt;element</span> <span class=err>index&gt;：列表元素的索引
+</span></span></span><span class=line><span class=cl><span class=err>从0开始编号，索引0的元素为列表中的第一个元素；
+</span></span></span><span class=line><span class=cl><span class=err>索引也可以是负数，-1表示列表的最后一个元素，-2表示列表倒数第二个元素，以此类推
+</span></span></span><span class=line><span class=cl><span class=err>当索引（不管是正还是负）超过列表的长度，运行会报错
+</span></span></span><span class=line><span class=cl><span class=err>&lt;output</span> <span class=err>variable&gt;：新创建的变量，存储指定索引元素的返回结果，也是一个列表。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将列表中的元素用连接符（字符串）连接起来组成一个字符串
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>JOIN</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;glue&gt;</span> <span class=s>&lt;output</span> <span class=s>variable&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>&lt;list&gt;：当前操作的列表
+</span></span></span><span class=line><span class=cl><span class=err>&lt;glue&gt;：指定的连接符（字符串）
+</span></span></span><span class=line><span class=cl><span class=err>&lt;output</span> <span class=err>variable&gt;：新创建的变量，存储返回的字符串
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>查找列表是否存在指定的元素，若果未找到，返回-1
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>FIND</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;value&gt;</span> <span class=s>&lt;output</span> <span class=s>variable&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>&lt;list&gt;：当前操作的列表
+</span></span></span><span class=line><span class=cl><span class=err>&lt;value&gt;：需要再列表中搜索的元素
+</span></span></span><span class=line><span class=cl><span class=err>&lt;output</span> <span class=err>variable&gt;：新创建的变量
+</span></span></span><span class=line><span class=cl><span class=err>如果列表&lt;list&gt;中存在&lt;value&gt;，那么返回&lt;value&gt;在列表中的索引
+</span></span></span><span class=line><span class=cl><span class=err>如果未找到则返回-1。
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将元素追加到列表中
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>APPEND</span> <span class=s>&lt;list&gt;</span> <span class=s>[&lt;element&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>在list中指定的位置插入若干元素
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>INSERT</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;element_index&gt;</span> <span class=s>&lt;element&gt;</span> <span class=s>[&lt;element&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将元素插入到列表的0索引位置
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>PREPEND</span> <span class=s>&lt;list&gt;</span> <span class=s>[&lt;element&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将列表中最后元素移除
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>POP_BACK</span> <span class=s>&lt;list&gt;</span> <span class=s>[&lt;out-var&gt;...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将列表中第一个元素移除
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>POP_FRONT</span> <span class=s>&lt;list&gt;</span> <span class=s>[&lt;out-var&gt;...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将指定的元素从列表中移除
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>REMOVE_ITEM</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;value&gt;</span> <span class=s>[&lt;value&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>将指定索引的元素从列表中移除
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>REMOVE_AT</span> <span class=s>&lt;list&gt;</span> <span class=s>&lt;index&gt;</span> <span class=s>[&lt;index&gt;</span> <span class=s>...]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>移除列表中的重复元素
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>REMOVE_DUPLICATES</span> <span class=s>&lt;list&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>列表翻转
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span><span class=p>(</span><span class=s>REVERSE</span> <span class=s>&lt;list&gt;</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>列表排序
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>list</span> <span class=p>(</span><span class=s>SORT</span> <span class=s>&lt;list&gt;</span> <span class=s>[COMPARE</span> <span class=s>&lt;compare&gt;]</span> <span class=s>[CASE</span> <span class=s>&lt;case&gt;]</span> <span class=s>[ORDER</span> <span class=s>&lt;order&gt;]</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>COMPARE：指定排序方法。有如下几种值可选：
+</span></span></span><span class=line><span class=cl><span class=err>STRING:按照字母顺序进行排序，为默认的排序方法
+</span></span></span><span class=line><span class=cl><span class=err>FILE_BASENAME：如果是一系列路径名，会使用basename进行排序
+</span></span></span><span class=line><span class=cl><span class=err>NATURAL：使用自然数顺序排序
+</span></span></span><span class=line><span class=cl><span class=err>CASE：指明是否大小写敏感。有如下几种值可选：
+</span></span></span><span class=line><span class=cl><span class=err>SENSITIVE:</span> <span class=err>按照大小写敏感的方式进行排序，为默认值
+</span></span></span><span class=line><span class=cl><span class=err>INSENSITIVE：按照大小写不敏感方式进行排序
+</span></span></span><span class=line><span class=cl><span class=err>ORDER：指明排序的顺序。有如下几种值可选：
+</span></span></span><span class=line><span class=cl><span class=err>ASCENDING:按照升序排列，为默认值
+</span></span></span><span class=line><span class=cl><span class=err>DESCENDING：按照降序排列
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 宏定义
+</span></span></span><span class=line><span class=cl><span class=c>#ifdef DEBUG
+</span></span></span><span class=line><span class=cl><span class=c></span>    <span class=nb>printf</span><span class=p>(</span><span class=s2>&#34;我是一个程序猿, 我不会爬树...\n&#34;</span><span class=p>)</span><span class=err>;
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c>#endif
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>为了让测试更灵活，我们可以不在代码中定义所需定义的宏，而是在测试的时候去把它定义出来，其中一种方式就是在gcc/g++命令中去指定
+</span></span></span><span class=line><span class=cl><span class=err>$</span> <span class=err>gcc</span> <span class=err>test.c</span> <span class=err>-DDEBUG</span> <span class=err>-o</span> <span class=err>app
+</span></span></span><span class=line><span class=cl><span class=err>在gcc/g++命令中通过参数</span> <span class=err>-D指定出要定义的宏的名字，这样就相当于在代码中定义了一个宏，其名字为DEBUG。
+</span></span></span><span class=line><span class=cl><span class=err>在CMake中我们也可以做类似的事情，对应的命令叫做add_definitions:
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_definitions</span><span class=p>(</span><span class=s>-D宏名称</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 自定义 DEBUG 宏
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_definitions</span><span class=p>(</span><span class=s>-DDEBUG</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>app</span> <span class=s>./test.c</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># cmake预定义宏
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>宏</span>	<span class=err>功能
+</span></span></span><span class=line><span class=cl><span class=err>PROJECT_SOURCE_DIR</span>			<span class=err>使用cmake命令后紧跟的目录，一般是工程的根目录
+</span></span></span><span class=line><span class=cl><span class=err>PROJECT_BINARY_DIR</span>			<span class=err>执行cmake命令的目录
+</span></span></span><span class=line><span class=cl><span class=err>CMAKE_CURRENT_SOURCE_DIR</span>	<span class=err>当前处理的CMakeLists.txt所在的路径
+</span></span></span><span class=line><span class=cl><span class=err>CMAKE_CURRENT_BINARY_DIR</span>	<span class=err>target</span> <span class=err>编译目录
+</span></span></span><span class=line><span class=cl><span class=err>EXECUTABLE_OUTPUT_PATH</span>		<span class=err>重新定义目标二进制可执行文件的存放位置
+</span></span></span><span class=line><span class=cl><span class=err>LIBRARY_OUTPUT_PATH</span>			<span class=err>重新定义目标链接库文件的存放位置
+</span></span></span><span class=line><span class=cl><span class=err>PROJECT_NAME</span>				<span class=err>返回通过PROJECT指令定义的项目名称
+</span></span></span><span class=line><span class=cl><span class=err>CMAKE_BINARY_DIR</span>			<span class=err>项目实际构建路径，假设在build目录进行的构建，那么得到的就是这个目录的路径
+</span></span></span></code></pre></div><h3 id=执行cmake>执行cmake<a hidden class=anchor aria-hidden=true href=#执行cmake>#</a></h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 在CMakeLists.txt所在目录执行</span>
+</span></span><span class=line><span class=cl>$ cmake .
+</span></span><span class=line><span class=cl><span class=c1># 在build目录执行</span>
+</span></span><span class=line><span class=cl>$ cmake ..
+</span></span></code></pre></div><h3 id=cmake-311-fetchcontent模块>CMake 3.11 FetchContent模块<a hidden class=anchor aria-hidden=true href=#cmake-311-fetchcontent模块>#</a></h3><p><code>FetchContent</code> 是 CMake 3.11 及以上版本中引入的一个功能，它允许你在构建时自动从外部获取依赖项，而不需要手动下载或预先安装它们。</p><h4 id=编写cmake>编写cmake：<a hidden class=anchor aria-hidden=true href=#编写cmake>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmake data-lang=cmake><span class=line><span class=cl><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.14</span><span class=p>)</span> <span class=c># 确保使用了足够新的 CMake 版本
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>project</span><span class=p>(</span><span class=s>MyProject</span> <span class=s>VERSION</span> <span class=s>1.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含 FetchContent 模块
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include</span><span class=p>(</span><span class=s>FetchContent</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 声明 GoogleTest 作为外部依赖项
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>FetchContent_Declare</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=s>googletest</span>
+</span></span><span class=line><span class=cl>  <span class=s>GIT_REPOSITORY</span> <span class=s>https://github.com/google/googletest.git</span>
+</span></span><span class=line><span class=cl>  <span class=s>GIT_TAG</span>        <span class=s>release-1.10.0</span> <span class=c># GIT_TAG 参数可以是分支名或标签，不是必须的，但它是推荐的做法，不指定下载默认分支
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 使外部依赖项（GoogleTest）可用
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>FetchContent_MakeAvailable</span><span class=p>(</span><span class=s>googletest</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加你的项目文件（替换为你的源文件）
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>my_project</span> <span class=s>main.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 定义一个测试目标
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>enable_testing</span><span class=p>()</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加测试可执行文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=s>my_test</span>
+</span></span><span class=line><span class=cl>  <span class=s>tests/test1.cpp</span>
+</span></span><span class=line><span class=cl>  <span class=s>tests/test2.cpp</span>
+</span></span><span class=line><span class=cl><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 链接 GoogleTest 到测试可执行文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>target_link_libraries</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=s>my_test</span>
+</span></span><span class=line><span class=cl>  <span class=s>gtest_main</span>
+</span></span><span class=line><span class=cl><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含 GoogleTest 的测试
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include</span><span class=p>(</span><span class=s>GoogleTest</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>gtest_discover_tests</span><span class=p>(</span><span class=s>my_test</span><span class=p>)</span><span class=err>
+</span></span></span></code></pre></div><p>在这个示例中：</p><ul><li>使用 <code>FetchContent_Declare</code> 声明了 GoogleTest 作为一个外部依赖项，指定了其 Git 仓库地址和要使用的标签（在这个例子中是 <code>release-1.10.0</code>）。</li><li>通过 <code>FetchContent_MakeAvailable</code> 自动下载（如果需要的话）、配置和构建 GoogleTest。</li><li>创建了两个可执行文件目标：一个是主项目 <code>my_project</code>，另一个是测试项目 <code>my_test</code>。</li><li><code>my_test</code> 测试可执行文件链接了 GoogleTest，并使用 <code>gtest_discover_tests</code> 自动发现和注册 GoogleTest 测试。</li></ul><h4 id=第二步编写测试>第二步：编写测试<a hidden class=anchor aria-hidden=true href=#第二步编写测试>#</a></h4><p>在 <code>tests</code> 目录下创建测试文件（例如，<code>test1.cpp</code> 和 <code>test2.cpp</code>），并使用 GoogleTest 编写测试。</p><h4 id=第三步构建和运行测试>第三步：构建和运行测试<a hidden class=anchor aria-hidden=true href=#第三步构建和运行测试>#</a></h4><ol><li><p>创建一个构建目录并进入：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir build <span class=o>&amp;&amp;</span> <span class=nb>cd</span> build
+</span></span></code></pre></div></li><li><p>使用 CMake 配置项目并构建：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>cmake --build .
+</span></span></code></pre></div></li><li><p>运行测试：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ctest
+</span></span></code></pre></div></li></ol><h4 id=使用catch2-v3x版本的测试cmake>使用catch2 v3.x版本的测试cmake<a hidden class=anchor aria-hidden=true href=#使用catch2-v3x版本的测试cmake>#</a></h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-cmake data-lang=cmake><span class=line><span class=cl><span class=nb>cmake_minimum_required</span><span class=p>(</span><span class=s>VERSION</span> <span class=s>3.14</span><span class=p>)</span> <span class=c># 确保使用的是 FetchContent 可用的 CMake 版本
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>project</span><span class=p>(</span><span class=s>MyProject</span> <span class=s>VERSION</span> <span class=s>1.0</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>include_directories</span><span class=p>(</span><span class=o>${</span><span class=nv>PROJECT_SOURCE_DIR</span><span class=o>}</span><span class=s>/include</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 包含 FetchContent 模块
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>include</span><span class=p>(</span><span class=s>FetchContent</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 使用 FetchContent_Declare 声明 Catch2 作为外部依赖项
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>FetchContent_Declare</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>        <span class=s>Catch2</span>
+</span></span><span class=line><span class=cl>        <span class=s>GIT_REPOSITORY</span> <span class=s>https://github.com/catchorg/Catch2.git</span>
+</span></span><span class=line><span class=cl>        <span class=s>GIT_TAG</span>        <span class=s>v3.3.0</span> <span class=c># or a later release
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 使 Catch2 可用
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>FetchContent_MakeAvailable</span><span class=p>(</span><span class=s>Catch2</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加你的项目文件（示例）
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span><span class=s>my_project</span> <span class=s>src/main.cpp</span> <span class=s>src/sub.cpp</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 如果你有测试代码，可以像这样设置
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>enable_testing</span><span class=p>()</span> <span class=c># 启用测试
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 添加测试可执行文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>add_executable</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>  <span class=s>my_test</span>
+</span></span><span class=line><span class=cl>  <span class=s>test/test1.cpp</span>
+</span></span><span class=line><span class=cl>  <span class=s>src/sub.cpp</span>
+</span></span><span class=line><span class=cl>  <span class=c># 添加其他测试文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 链接 Catch2 到测试可执行文件
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>target_link_libraries</span><span class=p>(</span><span class=s>my_test</span> <span class=s>PRIVATE</span> <span class=s>Catch2::Catch2WithMain</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 为 Catch2 配置测试发现
+</span></span></span><span class=line><span class=cl><span class=c></span><span class=nb>LIST</span><span class=p>(</span><span class=s>APPEND</span> <span class=s>CMAKE_MODULE_PATH</span> <span class=o>${</span><span class=nv>catch2_SOURCE_DIR</span><span class=o>}</span><span class=s>/extras</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>include</span><span class=p>(</span><span class=s>CTest</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>include</span><span class=p>(</span><span class=s>Catch</span><span class=p>)</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=nb>CATCH_DISCOVER_TESTS</span><span class=p>(</span><span class=s>my_test</span><span class=p>)</span><span class=err>
+</span></span></span></code></pre></div></div><footer class=post-footer><ul class=post-tags><li><a href=https://dueplay.github.io/tags/cmake/>Cmake</a></li></ul><nav class=paginav><a class=prev href=https://dueplay.github.io/posts/bustub-project0/><span class=title>« Prev</span><br><span>bustub project0</span>
+</a><a class=next href=https://dueplay.github.io/posts/protocol-buffer/><span class=title>Next »</span><br><span>Protocol Buffer的使用</span></a></nav></footer></article></main><footer class=footer><span>&copy; 2024 <a href=https://dueplay.github.io/>Cookie's Blog</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://git.io/hugopapermod rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
