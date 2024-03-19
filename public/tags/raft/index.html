@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Raft | Cookie&#39;s Blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="ExampleSite description">
+<meta name="author" content="Me">
+<link rel="canonical" href="http://localhost:1313/tags/raft/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/raft/index.xml">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/raft/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="Raft" />
+<meta property="og:description" content="ExampleSite description" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://localhost:1313/tags/raft/" /><meta property="og:image" content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"/><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"/>
+
+<meta name="twitter:title" content="Raft"/>
+<meta name="twitter:description" content="ExampleSite description"/>
+
+</head>
+
+<body class="list" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/tags/">Tags</a></div>
+  <h1>
+    Raft
+    <a href="index.xml" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2>MIT6.824 Lab3 KVService
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Introduction 摸了一段时间的鱼，去尝试用 SpringBoot &#43; Vue 搭建一个前后端分离的 Web 应用。都说 CS 的学生不能只会用框架 CRUD，但更不能不会用框架 CRUD。大概做出来一个小 demo 后就没有再继续了。接着来做 6.824。
+Lab3 和 Lab2 各有各的难处。Lab2 是 Raft 的核心，需要小心地处理各种 corner case。但好在有 Figure2 的引导，最终也是按照其严格的规定成功实现。Lab3 编码难度不如 Lab2，但没有详细的引导，留给个人自由发挥的空间更大 (更有可能不知道从何下手)。
+Lab3 需要在 Raft 层上实现一个 fault-tolerant key-value service，满足强一致性，也就是线性一致性 (Linearizable Consistency)。线性一致性保证整个系统看起来好像只有一个副本，其中所有的操作都是原子性的。简单地说，线性一致性系统的读写操作有以下特征：
+读写并不能瞬间完成，而是在一个时间段内进行。 读在写开始前完成，读到的一定是旧值；读在写完成之后开始，读到的一定是新值。(读写操作无重合部分) 读写并发进行，即有重合部分时，既可能读到新值，也可能读到旧值。 一旦有一个客户端读取到了新值，那么之后的客户端一定也都会读取到新值。 关于线性一致性更加详细的定义和解析，可以阅读《数据密集型应用系统》(DDIA) 相关章节。
+先来看看整个系统的架构：
+整个 KV Service 由多个 Server 组成，每个 Server 包含一个 State Machine，具体在 lab 中是一个 KV 数据库；Server 还包含一个 Raft 节点。需要注意的是，各 Server 之间并不会直接通信，而是靠其 Raft 节点进行通信。
+整个系统的理想运行流程是：
+Client 通过 RPC 向 KV Service 发送请求，例如 Put(x,1) KV Service 将请求转发给当前拥有 Leader Raft 节点的 Server Leader Server 将请求包含的 command 传递给 Raft 层 Raft 层对 command 进行共识，生成相同的 log replica 在达成共识后，Raft 层将 command Apply 回 Server Server 收到 Raft 层的 Apply 后，将 command 应用到状态机，即状态机此时状态为 {x: 1} 成功应用至状态机后，Server 对 Client 的 RPC 进行回复，返回结果和错误码。 当系统能够正常运行时，一切看起来都很清晰美好。但是一旦出现问题，如节点挂掉、RPC丢包、网络分区等等，情况就变得比较复杂了。...</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-09-22 18:16:09 &#43;0800 CST&#39;&gt;2022-09-22&lt;/span&gt;&amp;nbsp;·&amp;nbsp;8 min&amp;nbsp;·&amp;nbsp;1506 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to MIT6.824 Lab3 KVService" href="http://localhost:1313/posts/mit6.824-lab3-kvservice/"></a>
+</article>
+
+<article class="post-entry tag-entry"> 
+  <header class="entry-header">
+    <h2>MIT6.824 Lab2 Raft
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>趁着暑假有空，把鸽了很久的 MIT6.824 做一下。Lab1 是实现一个 Map-Reduce，因为和 Raft 主线关系不大（因为懒），就略过了。另外，这次尝试实现一个 part 就来记录相关的内容，以免在全部实现后忘记部分细节（以免之后太懒不想写）。因此，不同 part 的代码会变化，请以最终版本的代码为准（但保证每一 part 的代码可以正常通过绝大部分相应的测试）。同时，在写下某一 part 的记录时，我对 Raft 的整体把握也难免有所不足。
+Resources Course’s Page 课程主页 Students’ Guide to Raft 一篇引导博客 Debugging by Pretty Printing debug 技巧，强烈推荐阅读和运用 Raft Q&amp;A 关于 Raft 的一些 Q&amp;A Raft Visualization Raft 动画演示 In Search of an Understandable Consensus Algorithm Raft 论文 Lab2A Raft Leader Election Lab2A 实现时间为6.22~6.24。
+Lab2A 主要实现 Raft 的选主过程，包括选举出 Leader 和 Leader 通过心跳维持身份。
+Design 首先是选主过程的状态机模型：
+接下来是 Raft 论文中最为重要的 Figure 2:...</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-06-25 00:10:08 &#43;0800 CST&#39;&gt;2022-06-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;25 min&amp;nbsp;·&amp;nbsp;5286 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to MIT6.824 Lab2 Raft" href="http://localhost:1313/posts/mit6.824-lab2-raft/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

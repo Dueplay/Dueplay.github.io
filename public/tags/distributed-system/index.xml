@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Distributed System on Cookie&#39;s Blog</title>
+    <link>http://localhost:1313/tags/distributed-system/</link>
+    <description>Recent content in Distributed System on Cookie&#39;s Blog</description>
+    <image>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 18 Mar 2023 20:43:22 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Database and Distributed System TAGS</title>
+      <link>http://localhost:1313/posts/database-and-distributed-system-tags/</link>
+      <pubDate>Sat, 18 Mar 2023 20:43:22 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/database-and-distributed-system-tags/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>MIT6.824 Lab3 KVService</title>
+      <link>http://localhost:1313/posts/mit6.824-lab3-kvservice/</link>
+      <pubDate>Thu, 22 Sep 2022 18:16:09 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/mit6.824-lab3-kvservice/</guid>
+      <description>Fault-tolerant KV Service based on Raft</description>
+    </item>
+    
+    <item>
+      <title>MIT6.824 Lab2 Raft</title>
+      <link>http://localhost:1313/posts/mit6.824-lab2-raft/</link>
+      <pubDate>Sat, 25 Jun 2022 00:10:08 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/mit6.824-lab2-raft/</guid>
+      <description>The implementation of Raft consensus algorithm.</description>
+    </item>
+    
+  </channel>
+</rss>

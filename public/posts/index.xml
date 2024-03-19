@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Cookie&#39;s Blog</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Cookie&#39;s Blog</description>
+    <image>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 14 Jan 2024 12:42:01 +0800</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>catch2测试框架</title>
+      <link>http://localhost:1313/posts/catch2/</link>
+      <pubDate>Sun, 14 Jan 2024 12:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/catch2/</guid>
+      <description>简要介绍怎么用catch编写单元测试</description>
+    </item>
+    
+    <item>
+      <title>cmake Tutorial</title>
+      <link>http://localhost:1313/posts/cmake/</link>
+      <pubDate>Sat, 25 Mar 2023 14:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/cmake/</guid>
+      <description>介绍cmake的使用</description>
+    </item>
+    
+    <item>
+      <title>Protocol Buffer的使用</title>
+      <link>http://localhost:1313/posts/protocol-buffer/</link>
+      <pubDate>Mon, 20 Mar 2023 13:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/protocol-buffer/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>Database and Distributed System TAGS</title>
+      <link>http://localhost:1313/posts/database-and-distributed-system-tags/</link>
+      <pubDate>Sat, 18 Mar 2023 20:43:22 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/database-and-distributed-system-tags/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>zsh安装与配置</title>
+      <link>http://localhost:1313/posts/zsh/</link>
+      <pubDate>Thu, 26 Jan 2023 20:03:48 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/zsh/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>MIT6.824 Lab3 KVService</title>
+      <link>http://localhost:1313/posts/mit6.824-lab3-kvservice/</link>
+      <pubDate>Thu, 22 Sep 2022 18:16:09 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/mit6.824-lab3-kvservice/</guid>
+      <description>Fault-tolerant KV Service based on Raft</description>
+    </item>
+    
+    <item>
+      <title>MIT6.824 Lab2 Raft</title>
+      <link>http://localhost:1313/posts/mit6.824-lab2-raft/</link>
+      <pubDate>Sat, 25 Jun 2022 00:10:08 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/mit6.824-lab2-raft/</guid>
+      <description>The implementation of Raft consensus algorithm.</description>
+    </item>
+    
+    <item>
+      <title>chrono库的使用</title>
+      <link>http://localhost:1313/posts/chrono/</link>
+      <pubDate>Mon, 23 May 2022 13:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/chrono/</guid>
+      <description>c&#43;&#43;11新引入的chrono库介绍和使用</description>
+    </item>
+    
+    <item>
+      <title>Git Tutorial</title>
+      <link>http://localhost:1313/posts/git/</link>
+      <pubDate>Thu, 20 Jan 2022 10:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/git/</guid>
+      <description>git的使用</description>
+    </item>
+    
+    <item>
+      <title>配置ssh免密登录</title>
+      <link>http://localhost:1313/posts/ssh%E6%96%B9%E5%BC%8Fa%E4%B8%BB%E6%9C%BA%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95b/</link>
+      <pubDate>Fri, 03 Sep 2021 20:30:08 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/ssh%E6%96%B9%E5%BC%8Fa%E4%B8%BB%E6%9C%BA%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95b/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>gcc和c库的制作</title>
+      <link>http://localhost:1313/posts/%E5%88%B6%E4%BD%9Cc%E5%BA%93/</link>
+      <pubDate>Thu, 19 Aug 2021 15:43:43 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/%E5%88%B6%E4%BD%9Cc%E5%BA%93/</guid>
+      <description>如何制作静态库和动态库</description>
+    </item>
+    
+    <item>
+      <title>linux基础知识</title>
+      <link>http://localhost:1313/posts/linux%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Sat, 20 Mar 2021 15:30:09 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/linux%E5%85%A5%E9%97%A8/</guid>
+      <description>linux基础知识</description>
+    </item>
+    
+    <item>
+      <title>namespace，using，重载，extern c</title>
+      <link>http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/</link>
+      <pubDate>Mon, 22 Feb 2021 18:50:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/</guid>
+      <description>c&#43;&#43;语法中命名空间，using，重载，extern关键字</description>
+    </item>
+    
+    <item>
+      <title>Hugo Test</title>
+      <link>http://localhost:1313/posts/hugo-test/</link>
+      <pubDate>Sat, 20 Feb 2021 13:42:01 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/hugo-test/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+  </channel>
+</rss>

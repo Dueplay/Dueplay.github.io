@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>namespace，using，重载，extern c | Cookie&#39;s Blog</title>
+<meta name="keywords" content="c&#43;&#43;">
+<meta name="description" content="c&#43;&#43;语法中命名空间，using，重载，extern关键字">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="namespace，using，重载，extern c" />
+<meta property="og:description" content="c&#43;&#43;语法中命名空间，using，重载，extern关键字" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-02-22T18:50:01&#43;08:00" />
+<meta property="article:modified_time" content="2021-02-22T18:50:01&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="namespace，using，重载，extern c"/>
+<meta name="twitter:description" content="c&#43;&#43;语法中命名空间，using，重载，extern关键字"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "namespace，using，重载，extern c",
+      "item": "http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "namespace，using，重载，extern c",
+  "name": "namespace，using，重载，extern c",
+  "description": "c++语法中命名空间，using，重载，extern关键字",
+  "keywords": [
+    "c++"
+  ],
+  "articleBody": "1.::作用域运算符 可用::对被屏蔽的同名的全局变量进行访问\n后面有::的名称一定是类名或命名空间名。直接::代表全局作用域下\n通常情况下，如果有两个同名变量，一个是全局变量，另一个是局部变量，那么局部变量在其作用域内具有较高的优先权，它将屏蔽全局变量（就近原则）。\n//全局变量 int a = 10; void test(){ //局部变量 int a = 20; //全局a被隐藏 cout \u003c\u003c \"a:\" \u003c\u003c a \u003c\u003c endl; } 程序的输出结果是a:20。在test函数的输出语句中，使用的变量a是test函数内定义的局部变量，因此输出的结果为局部变量a的值。\n作用域运算符可以用来解决局部变量与全局变量的重名问题\n//全局变量 int a = 10; //1. 局部变量和全局变量同名 void test(){ int a = 20; //打印局部变量a cout \u003c\u003c \"局部变量a:\" \u003c\u003c a \u003c\u003c endl; //打印全局变量a cout \u003c\u003c \"全局变量a:\" \u003c\u003c ::a \u003c\u003c endl; } 这个例子可以看出，作用域运算符可以用来解决局部变量与全局变量的重名问题，即在局部变量的作用域内，可用::对被屏蔽的同名的全局变量进行访问。\n2.namespace 1.命名空间用途：解决名称冲突\n在game1和game2中都有相同名称的goAtk函数，如果不使用命名空间，会有二义性，编译报错。\n#include using namespace std; #include \"game1.h\" #include \"game2.h\" void test01(){ LOL::goAtk(); KingGlory::goAtk(); } int main() { test01(); system(\"pause\"); return 0; } game1.h中\n#pragma once #include using namespace std; //lol namespace LOL { void goAtk(); } game1.cpp中\n#include \"game1.h\" void LOL::goAtk() { cout \u003c\u003c \"lol的攻击函数\" \u003c\u003c endl; } game2.h中\n//王者荣耀 namespace KingGlory { void goAtk(); } 运行结果：\n2.命名空间下可以存放：变量，函数，结构体，类。\n3.命名空间必须声明在全局的作用域下。\n4.命名空间可以嵌套命名空间。\n5.命名空间是开放的，可以随时添加新的成员。\n6.命名空间可以是匿名的\n7.命名空间可以取别名\n//2.命名空间下可以存放：变量，函数，结构体，类 namespace A { int m_A = 10; void func(); struct Person{}; class Animal{}; } //3.命名空间必须声明在全局的作用域下。在局部中定义会报错:不允许进行命名空间定义 void test02() { /*namespace b { };*/ } //4.命名空间可以嵌套命名空间。 namespace B { int m_A = 20; namespace C { int m_A = 30; } } void test03() { cout \u003c\u003c \"B命名空间下的m_A = \" \u003c\u003c B::m_A \u003c\u003c endl;//20 cout \u003c\u003c \"C命名空间下的m_A = \" \u003c\u003c B::C::m_A \u003c\u003c endl;//30 } //5.命名空间是开放的，可以随时添加新的成员。 namespace B { int m_B = 40; }//这段代码不会与上面的B冲突，而是合二为一 void test04() { cout \u003c\u003c \"B命名空间下的m_A = \" \u003c\u003c B::m_A \u003c\u003c endl;//20 cout \u003c\u003c \"B命名空间下的m_B = \" \u003c\u003c B::m_B \u003c\u003c endl;//40 } //6.命名空间可以是匿名的 namespace { int m_C = 50; int m_D = 50; } void test05() { cout \u003c\u003c \"m_C = \" \u003c\u003c m_C \u003c\u003c endl;//50 cout \u003c\u003c \"m_D = \" \u003c\u003c ::m_D \u003c\u003c endl;//50 } //7.命名空间可以取别名 namespace veryLongName { int m_A = 100; } void test06() { namespace veryShortName = veryLongName; cout \u003c\u003c veryLongName::m_A \u003c\u003c endl;//100 cout \u003c\u003c veryShortName::m_A \u003c\u003c endl;//100 } 3.using声明和using编译指令 在开发中通常不自己写命名空间\n#include using namespace std; namespace LOL { int sunWuKongId = 1; } namespace KingGlory { int sunWuKongId = 3; } void test01() { //int sunWuKongId = 2; //1.using声明 //注意：using声明和就近原则不要同时出现，尽量避免 //using声明导致“LOL::sunWuKongId”的多次声明 using LOL::sunWuKongId;//告诉编译器使用的是sunWuKongId是LOL里的。 cout \u003c\u003c sunWuKongId \u003c\u003c endl; } void test02() { //int sunWuKongId = 2; //2.using编译指令 //注意：using编译指令和就近原则同时出现，优先使用就近原则 //当使用多个using编译指令，并且出现同名情况，使用数据依然加作用域,不加则不明确 using namespace LOL; using namespace KingGlory; cout \u003c\u003c LOL::sunWuKongId \u003c\u003c endl; cout \u003c\u003c KingGlory::sunWuKongId \u003c\u003c endl; } int main() { test02(); system(\"pause\"); return 0; } 报错：无法解析的外部命令。是在链接阶段出错了.\n4.函数重载原理 编译器为了实现函数重载，也是默认为我们做了一些幕后的工作，编译器用不同的参数类型来修饰不同的函数名，比如void func();编译器可能将函数名修饰成_func,当编译器碰到void func(int x)，编译器可能将函数名修饰为__func_int;当编译器碰到void func(int x,char c)；编译器可能会将函数名修饰为_func_int_char;我这里使用”可能”这个字眼是因为编译器如何修饰重载的函数名称并没有一个统一的标准，所以不同的编译器可能会产生不同的内部名。\nvoid func(){} void func(int x){} void func(int x,char y){} 以上三个函数在linux下生成的编译之后的函数名为:\n_Z4funcv //v 代表void,无参数\n_Z4funci //i 代表参数为int类型\n_Z4funcic //i 代表第一个参数为int类型，第二个参数为char类型\n5.extern “C”浅析 主要用途：c++中调用c语言的文件\n以下在Linux下测试:\nc函数: void MyFunc(){} ,被编译成函数: MyFunc c++函数: void MyFunc(){},被编译成函数: _Z6Myfuncv 通过这个测试，由于c++中需要支持函数重载，所以c和c++中对同一个函数经过编译后生成的函数名是不相同的，这就导致了一个问题，如果在c++中调用一个使用c语言编写模块中的某个函数，那么c++是根据c++的名称修饰方式来查找并链接这个函数，那么就会发生链接错误，以上例，在c++中调用MyFunc函数，在链接阶段会去找Z6Myfuncv，结果是没有找到的，因为这个MyFunc函数是c语言编写的，生成的符号是MyFunc。\n那么如果我想在c++调用c的函数怎么办？\nextern “C\"的主要作用就是为了实现c++代码能够调用其他c语言代码。加上extern “C\"后，这部分代码编译器按c语言的方式进行编译和链接，而不是按c++的方式。\n#ifdef __cplusplus//如果c++编译器在编译这个文件的时候，会有__cplusplus宏，就会将下面代码用c方式链接 extern \"C\" {//告诉编译器，这个{}中的代码都用c语言的方式来链接 #endif #include void show(); #ifdef __cplusplus } #endif #include \"test.h\" void show() { printf(\"hello world\\n\"); } #include using namespace std; #include \"test.h\" //解决方法1. //告诉编译器 利用c语言的方式链接show函数，这种方式就不用包含头文件了,适合一个函数的情况 //extern \"C\" void show(); //解决方法2：在.h中添加6行代码 void test01() { show();//show函数是在c语言编写的模块中，编译器如果按照c++的方式去找show， //可能将函数名称修饰为_Z4showv的形式，再去调用。在编译时用c++得方式去链接这个函数 //找的其实是_Z4showv这个名称，找不到这个函数的实现体。 } int main() { test01(); system(\"pause\"); return 0; } ",
+  "wordCount" : "454",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2021-02-22T18:50:01+08:00",
+  "dateModified": "2021-02-22T18:50:01+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      namespace，using，重载，extern c
+    </h1>
+    <div class="post-description">
+      c&#43;&#43;语法中命名空间，using，重载，extern关键字
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2021-02-22 18:50:01 &#43;0800 CST&#39;&gt;2021-02-22&lt;/span&gt;&amp;nbsp;·&amp;nbsp;3 min&amp;nbsp;·&amp;nbsp;454 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/Dueplay/blog/content/posts/namespace%e5%91%bd%e5%90%8d%e7%a9%ba%e9%97%b4.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h4 id="1作用域运算符">1.::作用域运算符<a hidden class="anchor" aria-hidden="true" href="#1作用域运算符">#</a></h4>
+<p><strong>可用::对被屏蔽的同名的全局变量进行访问</strong></p>
+<p>后面有::的名称一定是类名或命名空间名。直接::代表全局作用域下</p>
+<p>通常情况下，如果有两个同名变量，一个是全局变量，另一个是局部变量，那么局部变量在其作用域内具有较高的优先权，它将屏蔽全局变量（就近原则）。</p>
+<pre tabindex="0"><code>//全局变量
+int a = 10;
+void test(){
+	//局部变量
+	int a = 20;
+	//全局a被隐藏
+	cout &lt;&lt; &#34;a:&#34; &lt;&lt; a &lt;&lt; endl;
+}
+</code></pre><p>程序的输出结果是a:20。在test函数的输出语句中，使用的变量a是test函数内定义的局部变量，因此输出的结果为局部变量a的值。</p>
+<p><strong>作用域运算符可以用来解决局部变量与全局变量的重名问题</strong></p>
+<pre tabindex="0"><code>//全局变量
+int a = 10;
+//1. 局部变量和全局变量同名
+void test(){
+	int a = 20;
+	//打印局部变量a
+	cout &lt;&lt; &#34;局部变量a:&#34; &lt;&lt; a &lt;&lt; endl;
+	//打印全局变量a
+	cout &lt;&lt; &#34;全局变量a:&#34; &lt;&lt; ::a &lt;&lt; endl;
+}
+</code></pre><p>这个例子可以看出，作用域运算符可以用来解决局部变量与全局变量的重名问题，<strong>即在局部变量的作用域内，可用::对被屏蔽的同名的全局变量进行访问。</strong></p>
+<h4 id="2namespace">2.namespace<a hidden class="anchor" aria-hidden="true" href="#2namespace">#</a></h4>
+<p>1.命名空间用途：解决名称冲突</p>
+<p>在game1和game2中都有相同名称的goAtk函数，如果不使用命名空间，会有二义性，编译报错。</p>
+<pre tabindex="0"><code>#include &lt;iostream&gt;
+using namespace std;
+#include &#34;game1.h&#34;
+#include &#34;game2.h&#34;
+
+void test01(){
+	LOL::goAtk();
+	KingGlory::goAtk();
+}
+int main() {
+	test01();
+	system(&#34;pause&#34;);
+	return 0;
+
+}
+</code></pre><p>game1.h中</p>
+<pre tabindex="0"><code>#pragma once
+#include &lt;iostream&gt;
+using namespace std;
+//lol
+namespace LOL {
+	void goAtk();
+}
+</code></pre><p>game1.cpp中</p>
+<pre tabindex="0"><code>#include &#34;game1.h&#34;
+
+void LOL::goAtk()
+{
+	cout &lt;&lt; &#34;lol的攻击函数&#34; &lt;&lt; endl;
+}
+</code></pre><p>game2.h中</p>
+<pre tabindex="0"><code>//王者荣耀
+namespace KingGlory {
+	void goAtk();
+}
+</code></pre><p>运行结果：</p>
+<p><img loading="lazy" src="C:%5cUsers%5casus%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220222130944700.png" alt="image-20220222130944700"  />
+</p>
+<p>2.命名空间下可以存放：变量，函数，结构体，类。</p>
+<p>3.命名空间必须声明在全局的作用域下。</p>
+<p>4.命名空间可以嵌套命名空间。</p>
+<p>5.命名空间是开放的，可以随时添加新的成员。</p>
+<p>6.命名空间可以是匿名的</p>
+<p>7.命名空间可以取别名</p>
+<pre tabindex="0"><code>//2.命名空间下可以存放：变量，函数，结构体，类
+namespace A 
+{
+	int m_A = 10;
+	void func();
+	struct Person{};
+	class Animal{};
+}
+//3.命名空间必须声明在全局的作用域下。在局部中定义会报错:不允许进行命名空间定义
+void test02() {
+	/*namespace b 
+	{
+	};*/
+}
+//4.命名空间可以嵌套命名空间。
+namespace B
+{
+	int m_A = 20;
+	namespace C
+	{
+		int m_A = 30;
+	}
+}
+void test03()
+{
+	cout &lt;&lt; &#34;B命名空间下的m_A = &#34; &lt;&lt; B::m_A &lt;&lt; endl;//20
+	cout &lt;&lt; &#34;C命名空间下的m_A = &#34; &lt;&lt; B::C::m_A &lt;&lt; endl;//30
+}
+//5.命名空间是开放的，可以随时添加新的成员。
+namespace B
+{
+	int m_B = 40;
+}//这段代码不会与上面的B冲突，而是合二为一
+void test04() {
+	cout &lt;&lt; &#34;B命名空间下的m_A = &#34; &lt;&lt; B::m_A &lt;&lt; endl;//20
+	cout &lt;&lt; &#34;B命名空间下的m_B = &#34; &lt;&lt; B::m_B &lt;&lt; endl;//40
+}
+//6.命名空间可以是匿名的
+namespace
+{
+	int m_C = 50;
+	int m_D = 50;
+}
+void test05() {
+	cout &lt;&lt; &#34;m_C = &#34; &lt;&lt; m_C &lt;&lt; endl;//50
+	cout &lt;&lt; &#34;m_D = &#34; &lt;&lt; ::m_D &lt;&lt; endl;//50
+}
+//7.命名空间可以取别名
+namespace veryLongName
+{
+	int m_A = 100;
+}
+void test06()
+{
+	namespace veryShortName = veryLongName;
+	cout &lt;&lt; veryLongName::m_A &lt;&lt; endl;//100
+	cout &lt;&lt; veryShortName::m_A &lt;&lt; endl;//100
+}
+</code></pre><h4 id="3using声明和using编译指令">3.using声明和using编译指令<a hidden class="anchor" aria-hidden="true" href="#3using声明和using编译指令">#</a></h4>
+<p>在开发中通常不自己写命名空间</p>
+<pre tabindex="0"><code>#include &lt;iostream&gt;
+using namespace std;
+
+namespace LOL
+{
+	int sunWuKongId = 1;
+}
+namespace KingGlory
+{
+	int sunWuKongId = 3;
+}
+void test01()
+{
+	//int sunWuKongId = 2;
+
+	//1.using声明
+	//注意：using声明和就近原则不要同时出现，尽量避免
+	//using声明导致“LOL::sunWuKongId”的多次声明
+
+	using LOL::sunWuKongId;//告诉编译器使用的是sunWuKongId是LOL里的。
+	cout &lt;&lt; sunWuKongId &lt;&lt; endl;
+}
+void test02()
+{
+	//int sunWuKongId = 2;
+	//2.using编译指令
+	//注意：using编译指令和就近原则同时出现，优先使用就近原则
+	//当使用多个using编译指令，并且出现同名情况，使用数据依然加作用域,不加则不明确
+	using namespace LOL;
+	using namespace KingGlory;
+	cout &lt;&lt; LOL::sunWuKongId &lt;&lt; endl;
+	cout &lt;&lt; KingGlory::sunWuKongId &lt;&lt; endl;
+
+}
+int main() {
+	test02();
+	system(&#34;pause&#34;);
+	return 0;
+}
+</code></pre><p>报错：无法解析的外部命令。是在链接阶段出错了.</p>
+<h4 id="4函数重载原理">4.函数重载原理<a hidden class="anchor" aria-hidden="true" href="#4函数重载原理">#</a></h4>
+<p>编译器为了实现函数重载，也是默认为我们做了一些幕后的工作，编译器用不同的参数类型来修饰不同的函数名，比如void func();编译器可能将函数名修饰成_func,当编译器碰到void func(int x)，编译器可能将函数名修饰为__func_int;当编译器碰到void func(int x,char c)；编译器可能会将函数名修饰为_func_int_char;我这里使用”可能”这个字眼是因为编译器如何修饰重载的函数名称并没有一个统一的标准，所以不同的编译器可能会产生不同的内部名。</p>
+<pre tabindex="0"><code>void func(){}
+void func(int x){}
+void func(int x,char y){}
+</code></pre><p>以上三个函数在linux下生成的编译之后的函数名为:</p>
+<p>_Z4funcv //v 代表void,无参数</p>
+<p>_Z4funci //i 代表参数为int类型</p>
+<p>_Z4funcic //i 代表第一个参数为int类型，第二个参数为char类型</p>
+<h4 id="5extern-c浅析">5.extern “C”浅析<a hidden class="anchor" aria-hidden="true" href="#5extern-c浅析">#</a></h4>
+<p>主要用途：c++中调用c语言的文件</p>
+<p>以下在Linux下测试:</p>
+<pre tabindex="0"><code>c函数: void MyFunc(){} ,被编译成函数: MyFunc
+c++函数: void MyFunc(){},被编译成函数: _Z6Myfuncv
+</code></pre><p>通过这个测试，由于c++中需要支持函数重载，所以c和c++中对同一个函数经过编译后生成的函数名是不相同的，这就导致了一个问题，如果在c++中调用一个使用c语言编写模块中的某个函数，那么c++是根据c++的<strong>名称修饰方式</strong>来查找并链接这个函数，那么就会发生链接错误，以上例，在c++中调用MyFunc函数，在链接阶段会去找Z6Myfuncv，结果是没有找到的，因为这个MyFunc函数是c语言编写的，生成的符号是MyFunc。</p>
+<p>那么如果我想在c++调用c的函数怎么办？</p>
+<p>extern &ldquo;C&quot;的主要作用就是为了实现c++代码能够调用其他c语言代码。加上extern &ldquo;C&quot;后，这部分代码编译器按c语言的方式进行<strong>编译</strong>和<strong>链接</strong>，而不是按c++的方式。</p>
+<pre tabindex="0"><code>#ifdef __cplusplus//如果c++编译器在编译这个文件的时候，会有__cplusplus宏，就会将下面代码用c方式链接
+extern &#34;C&#34; {//告诉编译器，这个{}中的代码都用c语言的方式来链接
+#endif
+
+#include &lt;stdio.h&gt;
+
+	void show();
+
+#ifdef __cplusplus
+}
+#endif
+</code></pre><pre tabindex="0"><code>#include &#34;test.h&#34;
+
+void show()
+{
+	printf(&#34;hello world\n&#34;);
+}
+</code></pre><pre tabindex="0"><code>#include &lt;iostream&gt;
+using namespace std;
+#include &#34;test.h&#34;
+
+//解决方法1.
+//告诉编译器 利用c语言的方式链接show函数，这种方式就不用包含头文件了,适合一个函数的情况
+//extern &#34;C&#34; void show();
+
+//解决方法2：在.h中添加6行代码
+void test01() {
+	show();//show函数是在c语言编写的模块中，编译器如果按照c++的方式去找show，
+	       //可能将函数名称修饰为_Z4showv的形式，再去调用。在编译时用c++得方式去链接这个函数
+	       //找的其实是_Z4showv这个名称，找不到这个函数的实现体。
+}
+int main() {
+	test01();
+	system(&#34;pause&#34;);
+	return 0;
+
+}
+</code></pre>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/c&#43;&#43;/">C&#43;&#43;</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/linux%E5%85%A5%E9%97%A8/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>linux基础知识</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/hugo-test/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Hugo Test</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

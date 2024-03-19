@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>CMU15-445 Branch: Use Perf to Benchmark Your Code | Cookie&#39;s Blog</title>
+<meta name="keywords" content="Benchmark">
+<meta name="description" content="Record an experience of using perf to benchmark.">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/cmu15-445-branch-use-perf-to-benchmark-your-code/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="CMU15-445 Branch: Use Perf to Benchmark Your Code" />
+<meta property="og:description" content="Record an experience of using perf to benchmark." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/cmu15-445-branch-use-perf-to-benchmark-your-code/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-10-10T15:18:17&#43;08:00" />
+<meta property="article:modified_time" content="2022-10-10T15:18:17&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="CMU15-445 Branch: Use Perf to Benchmark Your Code"/>
+<meta name="twitter:description" content="Record an experience of using perf to benchmark."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "CMU15-445 Branch: Use Perf to Benchmark Your Code",
+      "item": "http://localhost:1313/posts/cmu15-445-branch-use-perf-to-benchmark-your-code/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "CMU15-445 Branch: Use Perf to Benchmark Your Code",
+  "name": "CMU15-445 Branch: Use Perf to Benchmark Your Code",
+  "description": "Record an experience of using perf to benchmark.",
+  "keywords": [
+    "Benchmark"
+  ],
+  "articleBody": "完成 15-445 Project 1 后，将代码提交到 GradeScope，运行时长为 8s 左右。而 Leaderboard 中排名第一的大佬耗时仅为 1s，于是尝试优化 Project 1 的代码来刷刷 Leaderboard 排名，至少差距不要太大…\n之前没有 C++ 性能优化的经验，一通搜索找到了 perf。perf 是 linux 下的一款性能调优工具。\nInstallation 安装方式 (Ubuntu 20.04 LTS)：\nsudo apt-get install linux-tools-$(uname -r) linux-tools-generic -y Commands sudo perf record -g -a /path/to/your/application 运行一个程序，并对其采样，生成相关数据 perf.data。-g 表明记录函数调用关系，-a 为路径名，还有一个可选参数 -e，表明需要监控的事件。\nperf 有一个监控事件列表，包含 cpu clock，cache miss，page fault 等各种事件。可以用\nsudo perf list 查看。默认为 cpu clock。\n生成 perf.data 后，执行\nsudo perf report -g 查看报告。\n在报告中可以看到各个函数的使用情况以及调用关系。\n再查找热点函数，看看耗时较高的原因是什么，进行相关的优化就可以了。\nperf 还有生成火焰图等更高阶的功能，以后也可以尝试一下。\nOptimization 我主要对之前的代码进行了两个地方的优化。\n一是 LRU-K Replacer 中，我原本用一个 std::unordered_map 存储 frames 的信息，在报告中发现性能并不好，因为有频繁的哈希表插入删除操作。之后改为了直接用 std::vector 存放。删除时，将相应的 frame 置为空指针。\n第二个也是 LRU-K Replacer 中的问题。在 LRU-K 算法中，如果存在引用次数小于 K 的 frame，则要在这些 frame 中使用普通的 LRU 算法，即找到第一次引用时间最小的 frame。在查找 frame 的第一次引用时间时，我直接简单地遍历引用记录。由于使用 std::list 存放引用记录，而链表的遍历是 O(n)，因此这里也出现了一定的性能问题。因此我额外用了一个 earliest_ref 变量来保存第一次引用的时间。只要在第一次发生引用时初始化这个变量，之后每次查询第一次引用时直接返回这个变量。\n经过优化后，再次使用 perf 生成报告，可以发现相关的函数耗时下降不少。\nResult 再次在 GradeScope 上提交，总耗时成功降到了 3.5s 左右，优化效果还是挺明显的。虽说还有挺大的优化空间，但目前的性能应该也够用了。\n还是没有进行针对多线程的性能优化，下次一定。\n",
+  "wordCount" : "117",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2022-10-10T15:18:17+08:00",
+  "dateModified": "2022-10-10T15:18:17+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/cmu15-445-branch-use-perf-to-benchmark-your-code/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      CMU15-445 Branch: Use Perf to Benchmark Your Code
+    </h1>
+    <div class="post-description">
+      Record an experience of using perf to benchmark.
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2022-10-10 15:18:17 &#43;0800 CST&#39;&gt;2022-10-10&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;117 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/el-even-11/blog/content/posts/CMU15-445-Branch-Use-Perf-To-Benchmark-Your-Code.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#optimization">Optimization</a></li>
+    <li><a href="#result">Result</a></li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>完成 15-445 Project 1 后，将代码提交到 GradeScope，运行时长为 8s 左右。而 Leaderboard 中排名第一的大佬耗时仅为 1s，于是尝试优化 Project 1 的代码来刷刷 Leaderboard 排名，至少差距不要太大&hellip;</p>
+<p>之前没有 C++ 性能优化的经验，一通搜索找到了 <a href="https://perf.wiki.kernel.org/index.php/Main_Page">perf</a>。perf 是 linux 下的一款性能调优工具。</p>
+<h2 id="installation">Installation<a hidden class="anchor" aria-hidden="true" href="#installation">#</a></h2>
+<p>安装方式 (Ubuntu 20.04 LTS)：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt-get install linux-tools-<span class="k">$(</span>uname -r<span class="k">)</span> linux-tools-generic -y
+</span></span></code></pre></div><h2 id="commands">Commands<a hidden class="anchor" aria-hidden="true" href="#commands">#</a></h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo perf record -g -a /path/to/your/application
+</span></span></code></pre></div><p>运行一个程序，并对其采样，生成相关数据 <code>perf.data</code>。<code>-g</code> 表明记录函数调用关系，<code>-a</code> 为路径名，还有一个可选参数 <code>-e</code>，表明需要监控的事件。</p>
+<p>perf 有一个监控事件列表，包含 cpu clock，cache miss，page fault 等各种事件。可以用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo perf list
+</span></span></code></pre></div><p>查看。默认为 cpu clock。</p>
+<p>生成 <code>perf.data</code> 后，执行</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo perf report -g
+</span></span></code></pre></div><p>查看报告。</p>
+<p>在报告中可以看到各个函数的使用情况以及调用关系。</p>
+<p><img loading="lazy" src="../../imgs/15-445-b-1.png" alt=""  />
+</p>
+<p>再查找热点函数，看看耗时较高的原因是什么，进行相关的优化就可以了。</p>
+<p>perf 还有生成火焰图等更高阶的功能，以后也可以尝试一下。</p>
+<h2 id="optimization">Optimization<a hidden class="anchor" aria-hidden="true" href="#optimization">#</a></h2>
+<p>我主要对之前的代码进行了两个地方的优化。</p>
+<p>一是 LRU-K Replacer 中，我原本用一个 <code>std::unordered_map</code> 存储 frames 的信息，在报告中发现性能并不好，因为有频繁的哈希表插入删除操作。之后改为了直接用 <code>std::vector</code> 存放。删除时，将相应的 frame 置为空指针。</p>
+<p>第二个也是 LRU-K Replacer 中的问题。在 LRU-K 算法中，如果存在引用次数小于 K 的 frame，则要在这些 frame 中使用普通的 LRU 算法，即找到第一次引用时间最小的 frame。在查找 frame 的第一次引用时间时，我直接简单地遍历引用记录。由于使用 <code>std::list</code> 存放引用记录，而链表的遍历是 O(n)，因此这里也出现了一定的性能问题。因此我额外用了一个 <code>earliest_ref</code> 变量来保存第一次引用的时间。只要在第一次发生引用时初始化这个变量，之后每次查询第一次引用时直接返回这个变量。</p>
+<p>经过优化后，再次使用 perf 生成报告，可以发现相关的函数耗时下降不少。</p>
+<h2 id="result">Result<a hidden class="anchor" aria-hidden="true" href="#result">#</a></h2>
+<p>再次在 GradeScope 上提交，总耗时成功降到了 3.5s 左右，优化效果还是挺明显的。虽说还有挺大的优化空间，但目前的性能应该也够用了。</p>
+<p>还是没有进行针对多线程的性能优化，下次一定。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/benchmark/">Benchmark</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cmu15-445-project2-b&#43;tree-index/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>CMU15-445 Project2 B&#43;Tree Index</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/cmu15-445-project1-buffer-pool-manager/">
+    <span class="title">Next »</span>
+    <br>
+    <span>CMU15-445 Project1 Buffer Pool Manager</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

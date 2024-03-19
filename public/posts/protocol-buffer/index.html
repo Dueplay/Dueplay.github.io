@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Protocol Buffer的使用 | Cookie&#39;s Blog</title>
+<meta name="keywords" content="proto buffer">
+<meta name="description" content="Desc Text.">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/protocol-buffer/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="Protocol Buffer的使用" />
+<meta property="og:description" content="Desc Text." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/protocol-buffer/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-03-20T13:42:01&#43;08:00" />
+<meta property="article:modified_time" content="2023-03-20T13:42:01&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="Protocol Buffer的使用"/>
+<meta name="twitter:description" content="Desc Text."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Protocol Buffer的使用",
+      "item": "http://localhost:1313/posts/protocol-buffer/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Protocol Buffer的使用",
+  "name": "Protocol Buffer的使用",
+  "description": "Desc Text.",
+  "keywords": [
+    "proto buffer"
+  ],
+  "articleBody": "为什么使用Protocol Buffer? 想象一下我们需要序列化/反序列化一个数据结构，有几种可行的方法：\n将原始内存数据结构保存为二进制形式。 但这是一种脆弱的方法，因为它要求读取端必须遵守完全相同的内存布局，并禁止数据格式的扩展。 编写我们自己的编码策略，例如以冒号为分隔的字符串“12:3:-23:67”，这需要我们编写编码和解析代码，这也带来了运行时开销。 将数据序列化为 XML 形式。 这是广泛使用的人类可读格式。 然而，XML 由于冗长而需要大量的存储空间。 Protocol Buffer ：灵活、高效、自动化的解决方案 定义Message syntax = \"proto3\"; // 版本 // 相当于c++中的namespace package tutorial; // 相当于c++中的class/struct message Person { // optional 修饰符表明该字段可能被设置，也可能不被设置。当从未设置的字段中检索值时，return系统默认值，整数为0，字符串为空等。 optional string name = 1; optional int32 id = 2; optional string email =3; // 对于枚举类型，默认值是枚举类型中定义的第一个值 enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2; } message PhoneNumber { optional string number = 1; optional PhoneType type = 2; } // repeated 修饰符相当于数组 repeated PhoneNumber phones = 4; } message AddressBook { repeated Person people = 1; } protobuf buffer message格式定义非常接近 C/C++ 中的类/结构定义。 有相当多的原始数据类型可用，例如int32、string，并且我们可以嵌套自定义数据类型，例如嵌套在PhoneNumber中的PhoneType，以及嵌套在AddressBook中的Person。\n编译Message 安装protocol buffer.在Ubuntu 22.04 LTS,通过下面方式安装\n$ sudo apt install -y protobuf-compiler 检查它的版本是否是最新的\n$ protoc --version libprotoc 3.12.4 现在我们可以将 protobuf message 格式编译成 cpp 文件。 让编译器为我们生成代码。\n$ ls addressbook.proto $ protoc --experimental_allow_proto3_optional --cpp_out=. addressbook.proto // 编译到当前目录 $ ls addressbook.pb.cc addressbook.pb.h addressbook.proto 编译器为我们生成了addressbook.ph.h和addressbook.ph.cc。 代码里包含很多我们上面刚刚定义的消息格式的 getter 和 setter 函数。\n常用的message方法 在所有版本的 protobuf 中都有一些常用的方法。\nbool IsInitialized() const: checks if all the required fields have been set. string DebugString() const: returns a human-readable representation of the message, particularly useful for debugging. void CopyFrom(const Person\u0026 from): overwrites the message with the given message’s values. void Clear(): clears all the elements back to the empty state. bool SerializeToString(string* output) const: serializes the message and stores the bytes in the given string. Note that the bytes are binary, not text; we only use the string class as a convenient container. bool ParseFromString(const string\u0026 data): parses a message from the given string. bool SerializeToOstream(ostream* output) const: writes the message to the given C++ ostream. bool ParseFromIstream(istream* input): parses a message from the given C++ istream. 例子 一个简单的程序，将新的地址信息附加到数据文件中。\n#include #include #include #include \"addressbook.pb.h\" void PromptForAddress(tutorial::Person *person) { std::cout \u003c\u003c \"Enter person ID number: \"; int id; std::cin \u003e\u003e id; person-\u003eset_id(id); std::cin.ignore(256, '\\n'); std::cout \u003c\u003c \"Enter name: \"; getline(std::cin, *person-\u003emutable_name()); std::cout \u003c\u003c \"Enter email address (blank for none): \"; std::string email; getline(std::cin, email); if (!email.empty()) { person-\u003eset_email(email); } while(true) { std::cout \u003c\u003c \"Enter a phone number (or leave blank to finish): \"; std::string number; getline(std::cin, number); if (number.empty()) { break; } tutorial::Person::PhoneNumber *phone_number = person-\u003eadd_phones(); phone_number-\u003eset_number(number); std::cout \u003c\u003c \"Is this a mobile, home, or work phone? \"; std::string type; getline(std::cin, type); if (type == \"mobile\") { phone_number-\u003eset_type(tutorial::Person::MOBILE); } else if (type == \"home\") { phone_number-\u003eset_type(tutorial::Person::HOME); } else if (type == \"work\") { phone_number-\u003eset_type(tutorial::Person::WORK); } else { std::cout \u003c\u003c \"Unknown phone type. Using default.\" \u003c\u003c std::endl; } } } // 从文件中读取整个地址簿，根据用户输入添加一个人，然后将其写回到同一文件中。 int main(int argc, char* argv[]) { // 验证我们链接的库的版本是否与我们编译的header的版本兼容。 GOOGLE_PROTOBUF_VERIFY_VERSION; if (argc != 2) { std::cerr \u003c\u003c \"Usage : \" \u003c\u003c argv[0] \u003c\u003c \" ADDRESSBOOK_FILE\" \u003c\u003c std::endl; return -1; } tutorial::AddressBook address_book; std::fstream ifs(argv[1], std::ios::in | std::ios::binary); if (!ifs) { std::cout \u003c\u003c argv[1] \u003c\u003c \": File not found. Creating a new file.\" \u003c\u003c std::endl; } else if (!address_book.ParseFromIstream(\u0026ifs)) { std::cerr \u003c\u003c \"Failed to parse address book.\" \u003c\u003c std::endl; return -1; } // Add an address. PromptForAddress(address_book.add_people()); // Write the new address book back to disk. std::fstream ofs(argv[1], std::ios::out | std::ios::binary | std::ios::trunc); if (!address_book.SerializeToOstream(\u0026ofs)) { std::cerr \u003c\u003c \"Failed to serialize address book.\" \u003c\u003c std::endl; return -1; } // 可选: 删除 libprotobuf 分配的所有全局对象。 google::protobuf::ShutdownProtobufLibrary(); return 0; } 读二进制文件中的消息\n读上面写的数据文件并展示里面包含的所有信息.\n#include #include #include #include \"addressbook.pb.h\" void ListPeople(tutorial::AddressBook\u0026 address_book) { for (int i = 0; i \u003c address_book.people_size(); i++) { const tutorial::Person\u0026 person = address_book.people(i); std::cout \u003c\u003c \"Person ID: \" \u003c\u003c person.id() \u003c\u003c std::endl; std::cout \u003c\u003c \" Name: \" \u003c\u003c person.name() \u003c\u003c std::endl; if (person.has_email()) { std::cout \u003c\u003c \" email address: \" \u003c\u003c person.email() \u003c\u003c std::endl; } for (int j = 0; j \u003c person.phones_size(); j++) { const tutorial::Person::PhoneNumber\u0026 phone_number = person.phones(j); switch (phone_number.type()) { case tutorial::Person::MOBILE: std::cout \u003c\u003c \" Mobile phone #: \"; break; case tutorial::Person::HOME: std::cout \u003c\u003c \" Home phone #: \"; break; case tutorial::Person::WORK: std::cout \u003c\u003c \" Work phone #: \"; break; } std::cout \u003c\u003c phone_number.number() \u003c\u003c std::endl; } } } // 从文件中读取整个地址簿并打印其中的所有信息。 int main(int argc, char* argv[]) { // 验证我们链接的库的版本是否与我们编译的header的版本兼容。 GOOGLE_PROTOBUF_VERIFY_VERSION; if (argc != 2) { std::cerr \u003c\u003c \"Usage : \" \u003c\u003c argv[0] \u003c\u003c \" ADDRESSBOOK_FILE\" \u003c\u003c std::endl; return -1; } tutorial::AddressBook address_book; std::fstream ifs(argv[1], std::ios::in | std::ios::binary); if (!address_book.ParseFromIstream(\u0026ifs)) { std::cerr \u003c\u003c \"Failed to parse address book.\" \u003c\u003c std::endl; return -1; } ListPeople(address_book); // 可选: 删除 libprotobuf 分配的所有全局对象。 google::protobuf::ShutdownProtobufLibrary(); return 0; } 编译运行 $ g++ -std=c++14 writer.cpp addressbook.pb.cc -o writer -lpthread -lprotobuf $ g++ -std=c++14 reader.cpp addressbook.pb.cc -o reader -lpthread -lprotobuf ",
+  "wordCount" : "716",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2023-03-20T13:42:01+08:00",
+  "dateModified": "2023-03-20T13:42:01+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/protocol-buffer/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      Protocol Buffer的使用
+    </h1>
+    <div class="post-description">
+      Desc Text.
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2023-03-20 13:42:01 &#43;0800 CST&#39;&gt;2023-03-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;716 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/Dueplay/blog/content/posts/Protocol%20Buffer.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>为什么使用<strong>Protocol Buffer</strong>?
+想象一下我们需要序列化/反序列化一个数据结构，有几种可行的方法：</p>
+<ul>
+<li>将原始内存数据结构保存为二进制形式。 但这是一种脆弱的方法，因为它要求读取端必须遵守完全相同的内存布局，并禁止数据格式的扩展。</li>
+<li>编写我们自己的编码策略，例如以冒号为分隔的字符串“12:3:-23:67”，这需要我们编写编码和解析代码，这也带来了运行时开销。</li>
+<li>将数据序列化为 XML 形式。 这是广泛使用的人类可读格式。 然而，XML 由于冗长而需要大量的存储空间。
+<strong>Protocol Buffer</strong> ：灵活、高效、自动化的解决方案</li>
+</ul>
+<h4 id="定义message">定义Message<a hidden class="anchor" aria-hidden="true" href="#定义message">#</a></h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-protobuf" data-lang="protobuf"><span class="line"><span class="cl"><span class="n">syntax</span> <span class="o">=</span> <span class="s">&#34;proto3&#34;</span><span class="p">;</span> <span class="c1">// 版本
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 相当于c++中的namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kn">package</span> <span class="nn">tutorial</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 相当于c++中的class/struct
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">message</span> <span class="nc">Person</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// optional 修饰符表明该字段可能被设置，也可能不被设置。当从未设置的字段中检索值时，return系统默认值，整数为0，字符串为空等。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">string</span> <span class="n">name</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">optional</span> <span class="kt">int32</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">optional</span> <span class="kt">string</span> <span class="n">email</span> <span class="o">=</span><span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// 对于枚举类型，默认值是枚举类型中定义的第一个值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">enum</span> <span class="n">PhoneType</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>        <span class="n">MOBILE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>        <span class="n">HOME</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>        <span class="n">WORK</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="kd">message</span> <span class="nc">PhoneNumber</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>        <span class="k">optional</span> <span class="kt">string</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>        <span class="k">optional</span> <span class="n">PhoneType</span> <span class="n">type</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// repeated 修饰符相当于数组
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">repeated</span> <span class="n">PhoneNumber</span> <span class="n">phones</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">AddressBook</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">repeated</span> <span class="n">Person</span> <span class="n">people</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><p>protobuf buffer message格式定义非常接近 C/C++ 中的类/结构定义。 有相当多的原始数据类型可用，例如int32、string，并且我们可以嵌套自定义数据类型，例如嵌套在PhoneNumber中的PhoneType，以及嵌套在AddressBook中的Person。</p>
+<h4 id="编译message">编译Message<a hidden class="anchor" aria-hidden="true" href="#编译message">#</a></h4>
+<p>安装protocol buffer.在Ubuntu 22.04 LTS,通过下面方式安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ sudo apt install -y protobuf-compiler
+</span></span></code></pre></div><p>检查它的版本是否是最新的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ protoc --version
+</span></span><span class="line"><span class="cl">libprotoc 3.12.4
+</span></span></code></pre></div><p>现在我们可以将 protobuf message 格式编译成 cpp 文件。 让编译器为我们生成代码。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ ls
+</span></span><span class="line"><span class="cl">addressbook.proto
+</span></span><span class="line"><span class="cl">$ protoc --experimental_allow_proto3_optional --cpp_out<span class="o">=</span>. addressbook.proto // 编译到当前目录
+</span></span><span class="line"><span class="cl">$ ls
+</span></span><span class="line"><span class="cl">addressbook.pb.cc  addressbook.pb.h  addressbook.proto
+</span></span></code></pre></div><p>编译器为我们生成了addressbook.ph.h和addressbook.ph.cc。 代码里包含很多我们上面刚刚定义的消息格式的 getter 和 setter 函数。</p>
+<h4 id="常用的message方法">常用的message方法<a hidden class="anchor" aria-hidden="true" href="#常用的message方法">#</a></h4>
+<p>在所有版本的 protobuf 中都有一些常用的方法。</p>
+<ul>
+<li><code>bool IsInitialized() const</code>: checks if all the required fields have been set.</li>
+<li><code>string DebugString() const</code>: returns a human-readable representation of the message, particularly useful for debugging.</li>
+<li><code>void CopyFrom(const Person&amp; from)</code>: overwrites the message with the given message’s values.</li>
+<li><code>void Clear()</code>: clears all the elements back to the empty state.</li>
+<li><code>bool SerializeToString(string* output) const</code>: serializes the message and stores the bytes in the given string. Note that the bytes are binary, not text; we only use the <code>string</code> class as a convenient container.</li>
+<li><code>bool ParseFromString(const string&amp; data)</code>: parses a message from the given string.</li>
+<li><code>bool SerializeToOstream(ostream* output) const</code>: writes the message to the given C++ <code>ostream</code>.</li>
+<li><code>bool ParseFromIstream(istream* input)</code>: parses a message from the given C++ <code>istream</code>.</li>
+</ul>
+<h4 id="例子">例子<a hidden class="anchor" aria-hidden="true" href="#例子">#</a></h4>
+<p>一个简单的程序，将新的地址信息附加到数据文件中。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;fstream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;addressbook.pb.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">PromptForAddress</span><span class="p">(</span><span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span> <span class="o">*</span><span class="n">person</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Enter person ID number: &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">person</span><span class="o">-&gt;</span><span class="n">set_id</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">.</span><span class="n">ignore</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="sc">&#39;\n&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Enter name: &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">getline</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">,</span> <span class="o">*</span><span class="n">person</span><span class="o">-&gt;</span><span class="n">mutable_name</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Enter email address (blank for none): &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">email</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">getline</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">,</span> <span class="n">email</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">email</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">person</span><span class="o">-&gt;</span><span class="n">set_email</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">while</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Enter a phone number (or leave blank to finish): &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">number</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">getline</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">,</span> <span class="n">number</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">number</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="n">PhoneNumber</span> <span class="o">*</span><span class="n">phone_number</span> <span class="o">=</span>  <span class="n">person</span><span class="o">-&gt;</span><span class="n">add_phones</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">phone_number</span><span class="o">-&gt;</span><span class="n">set_number</span><span class="p">(</span><span class="n">number</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Is this a mobile, home, or work phone? &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">type</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">getline</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">cin</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#34;mobile&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">phone_number</span><span class="o">-&gt;</span><span class="n">set_type</span><span class="p">(</span><span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="n">MOBILE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#34;home&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">phone_number</span><span class="o">-&gt;</span><span class="n">set_type</span><span class="p">(</span><span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="n">HOME</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#34;work&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">phone_number</span><span class="o">-&gt;</span><span class="n">set_type</span><span class="p">(</span><span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="n">WORK</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Unknown phone type.  Using default.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 从文件中读取整个地址簿，根据用户输入添加一个人，然后将其写回到同一文件中。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 验证我们链接的库的版本是否与我们编译的header的版本兼容。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">GOOGLE_PROTOBUF_VERIFY_VERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Usage : &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; ADDRESSBOOK_FILE&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">tutorial</span><span class="o">::</span><span class="n">AddressBook</span> <span class="n">address_book</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">fstream</span> <span class="n">ifs</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">in</span> <span class="o">|</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">binary</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ifs</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;: File not found.  Creating a new file.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">address_book</span><span class="p">.</span><span class="n">ParseFromIstream</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ifs</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Failed to parse address book.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Add an address.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">PromptForAddress</span><span class="p">(</span><span class="n">address_book</span><span class="p">.</span><span class="n">add_people</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Write the new address book back to disk.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">std</span><span class="o">::</span><span class="n">fstream</span> <span class="n">ofs</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">out</span> <span class="o">|</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">binary</span> <span class="o">|</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">trunc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">address_book</span><span class="p">.</span><span class="n">SerializeToOstream</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ofs</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Failed to serialize address book.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 可选: 删除 libprotobuf 分配的所有全局对象。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">google</span><span class="o">::</span><span class="n">protobuf</span><span class="o">::</span><span class="n">ShutdownProtobufLibrary</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>读二进制文件中的消息</p>
+<p>读上面写的数据文件并展示里面包含的所有信息.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;fstream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;addressbook.pb.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ListPeople</span><span class="p">(</span><span class="n">tutorial</span><span class="o">::</span><span class="n">AddressBook</span><span class="o">&amp;</span> <span class="n">address_book</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">address_book</span><span class="p">.</span><span class="n">people_size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">&amp;</span> <span class="n">person</span> <span class="o">=</span> <span class="n">address_book</span><span class="p">.</span><span class="n">people</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Person ID: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">person</span><span class="p">.</span><span class="n">id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;  Name: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">person</span><span class="p">.</span><span class="n">name</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">person</span><span class="p">.</span><span class="n">has_email</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;  email address: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">person</span><span class="p">.</span><span class="n">email</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">person</span><span class="p">.</span><span class="n">phones_size</span><span class="p">();</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">const</span> <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="n">PhoneNumber</span><span class="o">&amp;</span> <span class="n">phone_number</span> <span class="o">=</span> <span class="n">person</span><span class="p">.</span><span class="n">phones</span><span class="p">(</span><span class="n">j</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">switch</span> <span class="p">(</span><span class="n">phone_number</span><span class="p">.</span><span class="n">type</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="nl">MOBILE</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;  Mobile phone #: &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">case</span> <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="nl">HOME</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;  Home phone #: &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">case</span> <span class="n">tutorial</span><span class="o">::</span><span class="n">Person</span><span class="o">::</span><span class="nl">WORK</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;  Work phone #: &#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">phone_number</span><span class="p">.</span><span class="n">number</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 从文件中读取整个地址簿并打印其中的所有信息。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 验证我们链接的库的版本是否与我们编译的header的版本兼容。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">GOOGLE_PROTOBUF_VERIFY_VERSION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Usage : &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; ADDRESSBOOK_FILE&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">tutorial</span><span class="o">::</span><span class="n">AddressBook</span> <span class="n">address_book</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">fstream</span> <span class="n">ifs</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">in</span> <span class="o">|</span> <span class="n">std</span><span class="o">::</span><span class="n">ios</span><span class="o">::</span><span class="n">binary</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">address_book</span><span class="p">.</span><span class="n">ParseFromIstream</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ifs</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Failed to parse address book.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ListPeople</span><span class="p">(</span><span class="n">address_book</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 可选: 删除 libprotobuf 分配的所有全局对象。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">google</span><span class="o">::</span><span class="n">protobuf</span><span class="o">::</span><span class="n">ShutdownProtobufLibrary</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="编译运行">编译运行<a hidden class="anchor" aria-hidden="true" href="#编译运行">#</a></h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ g++ -std<span class="o">=</span>c++14 writer.cpp addressbook.pb.cc -o writer -lpthread -lprotobuf
+</span></span><span class="line"><span class="cl">$ g++ -std<span class="o">=</span>c++14 reader.cpp addressbook.pb.cc -o reader -lpthread -lprotobuf
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/proto-buffer/">Proto Buffer</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cmake/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>cmake Tutorial</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/database-and-distributed-system-tags/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Database and Distributed System TAGS</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
