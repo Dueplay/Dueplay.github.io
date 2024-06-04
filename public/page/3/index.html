@@ -159,38 +159,102 @@ if (!doNotTrack) {
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>namespace，using，重载，extern c
+    <h2>zsh安装与配置
     </h2>
   </header>
   <div class="entry-content">
-    <p>1.::作用域运算符 可用::对被屏蔽的同名的全局变量进行访问
-后面有::的名称一定是类名或命名空间名。直接::代表全局作用域下
-通常情况下，如果有两个同名变量，一个是全局变量，另一个是局部变量，那么局部变量在其作用域内具有较高的优先权，它将屏蔽全局变量（就近原则）。
-//全局变量 int a = 10; void test(){ //局部变量 int a = 20; //全局a被隐藏 cout &lt;&lt; &#34;a:&#34; &lt;&lt; a &lt;&lt; endl; } 程序的输出结果是a:20。在test函数的输出语句中，使用的变量a是test函数内定义的局部变量，因此输出的结果为局部变量a的值。
-作用域运算符可以用来解决局部变量与全局变量的重名问题
-//全局变量 int a = 10; //1. 局部变量和全局变量同名 void test(){ int a = 20; //打印局部变量a cout &lt;&lt; &#34;局部变量a:&#34; &lt;&lt; a &lt;&lt; endl; //打印全局变量a cout &lt;&lt; &#34;全局变量a:&#34; &lt;&lt; ::a &lt;&lt; endl; } 这个例子可以看出，作用域运算符可以用来解决局部变量与全局变量的重名问题，即在局部变量的作用域内，可用::对被屏蔽的同名的全局变量进行访问。
-2.namespace 1.命名空间用途：解决名称冲突
-在game1和game2中都有相同名称的goAtk函数，如果不使用命名空间，会有二义性，编译报错。
-#include &lt;iostream&gt; using namespace std; #include &#34;game1.h&#34; #include &#34;game2.h&#34; void test01(){ LOL::goAtk(); KingGlory::goAtk(); } int main() { test01(); system(&#34;pause&#34;); return 0; } game1....</p>
+    <p>安装 ubuntu系统默认的shell是bash，可以使用echo $SHELL命令来查看当前使用的shell，zsh是bash的一个替代品，它的功能更加强大和丰富，可以使用cat /etc/shells来查看支持的shell
+如果结果中没有zsh的话就需要使用下面的命令来安装一下：
+sudo apt install zsh -y 安装字体 这里安装powerlevel10k主题推荐使用的MesloLGS-Nerd字体。
+一般在初次安装配置主题的时候会默认提示安装，但是如果没有正常安装的话也可以使用下面的内容来手动安装一下： MesloLGS字体ttf文件下载地址：
+wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf 安装完成之后在系统设置或者各个软件比如终端或者VSCode上把字体设置为MesloLGS NF就可以了。
+# 将下载的字体拷贝至truetype sudo cp ttf/*.ttf /usr/share/fonts/truetype/ # 安装fontconfig sudo apt install fontconfig # 刷新字体缓存 fc-cache -fv 安装Oh-My-Zsh sh -c &#34;$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&#34; 慢或者失败的小伙伴可以换成国内源:
+wget https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh 下载之后给install.sh添加执行权限：
+chmod &#43;x install.sh 然后还需要修改一下安装脚本中的远程仓库地址：
+打开install.sh文件，找到以下部分：
+# Default settings ZSH=${ZSH:-~/.oh-my-zsh} REPO=${REPO:-ohmyzsh/ohmyzsh} REMOTE=${REMOTE:-https://github.com/${REPO}.git} BRANCH=${BRANCH:-master} 将中间两行修改为下面这样，使用gitee镜像：
+REPO=${REPO:-mirrors/ohmyzsh} REMOTE=${REMOTE:-https://gitee.com/${REPO}.git} 然后保存退出，再执行一下，一般就应该安装好了。
+将系统默认shell切换为zsh...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-02-22 18:50:01 &#43;0800 CST&#39;&gt;2021-02-22&lt;/span&gt;&amp;nbsp;·&amp;nbsp;3 min&amp;nbsp;·&amp;nbsp;454 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to namespace，using，重载，extern c" href="http://localhost:1313/posts/namespace%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-01-26 20:03:48 &#43;0800 CST&#39;&gt;2023-01-26&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;117 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to zsh安装与配置" href="http://localhost:1313/posts/zsh/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Hugo Test
+    <h2>Docker的使用
     </h2>
   </header>
   <div class="entry-content">
-    <p>First time here, just a test. 测试。</p>
+    <p>配置 Docker 使用 WSL 2 安装和设置 WSL 2 后，你需要确保 Docker Desktop 配置为使用 WSL 2。这可以通过 Docker Desktop 的设置进行：
+打开 Docker Desktop。 进入 Settings（设置）&gt; General（常规）。 确认 “Use the WSL 2 based engine”（使用基于 WSL 2 的引擎）选项已经被选中。 docker使用 1. 管理镜像 拉取镜像：
+docker pull [options] &lt;image&gt;:&lt;tag&gt; 例如：docker pull ubuntu:20.04
+列出镜像：
+docker images 构建镜像：
+docker build -t &lt;image_name&gt;:&lt;tag&gt; . 例如：docker build -t myapp:latest .
+latest为默认tag，.表示目录
+删除镜像：
+docker rmi &lt;image&gt; 例如：docker rmi myapp:latest
+2. 管理容器 运行容器：
+docker run [options] &lt;image&gt;:&lt;tag&gt; 例如：docker run -d --name webserver -p 80:80 nginx...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-02-20 13:42:01 &#43;0800 CST&#39;&gt;2021-02-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;7 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to Hugo Test" href="http://localhost:1313/posts/hugo-test/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2022-12-03 11:32:01 &#43;0800 CST&#39;&gt;2022-12-03&lt;/span&gt;&amp;nbsp;·&amp;nbsp;2 min&amp;nbsp;·&amp;nbsp;355 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to Docker的使用" href="http://localhost:1313/posts/docker/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>chrono库的使用
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>chrono库主要包含三种类型的类：时间间隔duration、时钟clocks、时间点time point
+1.duration 用来记录时间长度，可以表示几秒、几分钟、几个小时的时间间隔
+// duration的定义，定义于头文件 &lt;chrono&gt; template&lt; class Rep, class Period = std::ratio&lt;1&gt; &gt; class duration; //表示Rep个Period，一个period是一个ratio类，默认为1s // ratio的定义，定义于头文件 &lt;ratio&gt; template&lt; std::intmax_t Num, std::intmax_t Denom = 1 &gt; class ratio; // 代表 Num / Denom 秒，分母默认为1，ratio&lt;2&gt;代表一个时钟周期是2秒 为了方便使用，在标准库中定义了一些常用的时间间隔,定义如下
+纳秒：using std::chrono::nanoseconds = duration&lt;Rep*/*Rep至少 64 位的有符号整数类型*/*, std::nano&gt;; std::nano 为 ratio&lt;1,10e9&gt; 微秒：std::chrono::microseconds	duration&lt;Rep*/*至少 55 位的有符号整数类型*/*, std::micro&gt; 毫秒：std::chrono::milliseconds	duration&lt;Rep*/*至少 45 位的有符号整数类型*/*, std::milli&gt; 秒： std::chrono::seconds	duration&lt;Rep*/*至少 35 位的有符号整数类型*/*&gt; 分钟：std::chrono::minutes	duration&lt;Rep*/*至少 29 位的有符号整数类型*/*, std::ratio&lt;60&gt;&gt; std::chrono::minutes m(1);//表示1m 小时：std::chrono::hours	duration&lt;Rep*/*至少 23 位的有符号整数类型*/*, std::ratio&lt;3600&gt;&gt; 构造函数...</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-05-23 13:42:01 &#43;0800 CST&#39;&gt;2022-05-23&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;861 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to chrono库的使用" href="http://localhost:1313/posts/chrono/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>Git Tutorial
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Git Local 1.Check the Version $ git --version 2.Configure Git 我们通常会将 git 配置为我们在 github 上注册的用户名/电子邮件/密码。global 关键字会为系统中的每个版本库设置配置。我们可以去掉 global 关键字，只对当前仓库进行配置。
+# 配置 $ git config --global user.name &#34;Dueplay&#34; $ git config --global user.email &#34;2289535823@qq.com&#34; $ git config --global user.password &#34;your passwd&#34; # 查看配置 $ git config user.name Dueplay $ git config user.email 2289535823@qq.com $ git config user.password hello123 3. Initialize Git 创建一个新的 repo，并如下初始化 git 以跟踪一个文件夹：
+$ mkdir myproject &amp;&amp; cd myproject $ git init 在myproject有个隐藏文件夹 ....</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-01-20 10:42:01 &#43;0800 CST&#39;&gt;2022-01-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;8 min&amp;nbsp;·&amp;nbsp;1579 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to Git Tutorial" href="http://localhost:1313/posts/git/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>配置ssh免密登录
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>ssh方式A主机免密登录B
+1.首先在A主机上执行命令
+ssh-keygen -t rsa 会在执行命令的当前用户的家目录下的.ssh中生成公钥和私钥，id_rsa和id_rsa.pub分别存放私钥和公钥。
+2.将公钥加入到B主机的~/.ssh/authorized_keys文件中
+scp方式or手动复制粘贴。
+scp ~/.ssh/id_rsa.pub root@B主机ip:~/ B主机上执行：
+cat ~/id_rsa.pub&gt;&gt;~/.ssh/authorized_keys 3.如果不能登录检查以下注意的点和检查/etc/ssh/sshd_config，确保以下配置打开。
+RSAAuthentication yes PubkeyAuthentication yes AuthorizedKeysFile .ssh/authorized_keys 需要注意的几点： 1、确保A机器私钥文件名是id_rsa，否则会因为识别不到私钥文件而不会执行免密rsa登录；
+2、确保B机器上.ssh/authorized_keys文件的属性是600，否则要使用命令、
+chmod 600 ~/.ssh/authorized_keys 更改属性。 3、authorized_keys存放的目录需要与登录用户对应，比如使用root用户登录，则是在/home/root/.ssh/authorized_keys</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2021-09-03 20:30:08 &#43;0800 CST&#39;&gt;2021-09-03&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;29 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to 配置ssh免密登录" href="http://localhost:1313/posts/ssh%E6%96%B9%E5%BC%8Fa%E4%B8%BB%E6%9C%BA%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95b/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
     <a class="prev" href="http://localhost:1313/page/2/">« Prev</a>
+    <a class="next" href="http://localhost:1313/page/4/">Next »</a>
   </nav>
 </footer>
     </main>

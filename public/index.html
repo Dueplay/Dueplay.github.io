@@ -187,6 +187,47 @@ if (!doNotTrack) {
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2>stl中的算法介绍
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>stl算法
+算法把迭代器作为中介从而间接操作容器中的元素，而不直接操作容器本身。所有标准库算法都实现为函数模板的形式，其中模板类型参数一般都是迭代器类型。模板化的函数通常可通过函数参数推导出模板类型，因此通常情况下可以像调用普通函 数(而非模板)那样调用算法。
+简单例子 1.find和find_if
+find()在某个迭代器范围内查找特定元素。可将其用于任意容器类型。这个算法返回所找到元素的迭代器: 如果没有找到元素，则返回迭代器范围的尾迭代器。注意调用 find()时指定的范围不要求是容器中元素的完整范围，还可以是元素的子集。 注意： 如果 fnd()没有找到元素，那么返回的迭代器等于函数调用中指定的尾迭代器，而不是底层容器的尾迭代器
+auto endIt =cend(myVector); auto it = find(cbegin(myVector),endIt,num); // it == endIt -&gt; not find // c&#43;&#43;17 if (auto it = find(cbegin(myVector),endIt,num); it == endIt) { // not find } 一些容器(例如 map和 set)以类方法的方式提供自己的 find()函数。如果容器提供的方法具有与泛型算法同样的功能，那么应该使用容器相应的方法，那样速度更快。比如，泛型算法 find()的复杂度为线性时间，用于 map 迭代器时也是如此; 而 map 中find()方法的复杂度是对数时间。
+find_if
+find_if()和 find()类似，区别在于 find _f()接收谓词函数回调作为参数，而不是简单的匹配元素。谓词返回true或false。find_if()算法对范围内的每个元素调用谓词，直到谓词返回ture: 如果返回了true,find if()返回这个元素的迭代器。
+find_if(cbegin(myVector),endIt,Prec); 2.accumulate
+我们经常需要计算容器中所有元素的总和或其他算术值。acumulate函数就提供了这种功能，该函数在(而非)中定义。通过这个函数的最基本形式可计算指定范围内元素的总和。
+// 总和 int sum = accumulate(cbegin(nums)， cend(nums)， 0); // 给accumulate提供的二元回调。也可以是lambda int product(int num1，int num2) { return numl *num2; } // 计算乘积 double mult = accumulate(cbegin(nums)， cend(nums)，1，product); std:function std:function 在头文件中定义，可用来创建指向函数、函数对象或lambda 表达式的类型; 从根本上说可以指向任何可调用的对象。它被称为多态函数包装器，可以当成函数指针使用，还可用作实现回调的函数的参数。...</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2024-04-13 21:32:01 &#43;0800 CST&#39;&gt;2024-04-13&lt;/span&gt;&amp;nbsp;·&amp;nbsp;6 min&amp;nbsp;·&amp;nbsp;1083 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to stl中的算法介绍" href="http://localhost:1313/posts/stl%E7%AE%97%E6%B3%95/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>智能指针
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>unique_ptr 考虑下面的函数，这个函数在堆上分配了一个 Simple 对象，但是不释放这个对象，故意产生内存泄漏。
+void leaky() { Simple* mySimplePtr = new Simple(); // BUG! Memory is never released! mySimplePtr-&gt;go(); } 有时你可能认为，代码正确地释放了动态分配的内存。遗憾的是，这种想法几乎总是不正确的。比如这个函数:
+void couldBeLeaky() { Simple*mySimplePtr =new Simple(); mySimplePtr-&gt;go(); delete mySimplePtr; } 上面的函数动态分配一个 Simple 对象，使用该对象，然后正确地调用 delete。但是，这个例子仍然可能产生内存泄漏! 如果 go方法抛出一个异常，将永远不会调用 delete，导致内存泄漏。
+这两种情况下应使用 unique_ptr。对象不会显式删除，但实例 unique_ptr离开作用域时(在函数的末尾，或者因为抛出了异常)，就会在其析构函数中自动释放 Simple 对象:
+void notLeaky() { auto mySimpleSmartPtr =make unique&lt;Simple&gt;(); mySimpleSmartPtr-&gt;go(); } 这段代码使用 C&#43;&#43;14 中的 make_unique和 auto 关键字，所以只需要指定指针的类型，本例中是 Simple,如果Simple构造函数需要参数，就把它们放在make_unique()调用的圆括号中。
+如果编译器不支持make_unique, 可以这种方式创建。
+unique_ptr&lt;Simple&gt; p(new Simple()); 像标准指针一样，仍可以使用*或-&gt;对智能指针进行解引用。
+get()方法可用于直接访问底层指针。这可将指针传递给需要普通指针的函数。例如
+void processData(Simple* simple)( /* Use the simple pointer....</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2024-03-12 15:12:01 &#43;0800 CST&#39;&gt;2024-03-12&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;702 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to 智能指针" href="http://localhost:1313/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2>catch2测试框架
     </h2>
   </header>
@@ -203,91 +244,36 @@ struct DatabaseFixture { Database db; DatabaseFixture() : db(&#34;my_database&#3
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>cmake Tutorial
+    <h2>bustub project4 concurrency
     </h2>
   </header>
   <div class="entry-content">
-    <p>文件目录结构 $ tree . ├── add.c ├── div.c ├── head.h ├── main.c ├── mult.c └── sub.c # 指定使用的 cmake 的最低版本，可选，非必须，如果不加可能会有警告 cmake_minimum_required(VERSION 3.0) # 定义工程名称，并可指定工程的版本、工程描述、web主页地址、支持的语言 project(CALC) # 定义工程会生成一个可执行程序，语法add_executable(可执行程序名 源文件名称) add_executable(app add.c div.c main.c mult.c sub.c) # 定义变量，语法: set(VAR VALUE [CACHE TYPE DOCSTRING [FORCE]]).[]里是可选的 # eg.将文件名对应字符串存起来。 # 方式1: 各个源文件之间使用空格间隔 # set(SRC_LIST add.c div.c main.c mult.c sub.c) # 方式2: 各个源文件之间使用分号 ; 间隔 set(SRC_LIST add.c;div.c;main.c;mult.c;sub.c) add_executable(app ${SRC_LIST}) # 指定c&#43;&#43;标准 # 使用g&#43;&#43;时: $ g&#43;&#43; *.cpp -std=c&#43;&#43;11 -o app # C&#43;&#43;标准对应有一宏叫做DCMAKE_CXX_STANDARD，在CMake中想要指定C&#43;&#43;标准有两种方式： # 在cmakelists....</p>
+    <p>overview Lock Manager：锁管理器，利用 2PL 实现并发控制。支持 REPEATABLE_READ、READ_COMMITTED 和 READ_UNCOMMITTED 三种隔离级别，支持 SHARED、EXCLUSIVE、INTENTION_SHARED、INTENTION_EXCLUSIVE 和 SHARED_INTENTION_EXCLUSIVE 五种锁，支持 table 和 row 两种锁粒度，支持锁升级。Project 4 重点部分。 Deadlock Detection：死锁检测，运行在一个 后台线程，每间隔一定时间检测当前是否出现死锁，并挑选合适的事务将其 abort 以解开死锁。 Concurrent Query Execution：修改之前实现的 SeqScan、Insert 和 Delete 算子，加上适当的锁以实现并发的查询。 Lock Manager 首先理一理 Lock Manager 的成员：
+table_lock_map_：记录 table 和与其相关锁请求的map。 row_lock_map_：记录 row 和与其相关锁请求的map。 这两个 map 的值均为锁请求队列 LockRequestQueue：
+request_queue_：实际存放锁请求的队列 cv_ &amp; latch_：条件变量和锁，配合使用可以实现经典的等待资源模型。 upgrading_：正在此资源上尝试锁升级的事务 id。 锁请求以 LockRequest 表示：
+txn_id_：发起此请求的事务 id。 lock_mode_：请求锁的类型,有S,X,IS,IX,SIX。 oid_：在 table 粒度锁请求中，代表 table id。在 row 粒度锁请求中，表示 row 属于的 table 的 id。 rid_：仅在 row 粒度锁请求中有效。指 row 对应的 rid。 granted_：是否已经对此请求授予锁 on_table_: 锁请求是在表上还是在行上 Lock Manager 的作用:...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2023-03-25 14:42:01 &#43;0800 CST&#39;&gt;2023-03-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;869 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to cmake Tutorial" href="http://localhost:1313/posts/cmake/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-12-25 22:20:01 &#43;0800 CST&#39;&gt;2023-12-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;3 min&amp;nbsp;·&amp;nbsp;544 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to bustub project4 concurrency" href="http://localhost:1313/posts/bustub-project4-concurrency/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Protocol Buffer的使用
+    <h2>bustub project2
     </h2>
   </header>
   <div class="entry-content">
-    <p>为什么使用Protocol Buffer? 想象一下我们需要序列化/反序列化一个数据结构，有几种可行的方法：
-将原始内存数据结构保存为二进制形式。 但这是一种脆弱的方法，因为它要求读取端必须遵守完全相同的内存布局，并禁止数据格式的扩展。 编写我们自己的编码策略，例如以冒号为分隔的字符串“12:3:-23:67”，这需要我们编写编码和解析代码，这也带来了运行时开销。 将数据序列化为 XML 形式。 这是广泛使用的人类可读格式。 然而，XML 由于冗长而需要大量的存储空间。 Protocol Buffer ：灵活、高效、自动化的解决方案 定义Message syntax = &#34;proto3&#34;; // 版本 // 相当于c&#43;&#43;中的namespace package tutorial; // 相当于c&#43;&#43;中的class/struct message Person { // optional 修饰符表明该字段可能被设置，也可能不被设置。当从未设置的字段中检索值时，return系统默认值，整数为0，字符串为空等。 optional string name = 1; optional int32 id = 2; optional string email =3; // 对于枚举类型，默认值是枚举类型中定义的第一个值 enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2; } message PhoneNumber { optional string number = 1; optional PhoneType type = 2; } // repeated 修饰符相当于数组 repeated PhoneNumber phones = 4; } message AddressBook { repeated Person people = 1; } protobuf buffer message格式定义非常接近 C/C&#43;&#43; 中的类/结构定义。 有相当多的原始数据类型可用，例如int32、string，并且我们可以嵌套自定义数据类型，例如嵌套在PhoneNumber中的PhoneType，以及嵌套在AddressBook中的Person。...</p>
+    <p>实验中给出的 B&#43; 树接口非常简单，基本只有查询、插入和删除三个接口，内部基本没有给出别的辅助函数，可以让我们自由发挥（无从下手）。因此，任何合法的 B&#43; 树实现都是允许的。
+B&#43; 树索引在 Bustub 中的位置如图所示:
+B&#43;树种需要的page都需要使用在 Project 1 中实现的 buffer pool manager 来获取。
+Checkpoint1 Single Thread B&#43;Tree Checkpoint1 分为两个部分：
+Task1: B&#43;Tree pages，B&#43;树中的各种 page。在 Bustub 索引 B&#43; 树中，所有的节点都是一个 page。包含 leaf page，internal page ，和它们的父类 tree page。 Task2：B&#43;Tree Data Structure (Insertion, Deletion, Point Search)。Checkpoint1 的重点，即 B&#43;树的插入、删除和单点查询。 Task1 B&#43;Tree Pages task1 主要实现leaf page和internal page这两个类，都继承自BPlusTreePage这个父类，实现一些Getter和Setter方法。
+首先介绍一下page的内存布局
+其中，data_ 是实际存放 page 数据的地方，大小为 BUSTUB_PAGE_SIZE，为 4KB。其他的成员是 page 的 metadata。
+B&#43;树中的 tree page 数据均存放在 page 的 data 成员中，也就是B&#43;树中的节点是Page的data数据成员。...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2023-03-20 13:42:01 &#43;0800 CST&#39;&gt;2023-03-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;716 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to Protocol Buffer的使用" href="http://localhost:1313/posts/protocol-buffer/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>Database and Distributed System TAGS
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>知识点中转站！
-分布式 Raft：
-论文 翻译 Paxos：
-OpenACID Blog 最终一致性：
-DDIA 线性一致性：
-DDIA PingCAP：Raft与线性一致性 线性一致性与可串行化 CAP 定理：
-CAP定理没有帮助 顺序：
-DDIA 全序广播：
-DDIA 2PC：
-DDIA 3PC：
-DDIA </p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2023-03-18 20:43:22 &#43;0800 CST&#39;&gt;2023-03-18&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;25 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to Database and Distributed System TAGS" href="http://localhost:1313/posts/database-and-distributed-system-tags/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>zsh安装与配置
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>安装 ubuntu系统默认的shell是bash，可以使用echo $SHELL命令来查看当前使用的shell，zsh是bash的一个替代品，它的功能更加强大和丰富，可以使用cat /etc/shells来查看支持的shell
-如果结果中没有zsh的话就需要使用下面的命令来安装一下：
-sudo apt install zsh -y 安装字体 这里安装powerlevel10k主题推荐使用的MesloLGS-Nerd字体。
-一般在初次安装配置主题的时候会默认提示安装，但是如果没有正常安装的话也可以使用下面的内容来手动安装一下： MesloLGS字体ttf文件下载地址：
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf &amp;&amp; wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf 安装完成之后在系统设置或者各个软件比如终端或者VSCode上把字体设置为MesloLGS NF就可以了。
-# 将下载的字体拷贝至truetype sudo cp ttf/*.ttf /usr/share/fonts/truetype/ # 安装fontconfig sudo apt install fontconfig # 刷新字体缓存 fc-cache -fv 安装Oh-My-Zsh sh -c &#34;$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&#34; 慢或者失败的小伙伴可以换成国内源:
-wget https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh 下载之后给install.sh添加执行权限：
-chmod &#43;x install.sh 然后还需要修改一下安装脚本中的远程仓库地址：
-打开install.sh文件，找到以下部分：
-# Default settings ZSH=${ZSH:-~/.oh-my-zsh} REPO=${REPO:-ohmyzsh/ohmyzsh} REMOTE=${REMOTE:-https://github.com/${REPO}.git} BRANCH=${BRANCH:-master} 将中间两行修改为下面这样，使用gitee镜像：
-REPO=${REPO:-mirrors/ohmyzsh} REMOTE=${REMOTE:-https://gitee.com/${REPO}.git} 然后保存退出，再执行一下，一般就应该安装好了。
-将系统默认shell切换为zsh...</p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2023-01-26 20:03:48 &#43;0800 CST&#39;&gt;2023-01-26&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;117 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to zsh安装与配置" href="http://localhost:1313/posts/zsh/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>MIT6.824 Lab3 KVService
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Introduction 摸了一段时间的鱼，去尝试用 SpringBoot &#43; Vue 搭建一个前后端分离的 Web 应用。都说 CS 的学生不能只会用框架 CRUD，但更不能不会用框架 CRUD。大概做出来一个小 demo 后就没有再继续了。接着来做 6.824。
-Lab3 和 Lab2 各有各的难处。Lab2 是 Raft 的核心，需要小心地处理各种 corner case。但好在有 Figure2 的引导，最终也是按照其严格的规定成功实现。Lab3 编码难度不如 Lab2，但没有详细的引导，留给个人自由发挥的空间更大 (更有可能不知道从何下手)。
-Lab3 需要在 Raft 层上实现一个 fault-tolerant key-value service，满足强一致性，也就是线性一致性 (Linearizable Consistency)。线性一致性保证整个系统看起来好像只有一个副本，其中所有的操作都是原子性的。简单地说，线性一致性系统的读写操作有以下特征：
-读写并不能瞬间完成，而是在一个时间段内进行。 读在写开始前完成，读到的一定是旧值；读在写完成之后开始，读到的一定是新值。(读写操作无重合部分) 读写并发进行，即有重合部分时，既可能读到新值，也可能读到旧值。 一旦有一个客户端读取到了新值，那么之后的客户端一定也都会读取到新值。 关于线性一致性更加详细的定义和解析，可以阅读《数据密集型应用系统》(DDIA) 相关章节。
-先来看看整个系统的架构：
-整个 KV Service 由多个 Server 组成，每个 Server 包含一个 State Machine，具体在 lab 中是一个 KV 数据库；Server 还包含一个 Raft 节点。需要注意的是，各 Server 之间并不会直接通信，而是靠其 Raft 节点进行通信。
-整个系统的理想运行流程是：
-Client 通过 RPC 向 KV Service 发送请求，例如 Put(x,1) KV Service 将请求转发给当前拥有 Leader Raft 节点的 Server Leader Server 将请求包含的 command 传递给 Raft 层 Raft 层对 command 进行共识，生成相同的 log replica 在达成共识后，Raft 层将 command Apply 回 Server Server 收到 Raft 层的 Apply 后，将 command 应用到状态机，即状态机此时状态为 {x: 1} 成功应用至状态机后，Server 对 Client 的 RPC 进行回复，返回结果和错误码。 当系统能够正常运行时，一切看起来都很清晰美好。但是一旦出现问题，如节点挂掉、RPC丢包、网络分区等等，情况就变得比较复杂了。...</p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-09-22 18:16:09 &#43;0800 CST&#39;&gt;2022-09-22&lt;/span&gt;&amp;nbsp;·&amp;nbsp;8 min&amp;nbsp;·&amp;nbsp;1506 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to MIT6.824 Lab3 KVService" href="http://localhost:1313/posts/mit6.824-lab3-kvservice/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-12-10 18:12:01 &#43;0800 CST&#39;&gt;2023-12-10&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;913 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to bustub project2" href="http://localhost:1313/posts/bustub-project2/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>智能指针 | Cookie&#39;s Blog</title>
+<meta name="keywords" content="c&#43;&#43;">
+<meta name="description" content="c&#43;&#43;中的智能指针">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="智能指针" />
+<meta property="og:description" content="c&#43;&#43;中的智能指针" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-03-12T15:12:01&#43;08:00" />
+<meta property="article:modified_time" content="2024-03-12T15:12:01&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="智能指针"/>
+<meta name="twitter:description" content="c&#43;&#43;中的智能指针"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "智能指针",
+      "item": "http://localhost:1313/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "智能指针",
+  "name": "智能指针",
+  "description": "c++中的智能指针",
+  "keywords": [
+    "c++"
+  ],
+  "articleBody": "unique_ptr 考虑下面的函数，这个函数在堆上分配了一个 Simple 对象，但是不释放这个对象，故意产生内存泄漏。\nvoid leaky() { Simple* mySimplePtr = new Simple(); // BUG! Memory is never released! mySimplePtr-\u003ego(); } 有时你可能认为，代码正确地释放了动态分配的内存。遗憾的是，这种想法几乎总是不正确的。比如这个函数:\nvoid couldBeLeaky() { Simple*mySimplePtr =new Simple(); mySimplePtr-\u003ego(); delete mySimplePtr; } 上面的函数动态分配一个 Simple 对象，使用该对象，然后正确地调用 delete。但是，这个例子仍然可能产生内存泄漏! 如果 go方法抛出一个异常，将永远不会调用 delete，导致内存泄漏。\n这两种情况下应使用 unique_ptr。对象不会显式删除，但实例 unique_ptr离开作用域时(在函数的末尾，或者因为抛出了异常)，就会在其析构函数中自动释放 Simple 对象:\nvoid notLeaky() { auto mySimpleSmartPtr =make unique\u003cSimple\u003e(); mySimpleSmartPtr-\u003ego(); } 这段代码使用 C++14 中的 make_unique和 auto 关键字，所以只需要指定指针的类型，本例中是 Simple,如果Simple构造函数需要参数，就把它们放在make_unique()调用的圆括号中。\n如果编译器不支持make_unique, 可以这种方式创建。\nunique_ptr\u003cSimple\u003e p(new Simple()); 像标准指针一样，仍可以使用*或-\u003e对智能指针进行解引用。\nget()方法可用于直接访问底层指针。这可将指针传递给需要普通指针的函数。例如\nvoid processData(Simple* simple)( /* Use the simple pointer...*/ // 可采用如下方式进行调用: auto mySimpleSmartPtr = make_unique\u003cSimple\u003e(); processData(mySimpleSmartPtr.get()); 可释放unique_ptr 的底层指针，并使用reset()根据需要将其改成另一个指针。\nmySimpleSmartPtr.reset(); // Free resource and set to nullptr mySimpleSmartPtr.reset(new Simple()); // Free resource and set to a new Simple instance 可使用 release()断开 unique_ptr 与底层指针的连接。release方法返回资源的底层指针，然后将智能指针设 为 nullptr。实际上，智能指针失去对资源的所有权，负责在你用完资源时释放资源。\nSimple* simple= mySimpleSmartPtr.release();// Release ownership //Use the simple pointer... delete simple; simple = nullptr; 由于 unique_ptr代表唯一拥有权，因此无法复制它!使用 std::move() 移动语义将一个unique_ptr 移到另一个。这用于显式移动所有权。\nclass Foo { public: Foo(unique ptr\u003cint\u003e data) : mData(move(data)) {} private: unique_ptr\u003cint\u003emData; }; auto myIntSmartPtr = make unique\u003cint\u003e(42); Foo f(move(myIntSmartPtr)); unique_ptr 适用于存储动态分配的旧式C 风格数组。下例创建了一个 unique_ptr 来保存动态分配的、包含10个整数的C风格数组:\nauto myVariableSizedArray = make_unique\u003cint[]\u003e(10); 自定义 deleter 默认情况下，unique_ptr 使用标准的new 和delete运算符来分配和释放内存。可将此行为改成:\nint* malloc_int(int value) { int*p= (int*)malloc(sizeof(int)); *p=value; return p; } int main() { unique ptr\u003cint，decltype(free)*\u003e myIntSmartPtr(malloc_int(42)，free); return 0; } 这段代码使用 malloc_int()给整数分配内存。unique_ptr 调用标准的 free函数来释放内存。如前所述, 在C++中不应该使用 malloc，而应改用 new。然而，unique_ptr 的这项特性是很有用的，因为还可管理其他类型的资源而不仅是内存。例如，当 unique_ptr 离开作用域时，可自动关闭文件或网络套接字以及其他任何资源。 但是，unique_ptr 的自定义 deleter 的语法有些费解。需要将自定义 deleter 的类型指定为模板类型参数. decltype(free)用于返回 free()类型。模板类型参数应当是函数指针的类型，因此另外附加一个*，如decltype(free)*\nshared_ptr shared_ptr 的用法与 unique_ptr 类似。要创建 shared_ptr，可使用 make_shared()，它比直接创建 shared_ptr更高效。\n更高效原因：\n当使用 std::make_shared 创建 shared_ptr 时，所有需要的内存（包括对象本身和控制块）在一次分配中完成。这减少了内存分配的次数，从而提高了效率。\n而直接使用 std::shared_ptr 构造函数创建对象通常需要两次内存分配，一次用于对象本身，一次用于控制块。\n在直接使用 new 的情况下，在对象构造和控制块分配之间，如果对象构造抛出异常，可能会导致内存泄漏。而 std::make_shared 在分配和构造对象的过程中是异常安全的。\nauto mySimpleSmartPtr = make_shared\u003cSimple\u003e(); std::shared_ptr\u003cSimple\u003e ptr(new Simple()); 与unique_ptr 一样，shared_ptr 也支持 get和reset方法。唯一的区别在于，当调用 reset时，由于引用计数，仅在最后的 shared_ptr销毁或重置时,才释放底层资源。注意,shared ptr 不支持 release。可使用use count()来检索共享同一资源的shared_ptr 实例数量。\n与 unique_ptr 类似，shared_ptr 默认情况下使用标准的 new 和 delete 运算符来分配和释放内存;在 C++17 中存储C风格数组时，使用 new[]和 delete[]。可更改此行为\nshared_ptr\u003cint\u003e myIntSmartPtr(malloc_int(42)， free); 可以看到，不必将自定义 deleter 的类型指定为模板类型参数，这比 unique_ptr 的自定义 deleter 更简便。\n下面的示例使用 shared_ptr 存储文件指针。当 shared_ptr 离开作用域时(此处为脱离作用域时)，会调用 CloseFile函数来自动关闭文件指针。回顾一下，C++中有可以操作文件的面向对象的类。这些类在离开作用域时会自动关闭文件。\nvoid CloseFile(FILE* filePtr) { if (filePtr==nullptr) return; fclose(filePtr); cout \u003c\u003c\"File closed.\" \u003c\u003c endl; } int main() { FILE* f = fopen(\"data.txt\", uw\"); // 自定义deleter shared ptr\u003cFILE\u003e filePtr(f, CloseFile); if (filePtr== nullptr) { cerr \u003c\u003c \"Error opening file.\" \u003c\u003c endl; } else { cout \u003c\u003c\"File opened.\" \u003c\u003c endl; } //Use filePtr return 0; } 双重删除的问题 如果要创建两个标准的 shared_ptr，并使它们都指向同一个 Simple 对象，如下面的代码所示，在销毁时，两个智能指针将尝试删除同一个对象:\nvoid doubleDelete() { Simple*mySimple=new Simple(); shared ptr\u003cSimple\u003e smartPtrl(mySimple); shared ptr\u003cSimple\u003e smartPtr2(mySimple); } 根据编译器，这段代码可能会崩溃!如果得到了输出，则输出为: Simple constructor called! Simple destructor called! Simple destructor called 只调用一次构造函数，却调用两次析构函数?使用 unique ptr 也会出现同样的问题。然而，根据 C+标准，这是正确的行为。不应该像以上 doubleDelete函数那样创建两个指向同一个对象的 shared_ptr，而是应该建立副本，如下所示:\nvoid noDoubleDelete() { auto smartPtr1 = make_shared\u003cSimple\u003e(); shared ptr\u003cSimple\u003e smartPtr2(smartPtrl); } 这段代码的输出如下所示: Simple constructor called! Simple destructor called! 即使有两个指向同一个Simple对象的shared_ptr，Simple对象也只销毁一次。\nweak_ptr weak_ptr 可包含由 shared_ptr 管理的资源的引用。weak_ptr 不拥有这个资源，所以不能阻止 shared_ptr 释放资源。weak_ptr 销毁时(例如离开作用域时)不会销毁它指向的资源: 然而，它可用于判断资源是否已经被关联的 shared_ptr 释放了。\nweak_ptr 的构造函数要求将一个 shared_ptr 或另一个 weak_ptr 作为参数。\n为了访问 weak_ptr 中保存的指针，需要将 weak_ptr 转换为shared_ptr。有两种方法: 使用 weak_ptr 实例的 lock方法，这个方法返回一个 shared_ptr。如果同时释放了与 weak_ptr 关联的shared_ptr，返回的shared_ptr 是nullptr 创建一个新的 shared_ptr 实例，将 weak_ptr 作为 shared_ptr 造函数的参数。如果释放了与 weak_ptr关联的shared_ptr，将抛出std::bad weak_ptr 异常。\nvoid useResource(weak ptr\u003cSimple\u003e\u0026 weakSimple) { auto resource = weakSimple.lock(); if (resource) { cout \u003c\u003c\"Resource still alive.\" \u003c\u003c endl; }else cout \u003c\u003c\"Resource has been freed!\" \u003c\u003c endl; } int main() { auto sharedSimple = make_shared\u003cSimple\u003e(); weak_ptr\u003cSimple\u003e weakSimple(sharedSimple); // Try to use the weak ptr. useResource(weakSimple); // Reset the shared ptr. // Since there is only 1 shared ptr to the Simple resource, this will free the resource, even though there is still a weak ptr alive. sharedSimple.reset(); // Try touse the weak ptr a second time. useResource(weakSimple); return 0; } 上述代码的输出如下: Simple constructor called! Resource still alive. Simple destructor called! Resource has been freed!\nmove 1.右值引用 左值(value)是可获取其地址的一个量，例如一个有名称的变量。由于经常出现在赋值语句的左边，因此将其称作左值。另外，所有不是左值的量都是右值(rvalue)，例如字面量、临时对象或临时值。通常右值位于赋值运算符的右边。 int a=4 * 2; 在这条语句中，a 是左值，它具有名称，它的地址为\u0026a。右侧表达式4*2 的结果是右值。它是一个临时值,将在语句执行完毕时销毁。 右值引用是一个对右值(rvalue)的引用。特别地，这是一个当右值是临时对象时才适用的概念。右值引用允许开发者捕获将要销毁的临时对象，并对其资源进行重新利用。\n右值引用的目的是在涉及临时对象时提供可选用的特定函数。由于知道临时对象会被销毁，通过右值引用，某些涉及复制大量值的操作可通过简单地复制指向这些值的指针来实现。\n函数可将\u0026\u0026作为参数说明的一部分(例如 type\u0026\u0026name),以指定右值引用参数。通常,临时对象被当作 const type\u0026，但当函数重载使用了右值引用时，可以解析临时对象，用于该函数重载。\nstd::string str1 = \"Hello\"; std::string str2 = std::move(str1); // str1 的内容被移动到 str2，而不是复制 std::move 将 str1 转换为右值引用，从而触发移动构造函数，将 str1 的内部数据直接转移给 str2，避免了深度复制。\n假设有一个类 LargeData，它包含大量的数据：\nclass LargeData { public: LargeData() { data = new int[1000000]; // 大量数据 } ~LargeData() { delete[] data; } LargeData(const LargeData\u0026 other) { // 拷贝构造函数 data = new int[1000000]; std::copy(other.data, other.data + 1000000, data); } LargeData(LargeData\u0026\u0026 other) noexcept { // 移动构造函数 data = other.data; other.data = nullptr; // 将源对象的指针置空 } private: int* data; }; 在这里，移动构造函数通过简单地复制指针 data，而不是复制整个数据数组，实现了高效的资源转移。\nLargeData createLargeData() { return LargeData(); } int main() { LargeData ld = createLargeData(); // 移动构造，不是拷贝 return 0; } 在这个例子中，createLargeData 返回一个临时的 LargeData 对象，通过右值引用和移动语义，临时对象的资源被高效地移动到 ld，避免了大量数据的复制操作。\nstd::move可将左值转换为右值，强迫编译器调用 handleMessage函数的右值引用版本\nhandleMessage(std::move(b)); // Calls handleMessage(string\u0026\u0026 value) 因为有名称的变量是左值。因此，在 handleMessage函数中，右值引用参数 message 本身是一个左值，原因是它具有名称! 如果希望将这个左值引用参数，作为右值传递给另一个函数，则需要使用 std:move将左值转换为右值。例如，假设要添加以下函数，使用右值引用参数:\nvoid helper(std::string\u0026\u0026 message) 如果按如下方式调用，则无法编译:\nvoid handleMessage(std::string\u0026\u0026 message) { helper(message); } helper函数需要右值引用，而 handleMessage函数传递 message，message 具有名称，是左值，导致编译错误。正确的方式是使用std::move():\nvoid handleMessaqe(std::string\u0026\u0026 message) { helper(std::move(message)) ; } std::move 的返回的是一个右值引用。\nstd::move 并不真的“移动”对象，而是将一个左值转换为右值引用，允许调用移动构造函数或移动赋值运算符。\nMyClass b(std::move(a)); std::move(a) 将 a 转换为右值引用，触发 MyClass 的移动构造函数。\n错误：\nMyClass a(\"Hello\"); MyClass\u0026\u0026 r = std::move(a); // 右值引用赋给右值引用变量 r，但 r 作为变量名，是一个左值。 MyClass b(r); // 错误：调用的是复制构造函数，而不是移动构造函数 虽然 r 是一个右值引用，但是 r 作为一个具名变量是一个左值，因此 MyClass b(r); 调用了复制构造函数，而不是移动构造函数。\n",
+  "wordCount" : "702",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2024-03-12T15:12:01+08:00",
+  "dateModified": "2024-03-12T15:12:01+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      智能指针
+    </h1>
+    <div class="post-description">
+      c&#43;&#43;中的智能指针
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2024-03-12 15:12:01 &#43;0800 CST&#39;&gt;2024-03-12&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;702 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/Dueplay/blog/content/posts/%e6%99%ba%e8%83%bd%e6%8c%87%e9%92%88.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#unique_ptr">unique_ptr</a></li>
+    <li><a href="#shared_ptr">shared_ptr</a></li>
+    <li><a href="#weak_ptr">weak_ptr</a></li>
+    <li><a href="#move">move</a></li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="unique_ptr">unique_ptr<a hidden class="anchor" aria-hidden="true" href="#unique_ptr">#</a></h2>
+<p>考虑下面的函数，这个函数在堆上分配了一个 Simple 对象，但是不释放这个对象，故意产生内存泄漏。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">leaky</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Simple</span><span class="o">*</span> <span class="n">mySimplePtr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Simple</span><span class="p">();</span> <span class="c1">// BUG! Memory is never released!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">mySimplePtr</span><span class="o">-&gt;</span><span class="n">go</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>有时你可能认为，代码正确地释放了动态分配的内存。遗憾的是，这种想法几乎总是不正确的。比如这个函数:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">couldBeLeaky</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Simple</span><span class="o">*</span><span class="n">mySimplePtr</span> <span class="o">=</span><span class="k">new</span> <span class="n">Simple</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mySimplePtr</span><span class="o">-&gt;</span><span class="n">go</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">delete</span> <span class="n">mySimplePtr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上面的函数动态分配一个 Simple 对象，使用该对象，然后正确地调用 delete。但是，这个例子仍然可能产生内存泄漏! <strong>如果 go方法抛出一个异常，将永远不会调用 delete，导致内存泄漏。</strong></p>
+<p>这两种情况下应使用 unique_ptr。对象不会显式删除，但实例 unique_ptr离开作用域时(在函数的末尾，或者因为抛出了异常)，就会在其析构函数中自动释放 Simple 对象:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">notLeaky</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">mySimpleSmartPtr</span> <span class="o">=</span><span class="n">make</span> <span class="n">unique</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mySimpleSmartPtr</span><span class="o">-&gt;</span><span class="n">go</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这段代码使用 C++14 中的 make_unique和 auto 关键字，所以只需要指定指针的类型，本例中是 Simple,如果Simple构造函数需要参数，就把它们放在make_unique()调用的圆括号中。</p>
+<p>如果编译器不支持make_unique, 可以这种方式创建。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">p</span><span class="p">(</span><span class="k">new</span> <span class="n">Simple</span><span class="p">());</span>
+</span></span></code></pre></div><p>像标准指针一样，仍可以使用*或-&gt;对智能指针进行解引用。</p>
+<p>get()方法可用于直接访问底层指针。这可将指针传递给需要普通指针的函数。例如</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">processData</span><span class="p">(</span><span class="n">Simple</span><span class="o">*</span> <span class="n">simple</span><span class="p">)(</span> <span class="cm">/* Use the simple pointer...*/</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 可采用如下方式进行调用:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">auto</span> <span class="n">mySimpleSmartPtr</span> <span class="o">=</span> <span class="n">make_unique</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">processData</span><span class="p">(</span><span class="n">mySimpleSmartPtr</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+</span></span></code></pre></div><p>可释放unique_ptr 的底层指针，并使用reset()根据需要将其改成另一个指针。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">mySimpleSmartPtr</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// Free resource and set to nullptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">mySimpleSmartPtr</span><span class="p">.</span><span class="n">reset</span><span class="p">(</span><span class="k">new</span> <span class="n">Simple</span><span class="p">());</span> <span class="c1">// Free resource and set to a new Simple instance
+</span></span></span></code></pre></div><p>可使用 release()断开 unique_ptr 与底层指针的连接。release方法返回资源的底层指针，然后将智能指针设
+为 nullptr。实际上，智能指针失去对资源的所有权，负责在你用完资源时释放资源。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">Simple</span><span class="o">*</span> <span class="n">simple</span><span class="o">=</span> <span class="n">mySimpleSmartPtr</span><span class="p">.</span><span class="n">release</span><span class="p">();</span><span class="c1">// Release ownership
+</span></span></span><span class="line"><span class="cl"><span class="c1">//Use the simple pointer...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">delete</span> <span class="n">simple</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">simple</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span></code></pre></div><p>由于 unique_ptr代表唯一拥有权，因此无法复制它!使用 std::move() 移动语义将一个unique_ptr 移到另一个。这用于显式移动所有权。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Foo</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Foo</span><span class="p">(</span><span class="n">unique</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">data</span><span class="p">)</span> <span class="o">:</span> <span class="n">mData</span><span class="p">(</span><span class="n">move</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">unique_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="n">mData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">myIntSmartPtr</span> <span class="o">=</span> <span class="n">make</span> <span class="n">unique</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Foo</span> <span class="nf">f</span><span class="p">(</span><span class="n">move</span><span class="p">(</span><span class="n">myIntSmartPtr</span><span class="p">));</span> 
+</span></span></code></pre></div><p>unique_ptr 适用于存储动态分配的旧式C 风格数组。下例创建了一个 unique_ptr 来保存动态分配的、包含10个整数的C风格数组:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">myVariableSizedArray</span> <span class="o">=</span> <span class="n">make_unique</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span></span></code></pre></div><p>自定义 deleter
+默认情况下，unique_ptr 使用标准的new 和delete运算符来分配和释放内存。可将此行为改成:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">int</span><span class="o">*</span> <span class="nf">malloc_int</span><span class="p">(</span><span class="kt">int</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span><span class="o">*</span><span class="n">p</span><span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="n">p</span><span class="o">=</span><span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">unique</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="err">，</span><span class="k">decltype</span><span class="p">(</span><span class="n">free</span><span class="p">)</span><span class="o">*&gt;</span> 			<span class="n">myIntSmartPtr</span><span class="p">(</span><span class="n">malloc_int</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="err">，</span><span class="n">free</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这段代码使用 malloc_int()给整数分配内存。unique_ptr 调用标准的 free函数来释放内存。如前所述, 在C++中不应该使用 malloc，而应改用 new。然而，unique_ptr 的这项特性是很有用的，因为还可管理其他类型的资源而不仅是内存。例如，<strong>当 unique_ptr 离开作用域时，可自动关闭文件或网络套接字以及其他任何资源。</strong>
+但是，unique_ptr 的自定义 deleter 的语法有些费解。需要将自定义 deleter 的类型指定为模板类型参数. decltype(free)用于返回 free()类型。模板类型参数应当是函数指针的类型，因此另外附加一个*，如<code>decltype(free)*</code></p>
+<h2 id="shared_ptr">shared_ptr<a hidden class="anchor" aria-hidden="true" href="#shared_ptr">#</a></h2>
+<p>shared_ptr 的用法与 unique_ptr 类似。要创建 shared_ptr，可使用 make_shared()，它比直接创建 shared_ptr更高效。</p>
+<p>更高效原因：</p>
+<p>当使用 <code>std::make_shared</code> 创建 <code>shared_ptr</code> 时，所有需要的内存（包括对象本身和控制块）在一次分配中完成。这减少了内存分配的次数，从而提高了效率。</p>
+<p>而直接使用 <code>std::shared_ptr</code> 构造函数创建对象通常需要两次内存分配，一次用于对象本身，一次用于控制块。</p>
+<p>在直接使用 <code>new</code> 的情况下，在对象构造和控制块分配之间，如果对象构造抛出异常，可能会导致内存泄漏。而 <code>std::make_shared</code> 在分配和构造对象的过程中是异常安全的。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">mySimpleSmartPtr</span> <span class="o">=</span> <span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">ptr</span><span class="p">(</span><span class="k">new</span> <span class="n">Simple</span><span class="p">());</span>
+</span></span></code></pre></div><p>与unique_ptr 一样，shared_ptr 也支持 get和reset方法。唯一的区别在于，当调用 reset时，由于引用计数，仅在最后的 shared_ptr销毁或重置时,才释放底层资源。注意,shared ptr 不支持 release。可使用use count()来检索共享同一资源的shared_ptr 实例数量。</p>
+<p>与 unique_ptr 类似，shared_ptr 默认情况下使用标准的 new 和 delete 运算符来分配和释放内存;在 C++17
+中存储C风格数组时，使用 new[]和 delete[]。可更改此行为</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">myIntSmartPtr</span><span class="p">(</span><span class="n">malloc_int</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="err">，</span> <span class="n">free</span><span class="p">);</span>
+</span></span></code></pre></div><p>可以看到，不必将<strong>自定义 deleter 的类型指定为模板类型参数</strong>，这比 unique_ptr 的自定义 deleter 更简便。</p>
+<p>下面的示例使用 shared_ptr 存储文件指针。当 shared_ptr 离开作用域时(此处为脱离作用域时)，会调用
+CloseFile函数来自动关闭文件指针。回顾一下，C++中有可以操作文件的面向对象的类。这些类在离开作用域时会自动关闭文件。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">CloseFile</span><span class="p">(</span><span class="n">FILE</span><span class="o">*</span> <span class="n">filePtr</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">filePtr</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">fclose</span><span class="p">(</span><span class="n">filePtr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cout</span> <span class="o">&lt;&lt;</span><span class="s">&#34;File closed.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FILE</span><span class="o">*</span> <span class="n">f</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">&#34;data.txt&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="n">uw</span><span class="s">&#34;);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 自定义deleter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">shared</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span> <span class="n">filePtr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">CloseFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">filePtr</span><span class="o">==</span> <span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Error opening file.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span> <span class="o">&lt;&lt;</span><span class="s">&#34;File opened.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//Use filePtr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>双重删除的问题
+如果要创建两个标准的 shared_ptr，并使它们都指向同一个 Simple 对象，如下面的代码所示，在销毁时，两个智能指针将尝试删除同一个对象:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">doubleDelete</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Simple</span><span class="o">*</span><span class="n">mySimple</span><span class="o">=</span><span class="k">new</span> <span class="n">Simple</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">shared</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">smartPtrl</span><span class="p">(</span><span class="n">mySimple</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">shared</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">smartPtr2</span><span class="p">(</span><span class="n">mySimple</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>根据编译器，这段代码可能会崩溃!如果得到了输出，则输出为:
+Simple constructor called!
+Simple destructor called!
+Simple destructor called
+只调用一次构造函数，却调用两次析构函数?使用 unique ptr 也会出现同样的问题。然而，根据 C+标准，这是正确的行为。不应该像以上 doubleDelete函数那样<strong>创建两个指向同一个对象的 shared_ptr，而是应该建立副本</strong>，如下所示:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">noDoubleDelete</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">smartPtr1</span> <span class="o">=</span> <span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">shared</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">smartPtr2</span><span class="p">(</span><span class="n">smartPtrl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这段代码的输出如下所示:
+Simple constructor called!
+Simple destructor called!
+即使有两个指向同一个Simple对象的shared_ptr，Simple对象也只销毁一次。</p>
+<h2 id="weak_ptr">weak_ptr<a hidden class="anchor" aria-hidden="true" href="#weak_ptr">#</a></h2>
+<p>weak_ptr 可包含由 shared_ptr 管理的资源的引用。weak_ptr 不拥有这个资源，所以不能阻止 shared_ptr 释放资源。weak_ptr 销毁时(例如离开作用域时)不会销毁它指向的资源: 然而，它可用于判断资源是否已经被关联的 shared_ptr 释放了。</p>
+<p>weak_ptr 的构造函数要求将一个 shared_ptr 或另一个 weak_ptr 作为参数。</p>
+<p>为了访问 weak_ptr 中保存的指针，需要将 weak_ptr 转换为shared_ptr。有两种方法:
+使用 weak_ptr 实例的 lock方法，这个方法返回一个 shared_ptr。如果同时释放了与 weak_ptr 关联的shared_ptr，返回的shared_ptr 是nullptr
+创建一个新的 shared_ptr 实例，将 weak_ptr 作为 shared_ptr 造函数的参数。如果释放了与 weak_ptr关联的shared_ptr，将抛出std::bad weak_ptr 异常。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">useResource</span><span class="p">(</span><span class="n">weak</span> <span class="n">ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;&amp;</span> <span class="n">weakSimple</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">resource</span> <span class="o">=</span> <span class="n">weakSimple</span><span class="p">.</span><span class="n">lock</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">resource</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">cout</span> <span class="o">&lt;&lt;</span><span class="s">&#34;Resource still alive.&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span><span class="k">else</span> 
+</span></span><span class="line"><span class="cl">    	<span class="n">cout</span> <span class="o">&lt;&lt;</span><span class="s">&#34;Resource has been freed!&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">sharedSimple</span> <span class="o">=</span> <span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">weak_ptr</span><span class="o">&lt;</span><span class="n">Simple</span><span class="o">&gt;</span> <span class="n">weakSimple</span><span class="p">(</span><span class="n">sharedSimple</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Try to use the weak ptr.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">useResource</span><span class="p">(</span><span class="n">weakSimple</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Reset the shared ptr.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Since there is only 1 shared ptr to the Simple resource, this will free the resource, even though there is still a weak ptr alive.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">sharedSimple</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Try touse the weak ptr a second time.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">useResource</span><span class="p">(</span><span class="n">weakSimple</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>上述代码的输出如下:
+Simple constructor called!
+Resource still alive.
+Simple destructor called!
+Resource has been freed!</p>
+<h2 id="move">move<a hidden class="anchor" aria-hidden="true" href="#move">#</a></h2>
+<p>1.右值引用
+<strong>左值(value)是可获取其地址的一个量</strong>，例如一个有名称的变量。由于经常出现在赋值语句的左边，因此将其称作左值。另外，<strong>所有不是左值的量都是右值(rvalue)</strong>，例如<strong>字面量、临时对象或临时值</strong>。通常右值位于赋值运算符的右边。
+int a=4 * 2;
+在这条语句中，a 是左值，它具有名称，它的地址为&amp;a。右侧表达式4*2 的结果是右值。它是一个临时值,将在语句执行完毕时销毁。
+右值引用是一个对右值(rvalue)的引用。特别地，这是一个当右值是临时对象时才适用的概念。右值引用允许开发者捕获将要销毁的临时对象，并对其资源进行重新利用。</p>
+<p>右值引用的目的是在涉及临时对象时提供可选用的特定函数。由于知道临时对象会被销毁，通过右值引用，某些涉及复制大量值的操作可通过简单地复制指向这些值的指针来实现。</p>
+<p>函数可将&amp;&amp;作为参数说明的一部分(例如 type&amp;&amp;name),以指定右值引用参数。通常,临时对象被当作 const type&amp;，但当函数重载使用了右值引用时，可以解析临时对象，用于该函数重载。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">&#34;Hello&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str2</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">str1</span><span class="p">);</span> <span class="c1">// str1 的内容被移动到 str2，而不是复制
+</span></span></span></code></pre></div><p><code>std::move</code> 将 <code>str1</code> 转换为右值引用，从而触发移动构造函数，将 <code>str1</code> 的内部数据直接转移给 <code>str2</code>，避免了深度复制。</p>
+<p>假设有一个类 <code>LargeData</code>，它包含大量的数据：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">LargeData</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LargeData</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="mi">1000000</span><span class="p">];</span> <span class="c1">// 大量数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">LargeData</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">delete</span><span class="p">[]</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LargeData</span><span class="p">(</span><span class="k">const</span> <span class="n">LargeData</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 拷贝构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="mi">1000000</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">copy</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">.</span><span class="n">data</span> <span class="o">+</span> <span class="mi">1000000</span><span class="p">,</span> <span class="n">data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LargeData</span><span class="p">(</span><span class="n">LargeData</span><span class="o">&amp;&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="c1">// 移动构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">data</span> <span class="o">=</span> <span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">other</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span> <span class="c1">// 将源对象的指针置空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span><span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>在这里，移动构造函数通过简单地复制指针 <code>data</code>，而不是复制整个数据数组，实现了高效的资源转移。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">LargeData</span> <span class="nf">createLargeData</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">LargeData</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LargeData</span> <span class="n">ld</span> <span class="o">=</span> <span class="n">createLargeData</span><span class="p">();</span> <span class="c1">// 移动构造，不是拷贝
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>在这个例子中，<code>createLargeData</code> 返回一个临时的 <code>LargeData</code> 对象，通过右值引用和移动语义，临时对象的资源被高效地移动到 <code>ld</code>，避免了大量数据的复制操作。</p>
+<p>std::move可将左值转换为右值，强迫编译器调用 handleMessage函数的右值引用版本</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">handleMessage</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">b</span><span class="p">));</span> <span class="c1">// Calls handleMessage(string&amp;&amp; value)
+</span></span></span></code></pre></div><p>因为有名称的变量是左值。因此，在 handleMessage函数中，右值引用参数 message 本身是一个左值，原因是它具有名称! 如果希望将这个左值引用参数，作为右值传递给另一个函数，则需要使用 std:move将左值转换为右值。例如，假设要添加以下函数，使用右值引用参数:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">helper</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;&amp;</span> <span class="n">message</span><span class="p">)</span>
+</span></span></code></pre></div><p>如果按如下方式调用，则无法编译:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">handleMessage</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;&amp;</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">helper</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>helper函数需要右值引用，而 handleMessage函数传递 message，message 具有名称，是左值，导致编译错误。正确的方式是使用std::move():</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">handleMessaqe</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;&amp;</span> <span class="n">message</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">helper</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">message</span><span class="p">))</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><code>std::move</code> 的返回的是一个右值引用。</p>
+<p><code>std::move</code> 并不真的“移动”对象，而是将一个左值转换为右值引用，允许调用移动构造函数或移动赋值运算符。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">MyClass</span> <span class="nf">b</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
+</span></span></code></pre></div><p><code>std::move(a)</code> 将 <code>a</code> 转换为右值引用，触发 <code>MyClass</code> 的移动构造函数。</p>
+<p>错误：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"> <span class="n">MyClass</span> <span class="nf">a</span><span class="p">(</span><span class="s">&#34;Hello&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"> <span class="n">MyClass</span><span class="o">&amp;&amp;</span> <span class="n">r</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">a</span><span class="p">);</span> <span class="c1">// 右值引用赋给右值引用变量 r，但 r 作为变量名，是一个左值。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> <span class="n">MyClass</span> <span class="nf">b</span><span class="p">(</span><span class="n">r</span><span class="p">);</span> <span class="c1">// 错误：调用的是复制构造函数，而不是移动构造函数
+</span></span></span></code></pre></div><p>虽然 <code>r</code> 是一个右值引用，但是 <code>r</code> 作为一个具名变量是一个左值，因此 <code>MyClass b(r);</code> 调用了复制构造函数，而不是移动构造函数。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/c&#43;&#43;/">C&#43;&#43;</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/stl%E7%AE%97%E6%B3%95/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>stl中的算法介绍</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/catch2/">
+    <span class="title">Next »</span>
+    <br>
+    <span>catch2测试框架</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

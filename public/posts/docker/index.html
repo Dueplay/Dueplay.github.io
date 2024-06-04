@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Docker的使用 | Cookie&#39;s Blog</title>
+<meta name="keywords" content="devops">
+<meta name="description" content="Desc Text.">
+<meta name="author" content="Me">
+<link rel="canonical" href="https://canonical.url/to/page">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.ec8da366ca2fb647537ccb7a8f6fa5b4e9cd3c7a0d3171dd2d3baad1e49c8bfc.css" integrity="sha256-7I2jZsovtkdTfMt6j2&#43;ltOnNPHoNMXHdLTuq0eSci/w=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="apple-touch-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<link rel="mask-icon" href="http://localhost:1313/%3Clink%20/%20abs%20url%3E">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/docker/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4XHWHM02GB"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-4XHWHM02GB', { 'anonymize_ip': false });
+}
+</script>
+<meta property="og:title" content="Docker的使用" />
+<meta property="og:description" content="Desc Text." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/docker/" />
+<meta property="og:image" content="http://localhost:1313/%3Cimage%20path/url%3E" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-12-03T11:32:01&#43;08:00" />
+<meta property="article:modified_time" content="2022-12-03T11:32:01&#43;08:00" /><meta property="og:site_name" content="ExampleSite" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="http://localhost:1313/%3Cimage%20path/url%3E" />
+<meta name="twitter:title" content="Docker的使用"/>
+<meta name="twitter:description" content="Desc Text."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Docker的使用",
+      "item": "http://localhost:1313/posts/docker/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Docker的使用",
+  "name": "Docker的使用",
+  "description": "Desc Text.",
+  "keywords": [
+    "devops"
+  ],
+  "articleBody": "配置 Docker 使用 WSL 2 安装和设置 WSL 2 后，你需要确保 Docker Desktop 配置为使用 WSL 2。这可以通过 Docker Desktop 的设置进行：\n打开 Docker Desktop。 进入 Settings（设置）\u003e General（常规）。 确认 “Use the WSL 2 based engine”（使用基于 WSL 2 的引擎）选项已经被选中。 docker使用 1. 管理镜像 拉取镜像：\ndocker pull [options] : 例如：docker pull ubuntu:20.04\n列出镜像：\ndocker images 构建镜像：\ndocker build -t : . 例如：docker build -t myapp:latest .\nlatest为默认tag，.表示目录\n删除镜像：\ndocker rmi 例如：docker rmi myapp:latest\n2. 管理容器 运行容器：\ndocker run [options] : 例如：docker run -d --name webserver -p 80:80 nginx\n参数解释：\n-d 选项代表 “detached mode”，也就是让 Docker 容器在后台运行。这意味着命令行将不会被阻塞在容器日志输出上，用户可以继续在同一个命令行窗口中执行其他命令。如果不使用 -d，容器的标准输出将会显示在当前终端上，且终端会一直被占用直到容器停止。\n--name 选项用来给你的容器指定一个名称，在这个例子中容器的名称被指定为 webserver。这个名称可以用于 Docker 的各种命令来引用容器，比如启动、停止、删除容器等操作。如果不指定 --name，Docker 会自动生成一个随机的名称。\n--privileged 选项给予容器额外的权限，让容器几乎拥有宿主机相同级别的权限。这通常用于容器内需要执行一些特权操作的场景，如直接访问硬件设备、加载内核模块等。使用这个选项时需要谨慎，因为它降低了容器和宿主机之间的隔离度，增加了安全风险。\n-v 或 --volume 选项可以挂载卷，这是一种将宿主机的目录或数据卷连接到容器中的方式。这使得你可以保持数据的持久性和数据共享，同时也可以用于在容器与宿主机之间传递配置文件或其他数据。\n-v [host_path]:[container_path]:[options]\n[host_path]: 宿主机上的文件系统路径，可以是绝对路径也可以是相对路径。如果该路径不存在，Docker 会自动为你创建这个目录（在使用 Docker Desktop for Windows 或 Docker Desktop for Mac 时，你可能需要额外配置共享目录权限）。 [container_path]: 容器内的挂载点，必须是绝对路径。 [options]: 可选，用于设置挂载方式，如 ro (只读)，rw (读写，默认)。 查看运行中的容器：\ndocker ps 用 docker ps -a 查看所有容器（包括未运行的）。\n停止容器：\ndocker stop 例如：docker stop webserver\n启动容器：\ndocker start 删除容器：\ndocker rm 使用 -f 选项来强制删除运行中的容器：docker rm -f 查看容器日志：\ndocker logs 进入运行中的容器：\ndocker exec -it bash （对于不包含 bash 的容器，可能需要使用 sh）\n3. 网络管理 列出网络：\ndocker network ls 创建网络：\ndocker network create 连接容器到网络：\ndocker network connect 断开容器与网络的连接：\ndocker network disconnect 4. 数据卷和持久化数据 创建卷：\ndocker volume create 挂载卷到容器： 使用 docker run 命令时，添加 -v 参数：\ndocker run -d -v : 查看所有卷：\ndocker volume ls 删除卷：\ndocker volume rm 每个命令都可能带有许多选项，可以通过查看 Docker 文档或运行 docker command --help 来获取更详细的信息。\n例子 1.Dockerfile\n# 每个 Dockerfile 都必须从一个已有的镜像开始。 FROM ubuntu:20.04 # label标签是用来添加元数据的，比如作者、邮箱等信息。 LABEL maintainer=\"name@example.com\" # RUN 指令用于执行命令行命令。 RUN apt-get update \u0026\u0026 apt-get install -y nginx # CMD 指令提供了容器的默认执行命令。Dockerfile 中只能有一个 CMD 指令，如果列出多个，则只有最后一个生效。 CMD [\"nginx\", \"-g\", \"daemon off;\"] # 或者不要[],CMD nginx -g daemin off # EXPOSE 指令用于指定容器在运行时监听的端口。 EXPOSE 80 # 设置环境变量。 ENV NGINX_VERSION 1.14 # ADD 和 COPY 都是用来从构建环境复制文件到镜像中。COPY 是纯粹的复制，而 ADD 提供了更多功能（例如，自动解压缩压缩文件）。 # COPY src dst COPY ./index.html /var/www/html/ ADD archive.tar /usr/src/app/ # VOLUME创建一个可以从本地主机或其他容器挂载的挂载点。 VOLUME /var/log/nginx # 设置工作目录 WORKDIR /usr/share/nginx/html # 设置用户 USER nginx 2.构建image\n# 构建 docker build -t hello-docker . # 查看有哪些镜像 docker images docker image ls 3.运行image\n# 运行 docker run --name xxx image_name # 进入容器 docker exec -it 容器id或name bash # 查看运行的容器 docker ps # 停止容器 docker stop xxx # 删除容器 docker rm xxx # 启动容器 docker start xxx ",
+  "wordCount" : "355",
+  "inLanguage": "en",
+  "image":"http://localhost:1313/%3Cimage%20path/url%3E","datePublished": "2022-12-03T11:32:01+08:00",
+  "dateModified": "2022-12-03T11:32:01+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Me"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/docker/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Cookie's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/%3Clink%20/%20abs%20url%3E"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Home (Alt + H)">Home</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="⏱archives">
+                    <span>⏱archives</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="🔍Search">
+                    <span>🔍Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="🔖Tags">
+                    <span>🔖Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title">
+      Docker的使用
+    </h1>
+    <div class="post-description">
+      Desc Text.
+    </div>
+    <div class="post-meta">&lt;span title=&#39;2022-12-03 11:32:01 &#43;0800 CST&#39;&gt;2022-12-03&lt;/span&gt;&amp;nbsp;·&amp;nbsp;2 min&amp;nbsp;·&amp;nbsp;355 words&amp;nbsp;·&amp;nbsp;Me&nbsp;|&nbsp;<a href="https://github.com/Dueplay/blog/content/posts/docker.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#配置-docker-使用-wsl-2">配置 Docker 使用 WSL 2</a></li>
+      </ul>
+    </li>
+    <li><a href="#docker使用">docker使用</a>
+      <ul>
+        <li><a href="#1-管理镜像">1. 管理镜像</a></li>
+        <li><a href="#2-管理容器">2. 管理容器</a></li>
+        <li><a href="#3-网络管理">3. 网络管理</a></li>
+        <li><a href="#4-数据卷和持久化数据">4. 数据卷和持久化数据</a></li>
+        <li><a href="#例子">例子</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h3 id="配置-docker-使用-wsl-2">配置 Docker 使用 WSL 2<a hidden class="anchor" aria-hidden="true" href="#配置-docker-使用-wsl-2">#</a></h3>
+<p>安装和设置 WSL 2 后，你需要确保 Docker Desktop 配置为使用 WSL 2。这可以通过 Docker Desktop 的设置进行：</p>
+<ol>
+<li>打开 Docker Desktop。</li>
+<li>进入 Settings（设置）&gt; General（常规）。</li>
+<li>确认 “Use the WSL 2 based engine”（使用基于 WSL 2 的引擎）选项已经被选中。</li>
+</ol>
+<h2 id="docker使用">docker使用<a hidden class="anchor" aria-hidden="true" href="#docker使用">#</a></h2>
+<h3 id="1-管理镜像">1. 管理镜像<a hidden class="anchor" aria-hidden="true" href="#1-管理镜像">#</a></h3>
+<ul>
+<li>
+<p><strong>拉取镜像</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker pull <span class="o">[</span>options<span class="o">]</span> &lt;image&gt;:&lt;tag&gt;
+</span></span></code></pre></div><p>例如：<code>docker pull ubuntu:20.04</code></p>
+</li>
+<li>
+<p><strong>列出镜像</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker images
+</span></span></code></pre></div></li>
+<li>
+<p><strong>构建镜像</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker build -t &lt;image_name&gt;:&lt;tag&gt; .
+</span></span></code></pre></div><p>例如：<code>docker build -t myapp:latest .</code></p>
+<p>latest为默认tag，.表示目录</p>
+</li>
+<li>
+<p><strong>删除镜像</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker rmi &lt;image&gt;
+</span></span></code></pre></div><p>例如：<code>docker rmi myapp:latest</code></p>
+</li>
+</ul>
+<h3 id="2-管理容器">2. 管理容器<a hidden class="anchor" aria-hidden="true" href="#2-管理容器">#</a></h3>
+<ul>
+<li>
+<p><strong>运行容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker run <span class="o">[</span>options<span class="o">]</span> &lt;image&gt;:&lt;tag&gt;
+</span></span></code></pre></div><p>例如：<code>docker run -d --name webserver -p 80:80 nginx</code></p>
+<p>参数解释：</p>
+<p><code>-d</code> 选项代表 &ldquo;detached mode&rdquo;，也就是让 Docker 容器在后台运行。这意味着命令行将不会被阻塞在容器日志输出上，用户可以继续在同一个命令行窗口中执行其他命令。如果不使用 <code>-d</code>，容器的标准输出将会显示在当前终端上，且终端会一直被占用直到容器停止。</p>
+<p><code>--name</code> 选项用来给你的容器指定一个名称，在这个例子中容器的名称被指定为 <code>webserver</code>。这个名称可以用于 Docker 的各种命令来引用容器，比如启动、停止、删除容器等操作。如果不指定 <code>--name</code>，Docker 会自动生成一个随机的名称。</p>
+<p><code>--privileged</code> 选项给予容器额外的权限，让容器几乎拥有宿主机相同级别的权限。这通常用于容器内需要执行一些特权操作的场景，如直接访问硬件设备、加载内核模块等。使用这个选项时需要谨慎，因为它降低了容器和宿主机之间的隔离度，增加了安全风险。</p>
+<p><code>-v</code> 或 <code>--volume</code> 选项可以挂载卷，这是一种将宿主机的目录或数据卷连接到容器中的方式。这使得你可以保持数据的持久性和数据共享，同时也可以用于在容器与宿主机之间传递配置文件或其他数据。</p>
+<p><code>-v [host_path]:[container_path]:[options]</code></p>
+<ul>
+<li><strong>[host_path]</strong>: 宿主机上的文件系统路径，可以是绝对路径也可以是相对路径。如果该路径不存在，Docker 会自动为你创建这个目录（在使用 Docker Desktop for Windows 或 Docker Desktop for Mac 时，你可能需要额外配置共享目录权限）。</li>
+<li><strong>[container_path]</strong>: 容器内的挂载点，必须是绝对路径。</li>
+<li><strong>[options]</strong>: 可选，用于设置挂载方式，如 <code>ro</code> (只读)，<code>rw</code> (读写，默认)。</li>
+</ul>
+</li>
+<li>
+<p><strong>查看运行中的容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker ps
+</span></span></code></pre></div><p>用 <code>docker ps -a</code> 查看所有容器（包括未运行的）。</p>
+</li>
+<li>
+<p><strong>停止容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker stop &lt;container_id_or_name&gt;
+</span></span></code></pre></div><p>例如：<code>docker stop webserver</code></p>
+</li>
+<li>
+<p><strong>启动容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker start &lt;container_id_or_name&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>删除容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker rm &lt;container_id_or_name&gt;
+</span></span></code></pre></div><p>使用 <code>-f</code> 选项来强制删除运行中的容器：<code>docker rm -f &lt;container_id_or_name&gt;</code></p>
+</li>
+<li>
+<p><strong>查看容器日志</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker logs &lt;container_id_or_name&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>进入运行中的容器</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker <span class="nb">exec</span> -it &lt;container_id_or_name&gt; bash
+</span></span></code></pre></div><p>（对于不包含 bash 的容器，可能需要使用 <code>sh</code>）</p>
+</li>
+</ul>
+<h3 id="3-网络管理">3. 网络管理<a hidden class="anchor" aria-hidden="true" href="#3-网络管理">#</a></h3>
+<ul>
+<li>
+<p><strong>列出网络</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker network ls
+</span></span></code></pre></div></li>
+<li>
+<p><strong>创建网络</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker network create &lt;network_name&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>连接容器到网络</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker network connect &lt;network_name&gt; &lt;container_id_or_name&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>断开容器与网络的连接</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker network disconnect &lt;network_name&gt; &lt;container_id_or_name&gt;
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="4-数据卷和持久化数据">4. 数据卷和持久化数据<a hidden class="anchor" aria-hidden="true" href="#4-数据卷和持久化数据">#</a></h3>
+<ul>
+<li>
+<p><strong>创建卷</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker volume create &lt;volume_name&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>挂载卷到容器</strong>： 使用 <code>docker run</code> 命令时，添加 <code>-v</code> 参数：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker run -d -v &lt;volume_name&gt;:&lt;container_path&gt; &lt;image&gt;
+</span></span></code></pre></div></li>
+<li>
+<p><strong>查看所有卷</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker volume ls
+</span></span></code></pre></div></li>
+<li>
+<p><strong>删除卷</strong>：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker volume rm &lt;volume_name&gt;
+</span></span></code></pre></div></li>
+</ul>
+<p>每个命令都可能带有许多选项，可以通过查看 Docker 文档或运行 <code>docker command --help</code> 来获取更详细的信息。</p>
+<h3 id="例子">例子<a hidden class="anchor" aria-hidden="true" href="#例子">#</a></h3>
+<p>1.Dockerfile</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="c"># 每个 Dockerfile 都必须从一个已有的镜像开始。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> ubuntu:20.04 </span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># label标签是用来添加元数据的，比如作者、邮箱等信息。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">LABEL</span> <span class="nv">maintainer</span><span class="o">=</span><span class="s2">&#34;name@example.com&#34;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># RUN 指令用于执行命令行命令。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> apt-get install -y nginx<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># CMD 指令提供了容器的默认执行命令。Dockerfile 中只能有一个 CMD 指令，如果列出多个，则只有最后一个生效。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;nginx&#34;</span><span class="p">,</span> <span class="s2">&#34;-g&#34;</span><span class="p">,</span> <span class="s2">&#34;daemon off;&#34;</span><span class="p">]</span> <span class="c1"># 或者不要[],CMD nginx -g daemin off</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># EXPOSE 指令用于指定容器在运行时监听的端口。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 80</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 设置环境变量。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ENV</span> NGINX_VERSION 1.14<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># ADD 和 COPY 都是用来从构建环境复制文件到镜像中。COPY 是纯粹的复制，而 ADD 提供了更多功能（例如，自动解压缩压缩文件）。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># COPY src dst</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> ./index.html /var/www/html/<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ADD</span> archive.tar /usr/src/app/<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># VOLUME创建一个可以从本地主机或其他容器挂载的挂载点。</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">VOLUME</span><span class="s"> /var/log/nginx</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 设置工作目录</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /usr/share/nginx/html</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 设置用户</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">USER</span><span class="s"> nginx</span><span class="err">
+</span></span></span></code></pre></div><p>2.构建image</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 构建</span>
+</span></span><span class="line"><span class="cl">docker build -t hello-docker .
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看有哪些镜像</span>
+</span></span><span class="line"><span class="cl">docker images
+</span></span><span class="line"><span class="cl">docker image ls
+</span></span></code></pre></div><p>3.运行image</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 运行</span>
+</span></span><span class="line"><span class="cl">docker run --name xxx image_name
+</span></span><span class="line"><span class="cl"><span class="c1"># 进入容器</span>
+</span></span><span class="line"><span class="cl">docker <span class="nb">exec</span> -it 容器id或name bash
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看运行的容器</span>
+</span></span><span class="line"><span class="cl">docker ps
+</span></span><span class="line"><span class="cl"><span class="c1"># 停止容器</span>
+</span></span><span class="line"><span class="cl">docker stop xxx
+</span></span><span class="line"><span class="cl"><span class="c1"># 删除容器</span>
+</span></span><span class="line"><span class="cl">docker rm xxx
+</span></span><span class="line"><span class="cl"><span class="c1"># 启动容器</span>
+</span></span><span class="line"><span class="cl">docker start xxx
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/devops/">Devops</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/zsh/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>zsh安装与配置</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/chrono/">
+    <span class="title">Next »</span>
+    <br>
+    <span>chrono库的使用</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="http://localhost:1313/">Cookie&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

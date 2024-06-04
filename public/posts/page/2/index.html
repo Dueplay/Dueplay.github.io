@@ -172,139 +172,100 @@ if (!doNotTrack) {
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>MIT6.824 Lab2 Raft
+    <h2>bustub project1
     </h2>
   </header>
   <div class="entry-content">
-    <p>趁着暑假有空，把鸽了很久的 MIT6.824 做一下。Lab1 是实现一个 Map-Reduce，因为和 Raft 主线关系不大（因为懒），就略过了。另外，这次尝试实现一个 part 就来记录相关的内容，以免在全部实现后忘记部分细节（以免之后太懒不想写）。因此，不同 part 的代码会变化，请以最终版本的代码为准（但保证每一 part 的代码可以正常通过绝大部分相应的测试）。同时，在写下某一 part 的记录时，我对 Raft 的整体把握也难免有所不足。
-Resources Course’s Page 课程主页 Students’ Guide to Raft 一篇引导博客 Debugging by Pretty Printing debug 技巧，强烈推荐阅读和运用 Raft Q&amp;A 关于 Raft 的一些 Q&amp;A Raft Visualization Raft 动画演示 In Search of an Understandable Consensus Algorithm Raft 论文 Lab2A Raft Leader Election Lab2A 实现时间为6.22~6.24。
-Lab2A 主要实现 Raft 的选主过程，包括选举出 Leader 和 Leader 通过心跳维持身份。
-Design 首先是选主过程的状态机模型：
-接下来是 Raft 论文中最为重要的 Figure 2:...</p>
+    <p>buffer pool是负责在内存和磁盘之间移动页面(数据库文件是以页来组织的)。buffer pool的操作对于系统的其他组件是 透明的，也就是说系统只需要使用一个page_id（这是唯一的）去像buffer pool请求这个页面，是不知道这个页是不是已经在内存中了，还是需要从磁盘中读。
+可拓展hash table 第一个任务是需要实现一个可拓展hash table，这个hash table的作用是负责管理page_id到buffer pool中页面id(frame_id)的映射。buffer pool管理N个页面的内存空间，一个页面的内存空间就叫做frame。需要读取一个页面时，就将一个frame分配这个页面，然后用hash table记录这个映射关系。
+在实现之前需要理解一些可拓展哈希表中的概念：[参考文献](Extendible Hashing (Dynamic approach to DBMS) - GeeksforGeeks)
+目录dir：这个容器存储指向桶的指针。每个dir给定一个唯一的id，当扩张发生时id可能随之改变。哈希函数返回这个目录的id，这个id被用来指向合适的桶。dir的数量 = 2^{全局深度} 桶: 存储哈希键。目录指向桶。如果局部深度小于全局深度时，一个桶可能包含不止一个指针指向它。 全局深度：它跟目录相关联。它们表示哈希函数使用的比特位数目去分类这些键。全局深度=目录id的比特位数 局部深度：和全局深度类似，局部深度是跟桶关联，而不是跟目录。当桶溢出发生时，局部深度根据全局深度去决定执行的行为。局部深度通常小于等于全局深度。 桶分裂：当桶的元素超过了特定的大小，那么桶分裂成两个部分。 目录扩容：当桶溢出时，可能会有目录扩容。当溢出桶的局部深度等于全局深度时，目录扩容被执行。 首先需要实现的是Bucket，Bucket采用的std::list&lt;pair&lt;K,V»来作为存储数据的数据结构，stl可以让我们很方便的实现数据的增删查改。查找一个key可以通过std::find_if或者遍历这个list，插入时需要判断是否超出这个桶的大小。
+有了Bucket，就可以开始实现我们的可拓展hash表，它的全局深度首先被初始化为0，由于桶的数量是2^全局深度，所以在开始时只有一个桶，即dir中只有一个Bucket指针。
+重点是insert操作(插入一个key，value对)的实现。首先是根据hash函数计算出key的dir index，然后再在对应的桶中实现插入。在插入到桶中时可能因为桶已满而插入失败，这时候我们就需要进行目录扩张和桶分裂。需要注意的是：并不是桶满了就需要执行目录的分裂，而是当桶的局部深度=全局深度时，才需要进行桶的分裂。在桶的局部深度小于全局深度时是不需要扩张目录的，此时是有多个指针指向同一个桶，我们只需要再创建一个新桶，然后再将这个已满桶中的元素重新分配即可，创建新桶需要将局部深度&#43;1。在桶扩张时，将新扩张的dir(桶指针)指向同一个桶，当需要时再去创建新的桶。
+eg: global_depth = 2, local_depth = 2, dir_size = 2^2 = 4，插入kv到idx = 3 的桶，但这个桶已经满了。则需要执行dir扩张，扩张为原来的2倍，即dir_size = 2^2* « 1,扩张为8。idx = 3 = 011，3 &#43; old_dir_size = 7 = 111，7的位置则是新建的桶。其他新扩张应该指向之前的桶，等到之间的桶满，再创建。即4指向0指向的桶，等等。
+由于是要支持并发操作的，因此也需要在合适的地方加锁。
+造成死锁的一种情况：当一个函数中已经加锁再去调用另一个需要同一把锁的函数，这会造成死锁。
+lru_k替换策略 在frame中page，在整个buffer pool中的所有frame都被使用时，这时候则需要选择一个victim来替换。常使用的是lru算法，lru_k则是再lru的基础上多加了一个访问k次以上的页，是要比那些小于k次更晚被换出。简单的理解就是，将所有在frame中的页面分为访问小于k次的和大于等于k次的，两种都是采用lru算法，但是是先替换小于k次的页面，小于k次页面的全部不能被替换或者当没有小于k次还需要Evict一个page时，才去Evict一个大于k次的页面。
+不能被替换的page是那些被pin的，也就是还在使用的page。
+std::vector&lt;LRUKFrameRecord *&gt; frames_ 记录buffer pool中所有frame的一个访问记录，LRUKFrameRecord 是记录一个frame的最多k次访问记录。...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-06-25 00:10:08 &#43;0800 CST&#39;&gt;2022-06-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;25 min&amp;nbsp;·&amp;nbsp;5286 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to MIT6.824 Lab2 Raft" href="http://localhost:1313/posts/mit6.824-lab2-raft/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-11-28 10:32:01 &#43;0800 CST&#39;&gt;2023-11-28&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;102 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to bustub project1" href="http://localhost:1313/posts/bustub-project1/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>chrono库的使用
+    <h2>bustub project0
     </h2>
   </header>
   <div class="entry-content">
-    <p>chrono库主要包含三种类型的类：时间间隔duration、时钟clocks、时间点time point
-1.duration 用来记录时间长度，可以表示几秒、几分钟、几个小时的时间间隔
-// duration的定义，定义于头文件 &lt;chrono&gt; template&lt; class Rep, class Period = std::ratio&lt;1&gt; &gt; class duration; //表示Rep个Period，一个period是一个ratio类，默认为1s // ratio的定义，定义于头文件 &lt;ratio&gt; template&lt; std::intmax_t Num, std::intmax_t Denom = 1 &gt; class ratio; // 代表 Num / Denom 秒，分母默认为1，ratio&lt;2&gt;代表一个时钟周期是2秒 为了方便使用，在标准库中定义了一些常用的时间间隔,定义如下
-纳秒：using std::chrono::nanoseconds = duration&lt;Rep*/*Rep至少 64 位的有符号整数类型*/*, std::nano&gt;; std::nano 为 ratio&lt;1,10e9&gt; 微秒：std::chrono::microseconds	duration&lt;Rep*/*至少 55 位的有符号整数类型*/*, std::micro&gt; 毫秒：std::chrono::milliseconds	duration&lt;Rep*/*至少 45 位的有符号整数类型*/*, std::milli&gt; 秒： std::chrono::seconds	duration&lt;Rep*/*至少 35 位的有符号整数类型*/*&gt; 分钟：std::chrono::minutes	duration&lt;Rep*/*至少 29 位的有符号整数类型*/*, std::ratio&lt;60&gt;&gt; std::chrono::minutes m(1);//表示1m 小时：std::chrono::hours	duration&lt;Rep*/*至少 23 位的有符号整数类型*/*, std::ratio&lt;3600&gt;&gt; 构造函数...</p>
+    <p>概览 需要实现一个数据结构为Trie树的kv存储，Trie一种高效的有序树数据结构，用于检索给定键的值。Trie中的每个节点存储一个key的单个字符，并且可以很多字节点，子节点代表key的下一个字符。key的末尾字符的节点(终端节点)会用一个flag标记这是一个key的结束，并存储相应的val。
+下面这个Trie树，有ab-&gt;1,ac-&gt;“val”，两个kv对，注意val可以是任何类型。
+实现 TrieNode TrieNode类代表树中的单个节点，代表一个key中的单个char。一个TrieNode可以有很多子节点，因此用unordered_map来存储每个子节点的字符和子节点指针的映射。此外还需要一个flag来表示该节点是否是一个key的结尾。为了避免内存泄露，采用智能指针。
+TrieNodeWithValue 该类代表一个key的终端节点，它继承了TrieNode，并且增加了自己特有的属性，即需要存储的val.
+可以有两种方式来创建终端节点：
+插入一个key，创建一个新的终端节点。 插入一个key，将非终端节点转换为终端节点，即将TrieNode转为TrieNodeWithValue。因此需要给该类实现一个TrieNodeWithValue(TrieNode &amp;&amp;trieNode, T value)有参构造，用于将已有的非终端节点转为终端节点，这个构造需要去调用TrieNode的移动构造将trieNode的资源转移到终端节点，包括表示的字符和子节点map。 Trie 成员变量有root节点的指针，指向一个根节点(用字符‘\0’标识)；为了支持并发，还需要一个读写锁 ReaderWriterLatch latch_
+需要实现增删查三个功能
+Insert 插入一个kv对到Trie中，一个key的每个字符都是一个节点，因此需要做的就是从root节点开始，一层一层的插入新节点，如果有该字符的节点了，我们应该重用它。key最后一个字符需要特殊处理，而不是直接在父节点中插入新节点。
+需要判断是否该结尾字符已经在Trie树中，如果是，再判断这个节点是不是一个终端节点，如果是终端节点，则插入失败，因为不支持重复的key，如果不是终端节点，则需要将非终端的TrieNode转为终端节点TrieNodeWithValue。
+如果结尾字符不在Trie树中，创建新的TrieNodeWithValue，然后插入到父节点中，插入完成。
+同时在Insert操作中，应该是上写锁，返回时应该解锁。
+Remove 移除给定key的val，同时需要删除一些没用节点。首先是根据这个key从root开始一层一层遍历，找到该key的终端节点，没有该key对应的终端节点则直接返回false。找到终端节点后，将其flag设为false，表示这不是一个终端节点，逻辑上删除这个kv。下一步我们需要从该节点开始向上递归的删除那些没有任何子节点的非终端节点，因为这些节点肯定是不再会被用到的，既不是一个key的结尾，也不是一个key的中间节点。实现上可以通过从root开始将遍历到该节点的路径保存，然后在路径中从后往前遍历每个节点，判断是否属于这种情况，是则在其父节点的map中移除。
+同样的在Remove操作中，应该是上写锁，返回时应该解锁。
+GetValue 返回指定key对应的val，注意这个val的类型是任意的，所以这是一个函数模板。还是首先从根节点开始一层一层遍历key的每个字符找到最后一个字符所在的节点，然后不是终端节点或者没有该节点，失败直接返回。有这个key所对应的终端节点，那么返回这个终端节点的val。这样就ok了吗？其实不是，由于val是任意类型的，所以还需要判断这个val是不是我们所要的val类型。要检查这两个类型是否相同，将终端 TrieNode 通过dynamic_cast转为 TrieNodeWithValue。 如果转换结果不是 nullptr，则类型 T 是正确的类型。在类型不匹配时，即使有key所对应的终端节点，也应该失败直接返回。只有在类型匹配时，才正确返回其val。
+同样的在GetValue操作中，应该是上读锁，返回时应该解锁。
+ReaderWriterLatch 在c&#43;&#43;中可以通过std::shared_mutex mutex_很容易得实现一个读写锁。在bustub中已经有一个实现好的读写锁，上写锁mutex_.lock() ,上读锁mutex_.lock_shared(),对应的解锁操作分别是：mutex_.unlock() 和mutex_.unlock_shared()。
+源码 //===----------------------------------------------------------------------===// // // BusTub // // p0_trie.h // // Identification: src/include/primer/p0_trie.h // // Copyright (c) 2015-2022, Carnegie Mellon University Database Group // //===----------------------------------------------------------------------===// #pragma once #include &lt;memory&gt; #include &lt;stdexcept&gt; #include &lt;string&gt; #include &lt;unordered_map&gt; #include &lt;utility&gt; #include &lt;vector&gt; #include &#34;common/exception....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-05-23 13:42:01 &#43;0800 CST&#39;&gt;2022-05-23&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;861 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to chrono库的使用" href="http://localhost:1313/posts/chrono/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-11-20 13:42:01 &#43;0800 CST&#39;&gt;2023-11-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;10 min&amp;nbsp;·&amp;nbsp;2043 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to bustub project0" href="http://localhost:1313/posts/bustub-project0/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Git Tutorial
+    <h2>cmake Tutorial
     </h2>
   </header>
   <div class="entry-content">
-    <p>Git Local 1.Check the Version $ git --version 2.Configure Git 我们通常会将 git 配置为我们在 github 上注册的用户名/电子邮件/密码。global 关键字会为系统中的每个版本库设置配置。我们可以去掉 global 关键字，只对当前仓库进行配置。
-# 配置 $ git config --global user.name &#34;Dueplay&#34; $ git config --global user.email &#34;2289535823@qq.com&#34; $ git config --global user.password &#34;your passwd&#34; # 查看配置 $ git config user.name Dueplay $ git config user.email 2289535823@qq.com $ git config user.password hello123 3. Initialize Git 创建一个新的 repo，并如下初始化 git 以跟踪一个文件夹：
-$ mkdir myproject &amp;&amp; cd myproject $ git init 在myproject有个隐藏文件夹 ....</p>
+    <p>文件目录结构 $ tree . ├── add.c ├── div.c ├── head.h ├── main.c ├── mult.c └── sub.c # 指定使用的 cmake 的最低版本，可选，非必须，如果不加可能会有警告 cmake_minimum_required(VERSION 3.0) # 定义工程名称，并可指定工程的版本、工程描述、web主页地址、支持的语言 project(CALC) # 定义工程会生成一个可执行程序，语法add_executable(可执行程序名 源文件名称) add_executable(app add.c div.c main.c mult.c sub.c) # 定义变量，语法: set(VAR VALUE [CACHE TYPE DOCSTRING [FORCE]]).[]里是可选的 # eg.将文件名对应字符串存起来。 # 方式1: 各个源文件之间使用空格间隔 # set(SRC_LIST add.c div.c main.c mult.c sub.c) # 方式2: 各个源文件之间使用分号 ; 间隔 set(SRC_LIST add.c;div.c;main.c;mult.c;sub.c) add_executable(app ${SRC_LIST}) # 指定c&#43;&#43;标准 # 使用g&#43;&#43;时: $ g&#43;&#43; *.cpp -std=c&#43;&#43;11 -o app # C&#43;&#43;标准对应有一宏叫做DCMAKE_CXX_STANDARD，在CMake中想要指定C&#43;&#43;标准有两种方式： # 在cmakelists....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-01-20 10:42:01 &#43;0800 CST&#39;&gt;2022-01-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;8 min&amp;nbsp;·&amp;nbsp;1579 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to Git Tutorial" href="http://localhost:1313/posts/git/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-03-25 14:42:01 &#43;0800 CST&#39;&gt;2023-03-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;869 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to cmake Tutorial" href="http://localhost:1313/posts/cmake/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>配置ssh免密登录
+    <h2>Protocol Buffer的使用
     </h2>
   </header>
   <div class="entry-content">
-    <p>ssh方式A主机免密登录B
-1.首先在A主机上执行命令
-ssh-keygen -t rsa 会在执行命令的当前用户的家目录下的.ssh中生成公钥和私钥，id_rsa和id_rsa.pub分别存放私钥和公钥。
-2.将公钥加入到B主机的~/.ssh/authorized_keys文件中
-scp方式or手动复制粘贴。
-scp ~/.ssh/id_rsa.pub root@B主机ip:~/ B主机上执行：
-cat ~/id_rsa.pub&gt;&gt;~/.ssh/authorized_keys 3.如果不能登录检查以下注意的点和检查/etc/ssh/sshd_config，确保以下配置打开。
-RSAAuthentication yes PubkeyAuthentication yes AuthorizedKeysFile .ssh/authorized_keys 需要注意的几点： 1、确保A机器私钥文件名是id_rsa，否则会因为识别不到私钥文件而不会执行免密rsa登录；
-2、确保B机器上.ssh/authorized_keys文件的属性是600，否则要使用命令、
-chmod 600 ~/.ssh/authorized_keys 更改属性。 3、authorized_keys存放的目录需要与登录用户对应，比如使用root用户登录，则是在/home/root/.ssh/authorized_keys</p>
+    <p>为什么使用Protocol Buffer? 想象一下我们需要序列化/反序列化一个数据结构，有几种可行的方法：
+将原始内存数据结构保存为二进制形式。 但这是一种脆弱的方法，因为它要求读取端必须遵守完全相同的内存布局，并禁止数据格式的扩展。 编写我们自己的编码策略，例如以冒号为分隔的字符串“12:3:-23:67”，这需要我们编写编码和解析代码，这也带来了运行时开销。 将数据序列化为 XML 形式。 这是广泛使用的人类可读格式。 然而，XML 由于冗长而需要大量的存储空间。 Protocol Buffer ：灵活、高效、自动化的解决方案 定义Message syntax = &#34;proto3&#34;; // 版本 // 相当于c&#43;&#43;中的namespace package tutorial; // 相当于c&#43;&#43;中的class/struct message Person { // optional 修饰符表明该字段可能被设置，也可能不被设置。当从未设置的字段中检索值时，return系统默认值，整数为0，字符串为空等。 optional string name = 1; optional int32 id = 2; optional string email =3; // 对于枚举类型，默认值是枚举类型中定义的第一个值 enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2; } message PhoneNumber { optional string number = 1; optional PhoneType type = 2; } // repeated 修饰符相当于数组 repeated PhoneNumber phones = 4; } message AddressBook { repeated Person people = 1; } protobuf buffer message格式定义非常接近 C/C&#43;&#43; 中的类/结构定义。 有相当多的原始数据类型可用，例如int32、string，并且我们可以嵌套自定义数据类型，例如嵌套在PhoneNumber中的PhoneType，以及嵌套在AddressBook中的Person。...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-09-03 20:30:08 &#43;0800 CST&#39;&gt;2021-09-03&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;29 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to 配置ssh免密登录" href="http://localhost:1313/posts/ssh%E6%96%B9%E5%BC%8Fa%E4%B8%BB%E6%9C%BA%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95b/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-03-20 13:42:01 &#43;0800 CST&#39;&gt;2023-03-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;716 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to Protocol Buffer的使用" href="http://localhost:1313/posts/protocol-buffer/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>gcc和c库的制作
+    <h2>Database and Distributed System TAGS
     </h2>
   </header>
   <div class="entry-content">
-    <p>一、gcc编译流程 源文件-&gt;预处理-&gt;编译-&gt;汇编-&gt;链接-&gt;可执行文件
-1.预处理：cpp，宏替换，头文件展开，去掉注释。gcc -E hello.c -o hello.i
-2.编译：将.c文件通过gcc编译成汇编语言文件。gcc -S hello.i -o hello.s
-3.汇编：将汇编文件通过汇编器as变成二进制文件。gcc -c hello.s -o hello.o
-4.链接：将hello.o中所调用的库文件通过链接器ld链接到一起，成可执行文件。gcc hello.o -o hello
-一步到位：gcc hello.c -o hello 或gcc -o hello hello.c
-生成目标文件（.o文件）gcc -c hello.c -o hello.o（不写-o就默认生成hello.o）
-二、库的制作 1.静态库 ​	将源文件编译成目标文件 gcc -c add.c sub.c div.c mul.c
-​	将.o文件打包成库 ar rcs libmath.a add.o sub.o div.o mul.o
-​	使用库文件 gcc -o main main.c -I头文件的路径 -L库的路径 -l库名
-2.动态库 ​	将源文件编译成目标文件 gcc -fpic -c add.c sub.c div....</p>
+    <p>知识点中转站！
+分布式 Raft：
+论文 翻译 Paxos：
+OpenACID Blog 最终一致性：
+DDIA 线性一致性：
+DDIA PingCAP：Raft与线性一致性 线性一致性与可串行化 CAP 定理：
+CAP定理没有帮助 顺序：
+DDIA 全序广播：
+DDIA 2PC：
+DDIA 3PC：
+DDIA </p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-08-19 15:43:43 &#43;0800 CST&#39;&gt;2021-08-19&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;101 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to gcc和c库的制作" href="http://localhost:1313/posts/%E5%88%B6%E4%BD%9Cc%E5%BA%93/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>linux基础知识
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>一、目录 1./bin：可执行二进制文件的目录，绿色是可执行文件，
-输入命名./date，date可执行文件执行。cat命令，查看文本文件内容，ctrl&#43;c退出。
-2./boot：linux启动时用到的文件。reboot：重启。
-3./dev：存放设备文件，一切皆文件。
-sudo cat mice鼠标移动，输出。
-sudo临时获得一次管理员权限，cat是查看文件，mice是鼠标文件。
-4./etc：os相关的一些配置文件。cat passwd查看密码。
-5./home：用户的家目录会存在这。Linux系统支持多用户访问。~表示当前用户的家目录。
-6./lib：系统使用的函数库的目录。
-7./root：系统管理员的家目录。普通用户的家目录：/home/cookie。
-切换成管理员账户，sudu su。退出 exit。
-切换普通用户：su 用户名。退出 exit。
-cookie（用户名）@（at在）主机名：当前工作目录$(普通用户)#（管理员）
-cd空格 回车：回到当前用户的“家”目录，宿主目录，这个用户的所有数据。不是home。
-cd空格 - 回到上次工作目录。
-8./tmp：一般用户或正在执行的程序临时存放文件的目录。
-9./usr：unix system resource，应用程序存放目录。
-二、文件类型 linux下不以后缀名区分文件类型。ls -l 查看文件详细信息。
-普通文件-
-目录文件d
-套接字文件s
-软链接文件l
-字符设备文件c
-块设备文件b
-管道文件p
-第一个为文件类型，后面9个，三个一组，r可读，w可写，x可执行。分别为文件所有者权限，所属组权限，其他人的权限。数字2代表硬链接计数。第一个cookie为文件所有者，第二个是所属组。文件所占用的空间大小（byte），最后一次修改时间，文件名。
-gedit 文件名：用记事本编辑文件。
-三、命令 命令格式：命令 -可选 参数
-查看帮助文档：ls –help；man 1 xxx：1是标准命令，2是系统调用，3是库函数
-ctrl&#43;p/n 上/下一条命令
-ctrl&#43;u 清空
-ctrl&#43;b 光标向前移动一个字符
-ctrl&#43;a 光标移动到最前
-ctrl&#43;e 光标移动到最后
-通配符：ls std*.h ls std??.h *代表一堆，？代表一个字符。
-输出重定向：&gt;
-追加»
-删除：rm -f强制删 ；rm -r 递归删（无敌），删目录时必须用这个。...</p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-03-20 15:30:09 &#43;0800 CST&#39;&gt;2021-03-20&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;125 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to linux基础知识" href="http://localhost:1313/posts/linux%E5%85%A5%E9%97%A8/"></a>
+  <footer class="entry-footer">&lt;span title=&#39;2023-03-18 20:43:22 &#43;0800 CST&#39;&gt;2023-03-18&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;25 words&amp;nbsp;·&amp;nbsp;Me</footer>
+  <a class="entry-link" aria-label="post link to Database and Distributed System TAGS" href="http://localhost:1313/posts/database-and-distributed-system-tags/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">

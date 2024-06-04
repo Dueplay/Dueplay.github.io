@@ -176,41 +176,6 @@ DDIA </p>
   <footer class="entry-footer">&lt;span title=&#39;2023-03-18 20:43:22 &#43;0800 CST&#39;&gt;2023-03-18&lt;/span&gt;&amp;nbsp;·&amp;nbsp;1 min&amp;nbsp;·&amp;nbsp;25 words&amp;nbsp;·&amp;nbsp;Me</footer>
   <a class="entry-link" aria-label="post link to Database and Distributed System TAGS" href="http://localhost:1313/posts/database-and-distributed-system-tags/"></a>
 </article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>MIT6.824 Lab3 KVService
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Introduction 摸了一段时间的鱼，去尝试用 SpringBoot &#43; Vue 搭建一个前后端分离的 Web 应用。都说 CS 的学生不能只会用框架 CRUD，但更不能不会用框架 CRUD。大概做出来一个小 demo 后就没有再继续了。接着来做 6.824。
-Lab3 和 Lab2 各有各的难处。Lab2 是 Raft 的核心，需要小心地处理各种 corner case。但好在有 Figure2 的引导，最终也是按照其严格的规定成功实现。Lab3 编码难度不如 Lab2，但没有详细的引导，留给个人自由发挥的空间更大 (更有可能不知道从何下手)。
-Lab3 需要在 Raft 层上实现一个 fault-tolerant key-value service，满足强一致性，也就是线性一致性 (Linearizable Consistency)。线性一致性保证整个系统看起来好像只有一个副本，其中所有的操作都是原子性的。简单地说，线性一致性系统的读写操作有以下特征：
-读写并不能瞬间完成，而是在一个时间段内进行。 读在写开始前完成，读到的一定是旧值；读在写完成之后开始，读到的一定是新值。(读写操作无重合部分) 读写并发进行，即有重合部分时，既可能读到新值，也可能读到旧值。 一旦有一个客户端读取到了新值，那么之后的客户端一定也都会读取到新值。 关于线性一致性更加详细的定义和解析，可以阅读《数据密集型应用系统》(DDIA) 相关章节。
-先来看看整个系统的架构：
-整个 KV Service 由多个 Server 组成，每个 Server 包含一个 State Machine，具体在 lab 中是一个 KV 数据库；Server 还包含一个 Raft 节点。需要注意的是，各 Server 之间并不会直接通信，而是靠其 Raft 节点进行通信。
-整个系统的理想运行流程是：
-Client 通过 RPC 向 KV Service 发送请求，例如 Put(x,1) KV Service 将请求转发给当前拥有 Leader Raft 节点的 Server Leader Server 将请求包含的 command 传递给 Raft 层 Raft 层对 command 进行共识，生成相同的 log replica 在达成共识后，Raft 层将 command Apply 回 Server Server 收到 Raft 层的 Apply 后，将 command 应用到状态机，即状态机此时状态为 {x: 1} 成功应用至状态机后，Server 对 Client 的 RPC 进行回复，返回结果和错误码。 当系统能够正常运行时，一切看起来都很清晰美好。但是一旦出现问题，如节点挂掉、RPC丢包、网络分区等等，情况就变得比较复杂了。...</p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-09-22 18:16:09 &#43;0800 CST&#39;&gt;2022-09-22&lt;/span&gt;&amp;nbsp;·&amp;nbsp;8 min&amp;nbsp;·&amp;nbsp;1506 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to MIT6.824 Lab3 KVService" href="http://localhost:1313/posts/mit6.824-lab3-kvservice/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>MIT6.824 Lab2 Raft
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>趁着暑假有空，把鸽了很久的 MIT6.824 做一下。Lab1 是实现一个 Map-Reduce，因为和 Raft 主线关系不大（因为懒），就略过了。另外，这次尝试实现一个 part 就来记录相关的内容，以免在全部实现后忘记部分细节（以免之后太懒不想写）。因此，不同 part 的代码会变化，请以最终版本的代码为准（但保证每一 part 的代码可以正常通过绝大部分相应的测试）。同时，在写下某一 part 的记录时，我对 Raft 的整体把握也难免有所不足。
-Resources Course’s Page 课程主页 Students’ Guide to Raft 一篇引导博客 Debugging by Pretty Printing debug 技巧，强烈推荐阅读和运用 Raft Q&amp;A 关于 Raft 的一些 Q&amp;A Raft Visualization Raft 动画演示 In Search of an Understandable Consensus Algorithm Raft 论文 Lab2A Raft Leader Election Lab2A 实现时间为6.22~6.24。
-Lab2A 主要实现 Raft 的选主过程，包括选举出 Leader 和 Leader 通过心跳维持身份。
-Design 首先是选主过程的状态机模型：
-接下来是 Raft 论文中最为重要的 Figure 2:...</p>
-  </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-06-25 00:10:08 &#43;0800 CST&#39;&gt;2022-06-25&lt;/span&gt;&amp;nbsp;·&amp;nbsp;25 min&amp;nbsp;·&amp;nbsp;5286 words&amp;nbsp;·&amp;nbsp;Me</footer>
-  <a class="entry-link" aria-label="post link to MIT6.824 Lab2 Raft" href="http://localhost:1313/posts/mit6.824-lab2-raft/"></a>
-</article>
     </main>
     
 <footer class="footer">

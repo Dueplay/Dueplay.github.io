@@ -20,23 +20,5 @@
       <description>Desc Text.</description>
     </item>
     
-    <item>
-      <title>MIT6.824 Lab3 KVService</title>
-      <link>http://localhost:1313/posts/mit6.824-lab3-kvservice/</link>
-      <pubDate>Thu, 22 Sep 2022 18:16:09 +0800</pubDate>
-      
-      <guid>http://localhost:1313/posts/mit6.824-lab3-kvservice/</guid>
-      <description>Fault-tolerant KV Service based on Raft</description>
-    </item>
-    
-    <item>
-      <title>MIT6.824 Lab2 Raft</title>
-      <link>http://localhost:1313/posts/mit6.824-lab2-raft/</link>
-      <pubDate>Sat, 25 Jun 2022 00:10:08 +0800</pubDate>
-      
-      <guid>http://localhost:1313/posts/mit6.824-lab2-raft/</guid>
-      <description>The implementation of Raft consensus algorithm.</description>
-    </item>
-    
   </channel>
 </rss>
