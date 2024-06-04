@@ -10,7 +10,25 @@
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 14 Jan 2024 12:42:01 +0800</lastBuildDate><atom:link href="https://dueplay.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 13 Apr 2024 21:32:01 +0800</lastBuildDate><atom:link href="https://dueplay.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>stl中的算法介绍</title>
+      <link>https://dueplay.github.io/posts/stl%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Sat, 13 Apr 2024 21:32:01 +0800</pubDate>
+      
+      <guid>https://dueplay.github.io/posts/stl%E7%AE%97%E6%B3%95/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
+      <title>智能指针</title>
+      <link>https://dueplay.github.io/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</link>
+      <pubDate>Tue, 12 Mar 2024 15:12:01 +0800</pubDate>
+      
+      <guid>https://dueplay.github.io/posts/%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/</guid>
+      <description>c&#43;&#43;中的智能指针</description>
+    </item>
+    
     <item>
       <title>catch2测试框架</title>
       <link>https://dueplay.github.io/posts/catch2/</link>
@@ -18,6 +36,15 @@
       
       <guid>https://dueplay.github.io/posts/catch2/</guid>
       <description>简要介绍怎么用catch编写单元测试</description>
+    </item>
+    
+    <item>
+      <title>bustub project4 concurrency</title>
+      <link>https://dueplay.github.io/posts/bustub-project4-concurrency/</link>
+      <pubDate>Mon, 25 Dec 2023 22:20:01 +0800</pubDate>
+      
+      <guid>https://dueplay.github.io/posts/bustub-project4-concurrency/</guid>
+      <description>Desc Text.</description>
     </item>
     
     <item>
@@ -84,6 +111,15 @@
     </item>
     
     <item>
+      <title>Docker的使用</title>
+      <link>https://dueplay.github.io/posts/docker/</link>
+      <pubDate>Sat, 03 Dec 2022 11:32:01 +0800</pubDate>
+      
+      <guid>https://dueplay.github.io/posts/docker/</guid>
+      <description>Desc Text.</description>
+    </item>
+    
+    <item>
       <title>chrono库的使用</title>
       <link>https://dueplay.github.io/posts/chrono/</link>
       <pubDate>Mon, 23 May 2022 13:42:01 +0800</pubDate>
@@ -121,10 +157,10 @@
     
     <item>
       <title>linux基础知识</title>
-      <link>https://dueplay.github.io/posts/linux%E5%85%A5%E9%97%A8/</link>
+      <link>https://dueplay.github.io/posts/linux%E5%9F%BA%E7%A1%80/</link>
       <pubDate>Sat, 20 Mar 2021 15:30:09 +0800</pubDate>
       
-      <guid>https://dueplay.github.io/posts/linux%E5%85%A5%E9%97%A8/</guid>
+      <guid>https://dueplay.github.io/posts/linux%E5%9F%BA%E7%A1%80/</guid>
       <description>linux基础知识</description>
     </item>
     
