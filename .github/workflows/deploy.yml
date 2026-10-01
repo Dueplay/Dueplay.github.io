@@ -25,7 +25,10 @@ jobs:
 
       - run: npm ci
 
+      # 文章日期按北京时间显示
       - run: npm run build
+        env:
+          TZ: Asia/Shanghai
 
       # 发布到 gh-pages 分支（GitHub Pages 的发布源）
       - uses: peaceiris/actions-gh-pages@v4
