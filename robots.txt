@@ -1,3 +1,2 @@
 User-agent: *
-Disallow:
-Sitemap: https://dueplay.github.io/sitemap.xml
+Allow: /
