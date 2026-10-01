@@ -1,0 +1,85 @@
+---
+import { render } from 'astro:content';
+import QRCode from 'qrcode';
+import Base from '../../layouts/Base.astro';
+import { getPosts, postUrl, formatDate, excerpt, type Post } from '../../utils';
+import { SITE } from '../../site.config';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // Read More 指向更早的一篇，最早一篇回到最新
+    props: { post, next: posts.length > 1 ? posts[(i + 1) % posts.length] : undefined },
+  }));
+}
+
+interface Props { post: Post; next?: Post }
+const { post, next } = Astro.props;
+const { Content, headings } = await render(post);
+
+// 目录：h2/h3 不少于 5 个才显示，超过 14 个时只保留 h2
+const MAX_TOC_ITEMS = 14;
+let toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+if (toc.length > MAX_TOC_ITEMS && toc.some((h) => h.depth === 3)) toc = toc.filter((h) => h.depth === 2);
+const showToc = toc.length >= 5;
+const allChild = toc.every((h) => h.depth === 3);
+
+const pageUrl = new URL(postUrl(post), Astro.site).href;
+const qrSvg = await QRCode.toString(pageUrl, { type: 'svg', margin: 1, width: 128, errorCorrectionLevel: 'L' });
+const { giscus, sponsor } = SITE;
+---
+<Base bodyId="post" title={post.data.title} description={excerpt(post)} slogan={post.data.slogan} type="article" hasToc={showToc}>
+  <div class="post-shell">
+    <article class="hentry">
+      <div class="entry-content heti">
+        <h1 class="post-title entry-title">{post.data.title}</h1>
+        <h4 class="page-info">
+          {post.data.categories.length > 0 && <span>Categories: {post.data.categories.join(' / ')}</span>}
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <div class="qr-text">
+            <div class="qr-code" role="img" aria-label="QR code for this page" set:html={qrSvg} />
+          </div>
+        </h4>
+        <Content />
+        {sponsor.url && (
+          <div class="coffee">
+            <a class="buy-me-coffee" href={sponsor.url} target="_blank" rel="noopener noreferrer">{sponsor.text}</a>
+          </div>
+        )}
+      </div>
+    </article>
+    {showToc && (
+      <aside class="post-toc" id="J_post_toc" aria-label="On this page">
+        <div class="post-toc-inner">
+          <nav class="post-toc-nav" id="J_post_toc_nav">
+            {toc.map((h) => (
+              <a class:list={['post-toc-link', { 'is-child': !allChild && h.depth === 3 }]} href={`#${h.slug}`} data-toc-id={h.slug}>{h.text}</a>
+            ))}
+          </nav>
+        </div>
+      </aside>
+    )}
+  </div>
+  <div class="post-followup">
+    {giscus.repoId && giscus.categoryId && (
+      <div class="giscus-container">
+        <script src="https://giscus.app/client.js" data-repo={giscus.repo} data-repo-id={giscus.repoId}
+          data-category={giscus.category} data-category-id={giscus.categoryId}
+          data-mapping="specific" data-term={post.id}
+          data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom"
+          data-theme={new URL('/css/comment.css', SITE.url).href}
+          data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async is:inline></script>
+      </div>
+    )}
+    {next && (
+      <a class="read-more" href={postUrl(next)} data-astro-prefetch>
+        <div class="read-more-header"><div class="read-more-btn">Read More</div></div>
+        <div class="read-more-content">
+          <h3>{next.data.title}</h3>
+          <p>【{formatDate(next.data.date)}】{excerpt(next)}</p>
+        </div>
+      </a>
+    )}
+  </div>
+</Base>

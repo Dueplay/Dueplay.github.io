@@ -1,0 +1,13 @@
+---
+import Base from './Base.astro';
+
+// 供 src/pages 下的 Markdown 单页（如 about.md）使用
+const { frontmatter } = Astro.props;
+---
+<Base bodyId="page" title={frontmatter.title} description={frontmatter.description} slogan={frontmatter.slogan} active={frontmatter.active}>
+  <article class="hentry">
+    <div class="entry-content heti">
+      <slot />
+    </div>
+  </article>
+</Base>

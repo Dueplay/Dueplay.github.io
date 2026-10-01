@@ -1,0 +1,21 @@
+---
+import { excerpt, formatDate, postUrl, type Post } from '../utils';
+import Pagination from './Pagination.astro';
+import { SITE } from '../site.config';
+
+interface Props { posts: Post[]; current: number; total: number }
+const { posts, current, total } = Astro.props;
+---
+<h1 class="visually-hidden">{SITE.title}</h1>
+{posts.map((post) => (
+  <a href={postUrl(post)} rel="bookmark" title={post.data.title} class="header-href" data-astro-prefetch>
+    <article class="hentry">
+      <h2 class="entry-title">{post.data.title}</h2>
+      <div class="entry-content">
+        <span>【{formatDate(post.data.date)}】</span>{excerpt(post)}
+      </div>
+    </article>
+  </a>
+))}
+{posts.length === 0 && <article class="hentry"><div class="entry-content">还没有文章。</div></article>}
+<Pagination current={current} total={total} />

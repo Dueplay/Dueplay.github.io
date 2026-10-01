@@ -1,0 +1,25 @@
+---
+interface Props { current: number; total: number }
+const { current, total } = Astro.props;
+const href = (n: number) => (n === 1 ? '/' : `/page/${n}/`);
+
+// 首页、末页、当前页前后各两页，其余折叠为省略号
+const items: (number | null)[] = [];
+for (let n = 1; n <= total; n++) {
+  if (n === 1 || n === total || Math.abs(n - current) <= 2) items.push(n);
+  else if (items[items.length - 1] !== null) items.push(null);
+}
+---
+{total > 1 && (
+  <div class="pagination">
+    <ul class="inline-list">
+      {current > 1 && <li><a href={href(current - 1)} class="btn-arrow" aria-label="Previous page">&lt;</a></li>}
+      {items.map((n) =>
+        n === null ? <li>…</li>
+        : n === current ? <li><strong class="current-page">{n}</strong></li>
+        : <li><a href={href(n)} data-astro-prefetch>{n}</a></li>
+      )}
+      {current < total && <li><a href={href(current + 1)} class="btn-arrow" aria-label="Next page">&gt;</a></li>}
+    </ul>
+  </div>
+)}

@@ -1,0 +1,18 @@
+{
+  "name": "dueplay-site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "astro": "^5.18.2",
+    "lxgw-wenkai-screen-webfont": "^1.7.0",
+    "photoswipe": "^5.4.4",
+    "qrcode": "^1.5.4"
+  }
+}

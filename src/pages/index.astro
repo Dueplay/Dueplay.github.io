@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import { getPosts } from '../utils';
+import { SITE } from '../site.config';
+
+const posts = await getPosts();
+const total = Math.max(1, Math.ceil(posts.length / SITE.pageSize));
+---
+<Base bodyId="post-index">
+  <PostList posts={posts.slice(0, SITE.pageSize)} current={1} total={total} />
+</Base>
