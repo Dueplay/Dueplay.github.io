@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>刷新缓存 · Dueplay</title>
+  <style>body{font:16px/1.7 system-ui,sans-serif;max-width:560px;margin:120px auto;padding:0 20px;color:#24292f;background:#f5f4ed}</style>
+</head>
+<body>
+  <p id="msg">正在刷新本站在浏览器中的缓存…</p>
+  <script>
+    // 浏览器缓存了旧自定义域名的 301 跳转。用 cache: 'reload' 重新请求这些地址，
+    // 新响应会覆盖缓存里的旧跳转，之后访问就不再被带到旧域名。
+    const OLD_PATHS = ['/', '/about/', '/posts/', '/tags/', '/archives/', '/search/', '/index.xml', '/page/2/'];
+    const reload = (url) => fetch(url, { cache: 'reload', redirect: 'manual' }).catch(() => {});
+
+    fetch('/search.json', { cache: 'reload' })
+      .then((res) => res.json())
+      .then((posts) => posts.map((post) => post.url))
+      .catch(() => [])
+      .then((urls) => Promise.all([...new Set([...OLD_PATHS, ...urls])].map(reload)))
+      .then(() => {
+        document.getElementById('msg').textContent = '完成，正在返回首页…';
+        setTimeout(() => location.replace('/'), 800);
+      });
+  </script>
+</body>
+</html>
