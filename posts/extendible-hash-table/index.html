@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>可扩展哈希表 · Dueplay</title><meta name="description" content="深入理解可扩展哈希表的实现原理，包括目录扩展、桶分裂、插入和删除操作的详细过程。"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/extendible-hash-table/"><meta property="og:type" content="article"><meta property="og:title" content="可扩展哈希表 · Dueplay"><meta property="og:description" content="深入理解可扩展哈希表的实现原理，包括目录扩展、桶分裂、插入和删除操作的详细过程。"><meta property="og:url" content="https://dueplay.github.io/posts/extendible-hash-table/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">可扩展哈希表</h1> <h4 class="page-info"> <span>Categories: Data Structure / Database</span> <time datetime="2023-10-09T00:00:00.000Z">2023-10-09</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 35 35" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h35v35H0z"/><path stroke="#000000" d="M1 1.5h7m2 0h1m5 0h6m2 0h1m2 0h7M1 2.5h1m5 0h1m1 0h2m1 0h2m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m2 0h3m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h2m1 0h1m4 0h2m1 0h1m2 0h1m3 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m3 0h1m1 0h4m2 0h2m1 0h3m2 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m5 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M13 8.5h2m1 0h1m4 0h4M1 9.5h5m1 0h5m1 0h1m1 0h2m1 0h1m4 0h4m1 0h1m1 0h1m1 0h1M1 10.5h2m1 0h2m4 0h1m5 0h2m2 0h6m1 0h2m2 0h3M2 11.5h2m3 0h2m1 0h1m1 0h2m4 0h2m2 0h2m2 0h2m2 0h1m1 0h1M2 12.5h2m5 0h4m2 0h1m1 0h1m3 0h2m1 0h1m2 0h3m1 0h1M2 13.5h6m1 0h2m1 0h1m4 0h2m1 0h1m2 0h4m2 0h2M5 14.5h1m3 0h1m1 0h1m1 0h4m1 0h7m2 0h1m4 0h2M3 15.5h3m1 0h1m6 0h4m1 0h1m6 0h1m5 0h1M3 16.5h4m1 0h3m2 0h2m1 0h1m2 0h2m1 0h2m1 0h4m2 0h1M1 17.5h1m2 0h1m1 0h5m2 0h1m1 0h2m1 0h2m4 0h3m1 0h2m2 0h1M1 18.5h1m3 0h2m4 0h1m4 0h6m2 0h1m2 0h1m2 0h1m1 0h2M2 19.5h1m1 0h4m3 0h3m7 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1M1 20.5h3m1 0h2m1 0h2m2 0h1m2 0h1m1 0h1m4 0h3m1 0h1m2 0h1m1 0h1M1 21.5h2m4 0h1m2 0h1m1 0h1m5 0h1m1 0h1m2 0h4m1 0h2m2 0h1M1 22.5h2m2 0h1m2 0h1m2 0h1m1 0h4m3 0h3m1 0h4m2 0h1m1 0h2M1 23.5h1m1 0h2m1 0h3m1 0h2m2 0h4m4 0h2m1 0h2m1 0h1m1 0h1m1 0h1M1 24.5h1m3 0h2m1 0h1m1 0h2m1 0h2m2 0h1m1 0h1m1 0h5m2 0h1m1 0h2M1 25.5h1m1 0h2m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m4 0h1m1 0h5m3 0h1M9 26.5h2m8 0h3m1 0h1m1 0h1m3 0h3m1 0h1M1 27.5h7m1 0h1m1 0h3m2 0h2m1 0h1m2 0h1m1 0h2m1 0h1m1 0h1m1 0h2M1 28.5h1m5 0h1m2 0h3m2 0h3m2 0h3m1 0h2m3 0h3m1 0h1M1 29.5h1m1 0h3m1 0h1m1 0h1m1 0h2m3 0h1m1 0h1m1 0h1m2 0h1m1 0h6m1 0h1M1 30.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h8m2 0h5M1 31.5h1m1 0h3m1 0h1m1 0h2m3 0h3m1 0h2m1 0h5m1 0h1m2 0h2M1 32.5h1m5 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h2m1 0h1m2 0h1m2 0h2M1 33.5h7m1 0h1m3 0h1m1 0h1m2 0h1m4 0h3m6 0h1"/></svg>
+</div> </div> </h4> <p>可扩展哈希表是一种动态哈希技术，主要用于解决传统哈希表在数据量增长时需要整体重新哈希的问题。它通过维护一个目录（directory）和多个桶（bucket）来实现动态扩展。</p>
+<h3 id="基本概念">基本概念</h3>
+<p><strong>全局深度（Global Depth）</strong>：目录使用的哈希位数
+<strong>局部深度（Local Depth）</strong>：每个桶使用的哈希位数
+<strong>目录（Directory）</strong>：指向桶的指针数组
+<strong>桶（Bucket）</strong>：存储实际数据的容器</p>
+<h3 id="核心思想">核心思想</h3>
+<p>可扩展哈希表的核心思想是：</p>
+<ul>
+<li>使用目录来间接访问桶</li>
+<li>当桶满时，只分裂该桶而不是重新哈希整个表</li>
+<li>根据需要动态调整目录大小</li>
+</ul>
+<h3 id="插入操作">插入操作</h3>
+<p>插入元素时的步骤：</p>
+<ol>
+<li>计算哈希值</li>
+<li>使用全局深度的最低位找到对应的目录项</li>
+<li>通过目录项找到对应的桶</li>
+<li>如果桶未满，直接插入</li>
+<li>如果桶已满：
+<ul>
+<li>如果局部深度 &#x3C; 全局深度：分裂桶，重新分配元素</li>
+<li>如果局部深度 = 全局深度：先扩展目录（全局深度+1），再分裂桶</li>
+</ul>
+</li>
+</ol>
+<h3 id="桶分裂">桶分裂</h3>
+<p>当需要分裂桶时：</p>
+<ol>
+<li>创建新桶</li>
+<li>增加原桶的局部深度</li>
+<li>根据新的局部深度重新分配元素到两个桶</li>
+<li>更新目录指针</li>
+</ol>
+<h3 id="目录扩展">目录扩展</h3>
+<p>当局部深度等于全局深度且桶已满时：</p>
+<ol>
+<li>目录大小翻倍（2^(global_depth) → 2^(global_depth+1)）</li>
+<li>全局深度加1</li>
+<li>复制原有的目录项（每个指针复制两份）</li>
+<li>然后执行桶分裂</li>
+</ol>
+<h3 id="删除操作">删除操作</h3>
+<p>删除操作相对简单：</p>
+<ol>
+<li>找到对应的桶</li>
+<li>删除元素</li>
+<li>可选：如果桶为空且可以合并，执行合并操作</li>
+</ol>
+<h3 id="合并操作">合并操作</h3>
+<p>合并条件：</p>
+<ul>
+<li>两个桶的局部深度相同</li>
+<li>两个桶是分裂关系（buddy buckets）</li>
+<li>合并后的元素总数不超过桶容量</li>
+</ul>
+<h3 id="查找操作">查找操作</h3>
+<p>查找操作非常高效：</p>
+<ol>
+<li>计算哈希值</li>
+<li>使用全局深度的最低位找到目录项</li>
+<li>在对应的桶中查找元素</li>
+</ol>
+<p>时间复杂度为 O(1)（平均情况）</p>
+<h3 id="优点">优点</h3>
+<ol>
+<li><strong>动态扩展</strong>：无需预先分配大量空间</li>
+<li><strong>局部操作</strong>：只影响部分数据，不需要全表重哈希</li>
+<li><strong>高效查找</strong>：O(1) 时间复杂度</li>
+<li><strong>空间利用率</strong>：相比线性哈希更好的空间利用</li>
+</ol>
+<h3 id="缺点">缺点</h3>
+<ol>
+<li><strong>目录开销</strong>：需要额外的目录空间</li>
+<li><strong>实现复杂</strong>：相比简单哈希表更复杂</li>
+<li><strong>指针间接</strong>：需要通过目录间接访问</li>
+</ol>
+<h3 id="应用场景">应用场景</h3>
+<p>可扩展哈希表广泛应用于：</p>
+<ul>
+<li><strong>数据库索引</strong>：特别是需要动态增长的索引</li>
+<li><strong>文件系统</strong>：目录结构的组织</li>
+<li><strong>缓存系统</strong>：需要动态调整大小的缓存</li>
+<li><strong>键值存储</strong>：如某些 NoSQL 数据库</li>
+</ul>
+<h3 id="示例">示例</h3>
+<p>假设我们有一个桶大小为2的可扩展哈希表：</p>
+<p><strong>初始状态</strong>：</p>
+<ul>
+<li>全局深度 = 1</li>
+<li>目录大小 = 2</li>
+<li>两个桶，局部深度都为1</li>
+</ul>
+<p><strong>插入过程</strong>：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>插入 5 (hash: 101):</span></span>
+<span class="line"><span>- 看最后1位: 1</span></span>
+<span class="line"><span>- 插入到 bucket[1]</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>插入 13 (hash: 1101):</span></span>
+<span class="line"><span>- 看最后1位: 1</span></span>
+<span class="line"><span>- bucket[1] 已满，需要分裂</span></span>
+<span class="line"><span>- 全局深度 = 局部深度，先扩展目录</span></span>
+<span class="line"><span>- 全局深度变为2，目录大小变为4</span></span>
+<span class="line"><span>- 分裂 bucket[1]，局部深度变为2</span></span>
+<span class="line"><span>- 根据最后2位重新分配元素</span></span></code></pre></div>
+<h3 id="与其他哈希技术的比较">与其他哈希技术的比较</h3>
+<p><strong>vs 静态哈希</strong>：</p>
+<ul>
+<li>可扩展哈希表支持动态扩展</li>
+<li>静态哈希需要预知数据量</li>
+</ul>
+<p><strong>vs 线性哈希</strong>：</p>
+<ul>
+<li>可扩展哈希表使用目录，线性哈希不需要</li>
+<li>可扩展哈希表可能有更好的查找性能</li>
+<li>线性哈希空间利用率可能更高</li>
+</ul>
+<h3 id="实现要点">实现要点</h3>
+<p>在实现可扩展哈希表时需要注意：</p>
+<ol>
+<li><strong>目录管理</strong>：正确维护目录和指针关系</li>
+<li><strong>深度跟踪</strong>：准确跟踪全局深度和局部深度</li>
+<li><strong>分裂逻辑</strong>：正确实现桶分裂和元素重分配</li>
+<li><strong>并发控制</strong>：如果需要并发访问，需要适当的锁机制</li>
+<li><strong>内存管理</strong>：及时释放不再使用的桶</li>
+</ol>
+<h3 id="性能分析">性能分析</h3>
+<p><strong>时间复杂度</strong>：</p>
+<ul>
+<li>查找：O(1) 平均</li>
+<li>插入：O(1) 平摊</li>
+<li>删除：O(1) 平均</li>
+</ul>
+<p><strong>空间复杂度</strong>：</p>
+<ul>
+<li>数据空间：O(n)</li>
+<li>目录空间：O(2^global_depth)</li>
+</ul>
+<h3 id="总结">总结</h3>
+<p>可扩展哈希表是一种优雅的动态哈希技术，通过目录和桶的两层结构实现了高效的动态扩展。它在数据库系统中有广泛应用，是理解动态数据结构的重要案例。虽然实现相对复杂，但其提供的性能优势使其在许多场景下成为理想的选择。</p>  </div> </article>  </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="extendible-hash-table" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/publish-new-post/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>如何在这个博客发布一篇新文章</h3> <p>【2026-10-02】从新建 Markdown、放入配图、本地预览，到推送代码后由 GitHub Actions 自动构建上线，完整走一遍这个博客发布新文章的流程。</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

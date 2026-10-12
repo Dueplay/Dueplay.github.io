@@ -1,0 +1,248 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>通用面试题整理 · Dueplay</title><meta name="description" content="涵盖 Linux 系统、多线程、C++ 基础、网络、数据库等方面的常见面试题及详细解答。"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/general-interview-questions/"><meta property="og:type" content="article"><meta property="og:title" content="通用面试题整理 · Dueplay"><meta property="og:description" content="涵盖 Linux 系统、多线程、C++ 基础、网络、数据库等方面的常见面试题及详细解答。"><meta property="og:url" content="https://dueplay.github.io/posts/general-interview-questions/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post" class="has-post-toc"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">通用面试题整理</h1> <h4 class="page-info"> <span>Categories: Interview / System</span> <time datetime="2024-11-14T00:00:00.000Z">2024-11-14</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 35 35" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h35v35H0z"/><path stroke="#000000" d="M1 1.5h7m2 0h1m3 0h1m4 0h3m2 0h1m2 0h7M1 2.5h1m5 0h1m1 0h2m1 0h6m5 0h1m1 0h1m1 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m2 0h3m2 0h1m5 0h3m1 0h1m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h2m1 0h1m3 0h3m2 0h1m1 0h1m3 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m3 0h1m1 0h2m2 0h1m2 0h5m2 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h1m1 0h1m2 0h3m1 0h2m7 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M13 8.5h2m2 0h1m1 0h6M1 9.5h5m1 0h5m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h1M1 10.5h2m2 0h1m3 0h2m6 0h1m2 0h6m1 0h2m2 0h3M1 11.5h1m2 0h5m1 0h1m1 0h2m2 0h3m2 0h3m2 0h2m2 0h1m1 0h1M2 12.5h3m1 0h1m1 0h1m1 0h3m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h3m1 0h1M2 13.5h2m2 0h2m2 0h1m1 0h1m5 0h1m1 0h1m2 0h4m2 0h2M3 14.5h1m2 0h1m1 0h1m1 0h2m1 0h3m1 0h8m2 0h1m4 0h2M2 15.5h1m1 0h1m2 0h5m2 0h4m1 0h1m1 0h1m4 0h1m5 0h1M2 16.5h2m1 0h2m1 0h2m1 0h1m1 0h2m1 0h1m4 0h3m1 0h4m2 0h1M1 17.5h2m2 0h3m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m3 0h3m1 0h2m2 0h1M1 18.5h1m1 0h1m1 0h2m1 0h1m8 0h1m1 0h2m3 0h1m2 0h1m2 0h1m1 0h2M2 19.5h1m4 0h1m4 0h2m2 0h1m6 0h1m1 0h1m1 0h2m1 0h1m1 0h1M3 20.5h2m3 0h1m1 0h3m2 0h3m3 0h4m1 0h1m2 0h1m1 0h1M3 21.5h3m1 0h1m2 0h3m3 0h3m1 0h1m2 0h4m1 0h2m2 0h1M1 22.5h5m3 0h1m1 0h1m1 0h3m1 0h1m2 0h3m1 0h4m2 0h1m1 0h2M1 23.5h1m5 0h5m2 0h5m2 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1M1 24.5h1m3 0h1m2 0h1m1 0h1m2 0h2m7 0h4m2 0h1m1 0h2M1 25.5h1m1 0h5m1 0h1m1 0h1m1 0h1m1 0h5m3 0h1m1 0h5m3 0h1M9 26.5h1m7 0h6m2 0h1m3 0h3m1 0h1M1 27.5h7m1 0h5m2 0h2m4 0h4m1 0h1m1 0h1m1 0h2M1 28.5h1m5 0h1m2 0h1m1 0h1m2 0h3m2 0h1m1 0h4m3 0h3M1 29.5h1m1 0h3m1 0h1m1 0h1m1 0h2m3 0h1m1 0h1m2 0h1m1 0h1m1 0h6m1 0h2M1 30.5h1m1 0h3m1 0h1m1 0h2m2 0h3m1 0h1m2 0h2m2 0h3m2 0h5M1 31.5h1m1 0h3m1 0h1m1 0h3m2 0h4m1 0h1m1 0h1m1 0h3m1 0h1m2 0h2M1 32.5h1m5 0h1m1 0h3m1 0h2m1 0h2m3 0h2m1 0h1m2 0h1m2 0h2M1 33.5h7m1 0h3m1 0h1m1 0h4m4 0h3m6 0h1"/></svg>
+</div> </div> </h4> <h2 id="一linux-系统">一、Linux 系统</h2>
+<h3 id="1-linux-下-io-模型有几种各自的含义是什么">1. Linux 下 IO 模型有几种，各自的含义是什么</h3>
+<p><strong>阻塞 IO</strong>：当一个进程发起 IO 请求时，如果数据未准备好，进程会被阻塞，直至操作完成。</p>
+<p><strong>非阻塞 IO</strong>：发起 IO 请求时进程不会被阻塞，如果数据未准备好，会立即返回一个错误（通常是 EAGAIN 或者 EWOULDBLOCK），告知进程稍后再试。</p>
+<blockquote>
+<p>注意：阻塞是文件的特性，不是 read/write 函数的特性。socket、pipe 这类文件是默认阻塞 IO，而普通文件是非阻塞 IO。</p>
+</blockquote>
+<p><strong>IO 多路复用</strong>：通过使用 select、poll、epoll 等系统调用，单个线程可以监听多个 fd 上的事件，让 OS 内核检测绑定到其（IO 复用函数）上的 fd 读写事件来告诉用户某个 fd 是否可以进行 IO 操作。</p>
+<p><strong>异步 IO</strong>：进程发起 I/O 请求后，可以立即继续执行其他任务，而无需等待 I/O 操作完成。I/O 完成后，系统会通过回调函数或信号等方式通知进程。</p>
+<p><strong>io_uring</strong>：是 Linux 内核中异步 I/O 框架，引入于较新的内核版本。它通过使用环形缓冲区（ring buffers）在用户态和内核态之间高效地提交和完成 I/O 请求。</p>
+<h3 id="2-epoll-和-poll-有什么区别">2. epoll 和 poll 有什么区别</h3>
+<p>使用 epoll_wait 调用完成后，可以直接在 events 参数中拿到所有有事件就绪的 fd，直接处理即可，是一个出参。而 poll 函数的事件集合调用前后大小未改变，只是通过 pollfd 的 event 参数设置我们关心的事件，通过检查 revent 得到就绪的事件。</p>
+<h3 id="3-常用命令">3. 常用命令</h3>
+<ul>
+<li><strong>查看文件最后五行</strong>：<code>tail filename -n 5</code>，<code>tail -f</code> 实时监控文件，tail -f 原理是检测文件大小</li>
+<li><strong>输出正在运行的 java 进程</strong>：<code>ps aux | grep java | grep -v grep</code>，-v 反向过滤</li>
+</ul>
+<h3 id="4-线程切换过程">4. 线程切换过程</h3>
+<ol>
+<li><strong>保存当前运行线程的状态</strong>（上下文），包括寄存器：PC、堆栈指针 SP、通用寄存器；程序状态字：包含 CPU 状态，线程优先级等；内存管理信息：页表指针等</li>
+<li><strong>更新线程的状态</strong>为就绪或阻塞，CPU 时间片用完则更新为就绪态，因为等待 IO 则为阻塞态</li>
+<li><strong>调度器根据调度算法选择下一个要运行的线程</strong>。常见调度算法：先来先服务、短作业优先、优先级调度、时间片轮转、多级反馈队列</li>
+<li><strong>加载新线程的上下文</strong>，将被选中线程的上下文从其存储位置（如内核栈或线程控制块）加载到 CPU 寄存器中</li>
+<li><strong>更新内存管理单元 MMU</strong>。如果新线程属于不同进程，可能需要更新 MMU，如页表基地址寄存器</li>
+<li><strong>CPU 开始执行新线程的指令</strong>，切换过程结束</li>
+</ol>
+<h3 id="5-进程和线程的区别">5. 进程和线程的区别</h3>
+<ul>
+<li>进程是 OS 分配资源的基本单位，而线程是 OS 调度的基本单位</li>
+<li>进程之间内存和资源（fd）是相互隔离的，而同一个进程内所有线程共享进程的资源</li>
+<li>进程创建/销毁开销大，需要分配独立的地址空间、资源和 PCB。线程的创建/销毁开销比进程小</li>
+<li>上下文切换开销，进程大，线程小</li>
+<li>IPC 通信较复杂，通过管道（pipe、fifo）、消息队列、共享内存、信号、本地套接字。线程通信相对简单高效</li>
+<li>一个进程崩溃后，不会影响其他进程，而一个线程崩溃后可能导致整个进程结束</li>
+</ul>
+<h3 id="6-线上-cpu-爆高如何找到问题所在">6. 线上 CPU 爆高，如何找到问题所在</h3>
+<ul>
+<li>使用 <code>top/htop</code>，按 P 按 CPU 利用率进行排序</li>
+<li>使用 <code>strace</code> 跟踪系统调用：<code>strace -p &#x3C;PID></code></li>
+<li><code>perf</code>、vtune、火焰图等工具可以进行更深入的性能分析，找出 CPU 热点函数</li>
+<li>确认是否存在无限循环或低效的算法</li>
+<li>确认是否存在锁竞争、死锁等问题，导致线程频繁切换或忙等待</li>
+</ul>
+<h3 id="7-进程间通信机制">7. 进程间通信机制</h3>
+<p><strong>pipe（管道）</strong>：</p>
+<ul>
+<li>优点：实现和使用相对简单，在同一台机器上的进程间传输数据时性能较好</li>
+<li>缺点：标准管道只能实现单向数据传输；只能用于具有亲缘关系的进程之间；管道的缓冲区有限</li>
+</ul>
+<p><strong>fifo（命名管道）</strong>：可以在没有亲缘关系的任意两个进程之间进行通信，在文件系统中以文件的形式存在</p>
+<p><strong>消息队列</strong>：单条消息的大小受到限制，传输大数据时需要分割处理</p>
+<p><strong>共享内存</strong>：需要额外的同步机制（如信号量、互斥锁）来管理对共享内存的并发访问</p>
+<p><strong>信号</strong>：信号只能传递有限的信息，无法传递复杂的数据；信号可能被忽略或覆盖</p>
+<p><strong>本地套接字</strong>：适用于本地进程间通信</p>
+<h2 id="二多线程">二、多线程</h2>
+<h3 id="1-线程安全">1. 线程安全</h3>
+<p>线程安全指多个线程在并发访问共享资源时，不会导致数据不一致或出现竞态条件，程序的执行结果与单线程执行结果相同。</p>
+<p>实现线程安全：mutex、cv、rw_lock、atomic、TLS（线程局部存储）</p>
+<h3 id="2-volatile-的原理">2. volatile 的原理</h3>
+<p><code>volatile</code> 是一个类型修饰符，用于指示编译器该变量可能在程序的任何时刻被意外地修改，<strong>防止编译器对访问该变量的代码进行优化</strong>。确保每次对 <code>volatile</code> 变量的访问都发生实际的内存读取或写入。</p>
+<blockquote>
+<p>注意：编译器优化会假设程序没有未定义行为，两个线程同时访问同一个数据会产生数据竞争，这是未定义行为。</p>
+</blockquote>
+<h3 id="3-线程的生命周期">3. 线程的生命周期</h3>
+<p>新建 → 就绪 → 运行 → 等待/阻塞 → 终止</p>
+<h3 id="4-sleep-和-wait-的区别">4. sleep 和 wait 的区别</h3>
+<p><strong>sleep</strong>：</p>
+<ul>
+<li>暂停执行：线程在指定的时间内不执行任何操作，进入休眠状态</li>
+<li>不释放锁：如果在持有互斥锁的情况下调用 <code>sleep</code>，锁依然被持有</li>
+<li>时间控制：基于时间的暂停</li>
+<li>不可被唤醒：线程只能在指定时间到达后自动恢复执行</li>
+</ul>
+<p><strong>wait</strong>：</p>
+<ul>
+<li>条件等待：线程在等待某个条件满足后才继续执行</li>
+<li>释放锁：调用 <code>wait</code> 时，线程会自动释放持有的互斥锁</li>
+<li>可被唤醒：其他线程可以通过 <code>notify_one</code> 或 <code>notify_all</code> 唤醒等待的线程</li>
+<li>与互斥锁结合使用</li>
+</ul>
+<h2 id="三c-基础">三、C++ 基础</h2>
+<h3 id="1-static-关键字">1. static 关键字</h3>
+<ul>
+<li>修饰全局变量和函数</li>
+<li>修饰类的成员变量和函数</li>
+<li>修饰局部变量</li>
+</ul>
+<h3 id="2-final-关键字">2. final 关键字</h3>
+<p>确保子类中重写父类虚函数时函数签名保持一致，也表明这是一个重写函数，增加可读性。</p>
+<h3 id="3-虚函数表">3. 虚函数表</h3>
+<ul>
+<li>虚函数表是类级别的，对于同一个类的所有对象，共享同一份虚函数表</li>
+<li>每个包含虚函数的类的对象只包含一个指向虚函数表的指针（vptr）</li>
+<li>虚函数多的话，对象所占的内存不会增加（只有一个 vptr 指针）</li>
+<li>虚函数表通常存储在内存的静态区域中</li>
+<li>多重继承中，子类对象可能有多个虚函数表</li>
+</ul>
+<h3 id="4-this-指针">4. this 指针</h3>
+<p>this 指针是类的非静态函数的第一个隐藏参数，类的非静态函数采用的是 this_call 调用类型，this 就是调用对象的地址，通过寄存器传参。</p>
+<h3 id="5-析构函数可以抛出异常吗">5. 析构函数可以抛出异常吗</h3>
+<p>不建议。如果析构函数本身抛出异常，可能导致：</p>
+<ul>
+<li><strong>资源泄露</strong>：析构过程可能会中断，导致资源泄露</li>
+<li><strong>叠加异常</strong>：如果在析构函数中抛出异常，而析构函数正好在异常传播的过程中被调用，会导致”双重异常”，调用 <code>std::terminate()</code> 终止程序</li>
+</ul>
+<h3 id="6-vector-的扩容机制">6. vector 的扩容机制</h3>
+<p><strong>为什么是 2 倍</strong>：</p>
+<ul>
+<li>时间效率：2 倍扩容能保证大部分插入操作的均摊时间复杂度为 O(1)</li>
+<li>空间效率：2 倍扩容在大多数情况下能较好地平衡空间利用率和扩容频率</li>
+</ul>
+<h3 id="7-new-和-malloc-的区别">7. new 和 malloc 的区别</h3>
+<ul>
+<li>new 是 C++ 操作符，malloc 是 C 函数</li>
+<li>new 会调用构造函数，malloc 不会</li>
+<li>new 返回具体类型指针，malloc 返回 void*</li>
+<li>new 失败抛异常，malloc 失败返回 NULL</li>
+</ul>
+<h3 id="8-为什么栈比堆效率高">8. 为什么栈比堆效率高</h3>
+<p><strong>栈</strong>：</p>
+<ul>
+<li>栈的分配和释放是由编译器自动完成的</li>
+<li>采用 LIFO 的方式，连续分配在栈空间上</li>
+<li>仅涉及修改栈指针，时间复杂度为 O(1)</li>
+</ul>
+<p><strong>堆</strong>：</p>
+<ul>
+<li>堆内存的分配和释放由程序员手动控制</li>
+<li>涉及复杂的内存管理机制，如查找适合大小的空闲块</li>
+<li>频繁的分配和释放可能导致堆内存碎片化</li>
+</ul>
+<h3 id="9-brk-和-mmap-系统调用的区别">9. brk 和 mmap 系统调用的区别</h3>
+<p><strong>brk</strong>：从堆分配内存，向上移动堆顶指针。free 释放时，并不会将内存还给 OS，而是缓存在 malloc 的内存池中。</p>
+<p><strong>mmap</strong>：在文件映射区分配内存。free 释放时，会将内存还给 OS，内存得到真正的释放。</p>
+<p>malloc 时，分配内存大小 > 128 使用 mmap，小于则使用 brk。</p>
+<h3 id="10-free-如何知道要释放多大的内存">10. free() 如何知道要释放多大的内存</h3>
+<p>分配时是内存头 + 内存，返回内存地址。释放时通过该地址往前偏移 16B，读到内存头，内存头中包含了该块内存的大小。</p>
+<h2 id="四网络">四、网络</h2>
+<h3 id="1-tcp-三次握手">1. TCP 三次握手</h3>
+<ol>
+<li>客户端发送 SYN 报文</li>
+<li>服务器回复 SYN+ACK 报文</li>
+<li>客户端发送 ACK 报文</li>
+</ol>
+<h3 id="2-为什么断开连接要-4-次">2. 为什么断开连接要 4 次</h3>
+<p>保证数据能够处理完。服务器收到客户端的 FIN 后，可能还有数据需要发送，所以先发送 ACK，等数据发送完再发送 FIN。</p>
+<h3 id="3-如果握手只有两次会出现什么">3. 如果握手只有两次，会出现什么</h3>
+<p>之前的重复连接初始化可能造成资源浪费。比如一个 client 发起连接，发送 SYN 报文，但由于网络原因迟迟未到达，client 又重新发起了一次连接，而之前的 SYN 报文在新报文之前到达，server 会回复第一个的 SYN 的 ACK+SYN，由于只有两次连接，造成资源的浪费。</p>
+<h3 id="4-浏览器打开链接的过程">4. 浏览器打开链接的过程</h3>
+<ol>
+<li>URL 解析，将其拆解为协议、域名和路径</li>
+<li>DNS 解析，获取 IP 地址</li>
+<li>建立 TCP 连接，三次握手</li>
+<li>发起 HTTP 请求</li>
+<li>服务器处理请求，回复 HTTP response</li>
+<li>浏览器接收响应，解析 HTML 并渲染页面</li>
+<li>如果启用了 Keep-Alive，复用 TCP 连接</li>
+</ol>
+<h3 id="5-https-的加密方式">5. HTTPS 的加密方式</h3>
+<ol>
+<li>客户端选择一个随机数，将随机数和自己支持的加密算法发送给服务端</li>
+<li>服务端选择一个加密算法和计算一个随机数，加上自己的 CA（证书）发给客户端</li>
+<li>客户端验证 CA 的合法性，若合法计算一个 pre-master（随机数），采用 CA 中的公钥加密，发送给服务端。同时通过两个随机数 + pre-master 和加密算法计算出会话秘钥</li>
+<li>服务端用自己的私钥解密，得到 pre-master，进而计算出会话秘钥，回复确认之后的通话使用会话秘钥</li>
+</ol>
+<h3 id="6-三次握手和-accept-的时序关系">6. 三次握手和 accept 的时序关系</h3>
+<p>先完成三次握手。</p>
+<ul>
+<li>半连接队列：还未完成三次握手的连接</li>
+<li>全连接队列：已经完成三次握手等待调用 accept 的连接</li>
+</ul>
+<h3 id="7-给本机-ip-127001-发数据会走协议栈吗">7. 给本机 ip 127.0.0.1 发数据会走协议栈吗</h3>
+<p>会走协议栈，但不会通过物理网卡发送出去，而是在本地进行网络协议的处理和数据传输。数据在发送到 <code>127.0.0.1</code>（本地回环地址）时，仍然会经过网络协议栈的各个层级，但操作系统会在处理到链路层时，将数据直接回送给本机。</p>
+<h2 id="五架构">五、架构</h2>
+<h3 id="1-如何防止请求重复提交">1. 如何防止请求重复提交</h3>
+<ul>
+<li><strong>设置唯一请求 ID</strong>：每个请求携带一个唯一的标识符（如 UUID），服务器在处理请求前先检查该 ID 是否已被处理过</li>
+<li><strong>检查请求特征</strong>：通过检查请求的特征（如参数、IP、时间戳等）来判断是否为重复请求</li>
+</ul>
+<h3 id="2-如何做到接口的幂等性">2. 如何做到接口的幂等性</h3>
+<p>幂等：指同一个操作执行多次，产生的效果与执行一次相同。</p>
+<h3 id="3-限流策略">3. 限流策略</h3>
+<p><strong>令牌桶算法（Token Bucket）</strong>：</p>
+<ul>
+<li>令牌桶中按固定速率生成令牌</li>
+<li>每次请求到来时，需消耗一个令牌</li>
+<li>允许短时间内的突发流量</li>
+</ul>
+<p><strong>漏桶算法（Leaky Bucket）</strong>：</p>
+<ul>
+<li>漏桶以固定速率”漏”出请求</li>
+<li>请求到来时，如果桶中有空余空间，则将请求放入桶中</li>
+<li>保证请求以固定速率处理，防止瞬时高流量</li>
+</ul>
+<h2 id="六mysql">六、MySQL</h2>
+<h3 id="1-数据库隔离级别">1. 数据库隔离级别</h3>
+<ul>
+<li><strong>串行化</strong>：事务串行执行</li>
+<li><strong>可重复读</strong>：在一个事务中，同一个查询的结果一致【默认】</li>
+<li><strong>读提交</strong>：事务可以看到已提交事务的更改</li>
+<li><strong>读未提交</strong>：事务可以看到未提交事务的更改</li>
+</ul>
+<h3 id="2-什么是幻读">2. 什么是幻读</h3>
+<p>同一个事务中两次读取同一个范围，看到了上一次读取时未有的数据。</p>
+<p>解决幻读：间隙锁，锁住数据之间的间隙，其他事务不能插入。行 + 间隙 = next-key lock</p>
+<h3 id="3-mysql-存储引擎">3. MySQL 存储引擎</h3>
+<p><strong>MyISAM</strong>：不支持行锁，不支持事务，只支持表级锁，并发度低，只有 binlog 没有 redolog，没有 crash-safe。</p>
+<p><strong>InnoDB</strong>：支持行锁，支持事务，有 redolog。</p>
+<h3 id="4-索引失效的场景">4. 索引失效的场景</h3>
+<ul>
+<li>以 % 开头的 like 查询</li>
+<li>对索引列进行函数运算</li>
+<li>对索引列进行数据类型转换</li>
+<li>正则表达式不会使用索引</li>
+<li>复合索引的情况下，查询条件不满足最左原则</li>
+<li>如果 MySQL 估计使用索引比全表扫描更慢，则不使用索引</li>
+</ul>
+<h3 id="5-数据库会死锁吗">5. 数据库会死锁吗</h3>
+<p>会。例如：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#24292E"># Session1</span></span>
+<span class="line"><span style="color:#D73A49">begin</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#24292E"> t </span><span style="color:#D73A49">where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1</span><span style="color:#D73A49"> for</span><span style="color:#D73A49"> update</span><span style="color:#24292E">; </span></span>
+<span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#24292E"> t </span><span style="color:#D73A49">where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 3</span><span style="color:#D73A49"> for</span><span style="color:#D73A49"> update</span><span style="color:#24292E">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E"># Session2</span></span>
+<span class="line"><span style="color:#D73A49">begin</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#24292E"> t </span><span style="color:#D73A49">where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 3</span><span style="color:#D73A49"> for</span><span style="color:#D73A49"> update</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#24292E"> t </span><span style="color:#D73A49">where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1</span><span style="color:#D73A49"> for</span><span style="color:#D73A49"> update</span><span style="color:#24292E">;</span></span></code></pre></div>
+<p>解决死锁：通过死锁检测，终止掉一些事务。</p>
+<h3 id="6-千万级数据分页查询优化">6. 千万级数据分页查询优化</h3>
+<p><strong>方案 1</strong>（性能差）：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#D73A49"> table</span><span style="color:#D73A49"> order by</span><span style="color:#24292E"> id </span><span style="color:#D73A49">asc</span><span style="color:#D73A49"> limit</span><span style="color:#005CC5"> 90000000</span><span style="color:#24292E">, </span><span style="color:#005CC5">100</span></span></code></pre></div>
+<p><strong>优化方案 2</strong>（如果 ID 是自增且连续的）：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#D73A49"> table</span><span style="color:#D73A49"> where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">>=</span><span style="color:#005CC5"> 90000000</span><span style="color:#D73A49"> limit</span><span style="color:#005CC5"> 100</span></span></code></pre></div>
+<p><strong>方案 3</strong>（ID 不连续）：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> *</span><span style="color:#D73A49"> from</span><span style="color:#D73A49"> table</span><span style="color:#24292E"> </span></span>
+<span class="line"><span style="color:#D73A49">where</span><span style="color:#24292E"> id </span><span style="color:#D73A49">>=</span><span style="color:#24292E"> (</span><span style="color:#D73A49">select</span><span style="color:#24292E"> id </span><span style="color:#D73A49">from</span><span style="color:#D73A49"> table</span><span style="color:#D73A49"> order by</span><span style="color:#24292E"> id </span><span style="color:#D73A49">asc</span><span style="color:#D73A49"> limit</span><span style="color:#005CC5"> 90000000</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">order by</span><span style="color:#24292E"> id </span><span style="color:#D73A49">asc</span><span style="color:#D73A49"> limit</span><span style="color:#005CC5"> 100</span></span></code></pre></div>
+<h3 id="7-mysql-主备复制原理">7. MySQL 主备复制原理</h3>
+<p>涉及 3 个线程：</p>
+<ol>
+<li>主：binlog 线程——记录下所有改变了数据库数据的语句，放进 master 上的 binlog 中</li>
+<li>从：IO 线程——负责从 master 上拉取 binlog 内容，放进自己的 relay log 中</li>
+<li>从：SQL 执行线程——执行 relay log 中的语句</li>
+</ol>  </div> </article> <aside class="post-toc" id="J_post_toc" aria-label="On this page"> <div class="post-toc-inner"> <nav class="post-toc-nav" id="J_post_toc_nav"> <a class="post-toc-link" href="#一linux-系统" data-toc-id="一linux-系统">一、Linux 系统</a><a class="post-toc-link" href="#二多线程" data-toc-id="二多线程">二、多线程</a><a class="post-toc-link" href="#三c-基础" data-toc-id="三c-基础">三、C++ 基础</a><a class="post-toc-link" href="#四网络" data-toc-id="四网络">四、网络</a><a class="post-toc-link" href="#五架构" data-toc-id="五架构">五、架构</a><a class="post-toc-link" href="#六mysql" data-toc-id="六mysql">六、MySQL</a> </nav> </div> </aside> </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="general-interview-questions" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/mysql-architecture/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>MySQL 架构详解</h3> <p>【2023-11-23】深入理解 MySQL 的整体架构，包括连接层、服务层、存储引擎层以及物理文件的组织方式。</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>
