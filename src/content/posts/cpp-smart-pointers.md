@@ -1,141 +1,124 @@
 ---
-title: C++ 智能指针详解
-date: 2023-11-20
-description: 深入理解 C++ 智能指针 unique_ptr、shared_ptr 和 weak_ptr 的使用方法、实现原理以及最佳实践，掌握现代 C++ 的内存管理。
-categories: [C++]
+title: "C++ 智能指针完全指南"
+date: 2024-12-03
+categories: ["C++", "智能指针", "内存管理"]
+description: "深入讲解 C++ 智能指针 unique_ptr、shared_ptr 和 weak_ptr 的使用方法、原理和最佳实践"
 ---
 
-智能指针是现代 C++ 中管理动态内存的核心工具，它们通过 RAII 机制自动管理资源，避免内存泄漏。
+## unique_ptr 
 
-## unique_ptr
+考虑下面的函数，这个函数在堆上分配了一个 Simple 对象，但是不释放这个对象，故意产生内存泄漏。
 
-### 为什么需要智能指针
-
-考虑下面的函数，这个函数在堆上分配了一个 Simple 对象，但是不释放这个对象，故意产生内存泄漏：
-
-```cpp
+```c++
 void leaky() {
     Simple* mySimplePtr = new Simple(); // BUG! Memory is never released!
-    mySimplePtr->go();
+	mySimplePtr->go();
 }
 ```
 
-有时你可能认为，代码正确地释放了动态分配的内存。遗憾的是，这种想法几乎总是不正确的。比如这个函数：
+有时你可能认为，代码正确地释放了动态分配的内存。遗憾的是，这种想法几乎总是不正确的。比如这个函数:
 
-```cpp
+```c++
 void couldBeLeaky() {
-    Simple* mySimplePtr = new Simple();
-    mySimplePtr->go();
-    delete mySimplePtr;
+    Simple*mySimplePtr =new Simple();
+	mySimplePtr->go();
+	delete mySimplePtr;
 }
 ```
 
-上面的函数动态分配一个 Simple 对象，使用该对象，然后正确地调用 delete。但是，这个例子仍然可能产生内存泄漏！**如果 go 方法抛出一个异常，将永远不会调用 delete，导致内存泄漏。**
+上面的函数动态分配一个 Simple 对象，使用该对象，然后正确地调用 delete。但是，这个例子仍然可能产生内存泄漏! **如果 go方法抛出一个异常，将永远不会调用 delete，导致内存泄漏。**
 
-### unique_ptr 的使用
+这两种情况下应使用 unique_ptr。对象不会显式删除，但实例 unique_ptr离开作用域时(在函数的末尾，或者因为抛出了异常)，就会在其析构函数中自动释放 Simple 对象:
 
-这两种情况下应使用 unique_ptr。对象不会显式删除，但实例 unique_ptr 离开作用域时（在函数的末尾，或者因为抛出了异常），就会在其析构函数中自动释放 Simple 对象：
-
-```cpp
+```c++
 void notLeaky() {
-    auto mySimpleSmartPtr = make_unique<Simple>();
-    mySimpleSmartPtr->go();
+    auto mySimpleSmartPtr =make unique<Simple>();
+	mySimpleSmartPtr->go();
 }
 ```
 
-这段代码使用 C++14 中的 make_unique 和 auto 关键字，所以只需要指定指针的类型。如果 Simple 构造函数需要参数，就把它们放在 make_unique() 调用的圆括号中。
+这段代码使用 C++14 中的 make_unique和 auto 关键字，所以只需要指定指针的类型，本例中是 Simple,如果Simple构造函数需要参数，就把它们放在make_unique()调用的圆括号中。
 
-如果编译器不支持 make_unique，可以这种方式创建：
+如果编译器不支持make_unique, 可以这种方式创建。
 
-```cpp
+```c++
 unique_ptr<Simple> p(new Simple());
 ```
 
-### unique_ptr 的操作
+像标准指针一样，仍可以使用*或->对智能指针进行解引用。
 
-像标准指针一样，仍可以使用 * 或 -> 对智能指针进行解引用。
+get()方法可用于直接访问底层指针。这可将指针传递给需要普通指针的函数。例如
 
-**get() 方法**：可用于直接访问底层指针。这可将指针传递给需要普通指针的函数。
-
-```cpp
-void processData(Simple* simple) { /* Use the simple pointer... */ }
-
+```c++
+void processData(Simple* simple)( /* Use the simple pointer...*/
 // 可采用如下方式进行调用:
 auto mySimpleSmartPtr = make_unique<Simple>();
 processData(mySimpleSmartPtr.get());
 ```
 
-**reset() 方法**：可释放 unique_ptr 的底层指针，并使用 reset() 根据需要将其改成另一个指针。
+可释放unique_ptr 的底层指针，并使用reset()根据需要将其改成另一个指针。
 
-```cpp
-mySimpleSmartPtr.reset();                    // Free resource and set to nullptr
-mySimpleSmartPtr.reset(new Simple());        // Free resource and set to a new Simple instance
+```c++
+mySimpleSmartPtr.reset();
+// Free resource and set to nullptr
+mySimpleSmartPtr.reset(new Simple()); // Free resource and set to a new Simple instance
 ```
 
-**release() 方法**：可使用 release() 断开 unique_ptr 与底层指针的连接。release 方法返回资源的底层指针，然后将智能指针设为 nullptr。实际上，智能指针失去对资源的所有权，负责在你用完资源时释放资源。
+可使用 release()断开 unique_ptr 与底层指针的连接。release方法返回资源的底层指针，然后将智能指针设
+为 nullptr。实际上，智能指针失去对资源的所有权，负责在你用完资源时释放资源。
 
-```cpp
-Simple* simple = mySimpleSmartPtr.release(); // Release ownership
-// Use the simple pointer...
+```c++
+Simple* simple= mySimpleSmartPtr.release();// Release ownership
+//Use the simple pointer...
 delete simple;
 simple = nullptr;
 ```
 
-### unique_ptr 与移动语义
+由于 unique_ptr代表唯一拥有权，因此无法复制它!使用 std::move() 移动语义将一个unique_ptr 移到另一个。这用于显式移动所有权。
 
-由于 unique_ptr 代表唯一拥有权，因此无法复制它！使用 std::move() 移动语义将一个 unique_ptr 移到另一个。这用于显式移动所有权。
-
-```cpp
+```c++
 class Foo
 {
 public:
-    Foo(unique_ptr<int> data) : mData(move(data)) {}
+	Foo(unique ptr<int> data) : mData(move(data)) {}
 private:
-    unique_ptr<int> mData;
+	unique_ptr<int>mData;
 };
-
-auto myIntSmartPtr = make_unique<int>(42);
-Foo f(move(myIntSmartPtr));
+auto myIntSmartPtr = make unique<int>(42);
+Foo f(move(myIntSmartPtr)); 
 ```
 
-### unique_ptr 与数组
+unique_ptr 适用于存储动态分配的旧式C 风格数组。下例创建了一个 unique_ptr 来保存动态分配的、包含10个整数的C风格数组:
 
-unique_ptr 适用于存储动态分配的旧式 C 风格数组。下例创建了一个 unique_ptr 来保存动态分配的、包含 10 个整数的 C 风格数组：
-
-```cpp
+```c++
 auto myVariableSizedArray = make_unique<int[]>(10);
 ```
 
-### 自定义 deleter
+自定义 deleter
+默认情况下，unique_ptr 使用标准的new 和delete运算符来分配和释放内存。可将此行为改成:
 
-默认情况下，unique_ptr 使用标准的 new 和 delete 运算符来分配和释放内存。可将此行为改成：
-
-```cpp
+```c++
 int* malloc_int(int value) {
-    int* p = (int*)malloc(sizeof(int));
-    *p = value;
-    return p;
+    int*p= (int*)malloc(sizeof(int));
+	*p=value;
+	return p;
 }
 
 int main() {
-    unique_ptr<int, decltype(free)*> myIntSmartPtr(malloc_int(42), free);
-    return 0;
+    unique ptr<int，decltype(free)*> 			myIntSmartPtr(malloc_int(42)，free);
+	return 0;
 }
+
 ```
 
-这段代码使用 malloc_int() 给整数分配内存。unique_ptr 调用标准的 free 函数来释放内存。
-
-unique_ptr 的自定义 deleter 的语法有些费解。需要将自定义 deleter 的类型指定为模板类型参数。decltype(free) 用于返回 free() 类型。模板类型参数应当是函数指针的类型，因此另外附加一个 *，如 `decltype(free)*`
-
-**当 unique_ptr 离开作用域时，可自动关闭文件或网络套接字以及其他任何资源。**
+这段代码使用 malloc_int()给整数分配内存。unique_ptr 调用标准的 free函数来释放内存。如前所述, 在C++中不应该使用 malloc，而应改用 new。然而，unique_ptr 的这项特性是很有用的，因为还可管理其他类型的资源而不仅是内存。例如，**当 unique_ptr 离开作用域时，可自动关闭文件或网络套接字以及其他任何资源。**
+但是，unique_ptr 的自定义 deleter 的语法有些费解。需要将自定义 deleter 的类型指定为模板类型参数. decltype(free)用于返回 free()类型。模板类型参数应当是函数指针的类型，因此另外附加一个*，如`decltype(free)*`
 
 ## shared_ptr
 
-### shared_ptr 的使用
+shared_ptr 的用法与 unique_ptr 类似。要创建 shared_ptr，可使用 make_shared()，它比直接创建 shared_ptr更高效。
 
-shared_ptr 的用法与 unique_ptr 类似。要创建 shared_ptr，可使用 make_shared()，它比直接创建 shared_ptr 更高效。
-
-**更高效原因**：
+更高效原因：
 
 当使用 `std::make_shared` 创建 `shared_ptr` 时，所有需要的内存（包括对象本身和控制块）在一次分配中完成。这减少了内存分配的次数，从而提高了效率。
 
@@ -143,169 +126,135 @@ shared_ptr 的用法与 unique_ptr 类似。要创建 shared_ptr，可使用 mak
 
 在直接使用 `new` 的情况下，在对象构造和控制块分配之间，如果对象构造抛出异常，可能会导致内存泄漏。而 `std::make_shared` 在分配和构造对象的过程中是异常安全的。
 
-```cpp
+```c++
 auto mySimpleSmartPtr = make_shared<Simple>();
 std::shared_ptr<Simple> ptr(new Simple());
 ```
 
-### shared_ptr 的操作
+与unique_ptr 一样，shared_ptr 也支持 get和reset方法。唯一的区别在于，当调用 reset时，由于引用计数，仅在最后的 shared_ptr销毁或重置时,才释放底层资源。注意,shared ptr 不支持 release。可使用use count()来检索共享同一资源的shared_ptr 实例数量。
 
-与 unique_ptr 一样，shared_ptr 也支持 get 和 reset 方法。唯一的区别在于，当调用 reset 时，由于引用计数，仅在最后的 shared_ptr 销毁或重置时，才释放底层资源。
+与 unique_ptr 类似，shared_ptr 默认情况下使用标准的 new 和 delete 运算符来分配和释放内存;在 C++17
+中存储C风格数组时，使用 new[]和 delete[]。可更改此行为
 
-注意，shared_ptr 不支持 release。
-
-**use_count() 方法**：可使用 use_count() 来检索共享同一资源的 shared_ptr 实例数量。
-
-### 自定义 deleter
-
-与 unique_ptr 类似，shared_ptr 默认情况下使用标准的 new 和 delete 运算符来分配和释放内存。可更改此行为：
-
-```cpp
-shared_ptr<int> myIntSmartPtr(malloc_int(42), free);
+```c++
+shared_ptr<int> myIntSmartPtr(malloc_int(42)， free);
 ```
 
 可以看到，不必将**自定义 deleter 的类型指定为模板类型参数**，这比 unique_ptr 的自定义 deleter 更简便。
 
-### 自动关闭文件的示例
+下面的示例使用 shared_ptr 存储文件指针。当 shared_ptr 离开作用域时(此处为脱离作用域时)，会调用
+CloseFile函数来自动关闭文件指针。回顾一下，C++中有可以操作文件的面向对象的类。这些类在离开作用域时会自动关闭文件。
 
-下面的示例使用 shared_ptr 存储文件指针。当 shared_ptr 离开作用域时，会调用 CloseFile 函数来自动关闭文件指针：
-
-```cpp
+```c++
 void CloseFile(FILE* filePtr) {
-    if (filePtr == nullptr)
-        return;
+    if (filePtr==nullptr)
+		return;
     fclose(filePtr);
-    cout << "File closed." << endl;
+    cout <<"File closed." << endl;
 }
 
 int main() {
-    FILE* f = fopen("data.txt", "w");
-    // 自定义 deleter
-    shared_ptr<FILE> filePtr(f, CloseFile);
-    if (filePtr == nullptr) {
+    FILE* f = fopen("data.txt",
+uw");
+    // 自定义deleter
+    shared ptr<FILE> filePtr(f, CloseFile);
+    if (filePtr== nullptr) {
         cerr << "Error opening file." << endl;
     } else {
-        cout << "File opened." << endl;
+        cout <<"File opened." << endl;
     }
-    // Use filePtr
+    //Use filePtr
     return 0;
 }
 ```
 
-### 双重删除的问题
+双重删除的问题
+如果要创建两个标准的 shared_ptr，并使它们都指向同一个 Simple 对象，如下面的代码所示，在销毁时，两个智能指针将尝试删除同一个对象:
 
-如果要创建两个标准的 shared_ptr，并使它们都指向同一个 Simple 对象，如下面的代码所示，在销毁时，两个智能指针将尝试删除同一个对象：
-
-```cpp
+```c++
 void doubleDelete() {
-    Simple* mySimple = new Simple();
-    shared_ptr<Simple> smartPtr1(mySimple);
-    shared_ptr<Simple> smartPtr2(mySimple);  // 错误！
+    Simple*mySimple=new Simple();
+	shared ptr<Simple> smartPtrl(mySimple);
+	shared ptr<Simple> smartPtr2(mySimple);
 }
 ```
 
-根据编译器，这段代码可能会崩溃！输出为：
-```
+根据编译器，这段代码可能会崩溃!如果得到了输出，则输出为:
 Simple constructor called!
 Simple destructor called!
-Simple destructor called!
-```
+Simple destructor called
+只调用一次构造函数，却调用两次析构函数?使用 unique ptr 也会出现同样的问题。然而，根据 C+标准，这是正确的行为。不应该像以上 doubleDelete函数那样**创建两个指向同一个对象的 shared_ptr，而是应该建立副本**，如下所示:
 
-只调用一次构造函数，却调用两次析构函数！
-
-**正确的做法**是不应该创建两个指向同一个对象的 shared_ptr，而是应该建立副本：
-
-```cpp
+```c++
 void noDoubleDelete() {
     auto smartPtr1 = make_shared<Simple>();
-    shared_ptr<Simple> smartPtr2(smartPtr1);  // 正确！
+	shared ptr<Simple> smartPtr2(smartPtrl);
 }
+
 ```
 
-这段代码的输出：
-```
+这段代码的输出如下所示:
 Simple constructor called!
 Simple destructor called!
-```
-
-即使有两个指向同一个 Simple 对象的 shared_ptr，Simple 对象也只销毁一次。
+即使有两个指向同一个Simple对象的shared_ptr，Simple对象也只销毁一次。
 
 ## weak_ptr
 
-### weak_ptr 的作用
-
-weak_ptr 可包含由 shared_ptr 管理的资源的引用。weak_ptr 不拥有这个资源，所以不能阻止 shared_ptr 释放资源。weak_ptr 销毁时（例如离开作用域时）不会销毁它指向的资源。然而，它可用于判断资源是否已经被关联的 shared_ptr 释放了。
-
-### weak_ptr 的使用
+weak_ptr 可包含由 shared_ptr 管理的资源的引用。weak_ptr 不拥有这个资源，所以不能阻止 shared_ptr 释放资源。weak_ptr 销毁时(例如离开作用域时)不会销毁它指向的资源: 然而，它可用于判断资源是否已经被关联的 shared_ptr 释放了。
 
 weak_ptr 的构造函数要求将一个 shared_ptr 或另一个 weak_ptr 作为参数。
 
-为了访问 weak_ptr 中保存的指针，需要将 weak_ptr 转换为 shared_ptr。有两种方法：
+为了访问 weak_ptr 中保存的指针，需要将 weak_ptr 转换为shared_ptr。有两种方法:
+使用 weak_ptr 实例的 lock方法，这个方法返回一个 shared_ptr。如果同时释放了与 weak_ptr 关联的shared_ptr，返回的shared_ptr 是nullptr
+创建一个新的 shared_ptr 实例，将 weak_ptr 作为 shared_ptr 造函数的参数。如果释放了与 weak_ptr关联的shared_ptr，将抛出std::bad weak_ptr 异常。
 
-1. 使用 weak_ptr 实例的 lock 方法，这个方法返回一个 shared_ptr。如果同时释放了与 weak_ptr 关联的 shared_ptr，返回的 shared_ptr 是 nullptr
-2. 创建一个新的 shared_ptr 实例，将 weak_ptr 作为 shared_ptr 构造函数的参数。如果释放了与 weak_ptr 关联的 shared_ptr，将抛出 std::bad_weak_ptr 异常
-
-```cpp
-void useResource(weak_ptr<Simple>& weakSimple) {
+```c++
+void useResource(weak ptr<Simple>& weakSimple) {
     auto resource = weakSimple.lock();
     if (resource) {
-        cout << "Resource still alive." << endl;
-    } else {
-        cout << "Resource has been freed!" << endl;
-    }
+    	cout <<"Resource still alive." << endl;
+    }else 
+    	cout <<"Resource has been freed!" << endl;
 }
 
 int main() {
     auto sharedSimple = make_shared<Simple>();
-    weak_ptr<Simple> weakSimple(sharedSimple);
-    
+	weak_ptr<Simple> weakSimple(sharedSimple);
     // Try to use the weak ptr.
     useResource(weakSimple);
-    
     // Reset the shared ptr.
+    // Since there is only 1 shared ptr to the Simple resource, this will free the resource, even though there is still a weak ptr alive.
     sharedSimple.reset();
-    
-    // Try to use the weak ptr a second time.
+    // Try touse the weak ptr a second time.
     useResource(weakSimple);
-    
     return 0;
 }
 ```
 
-输出：
-```
+上述代码的输出如下:
 Simple constructor called!
 Resource still alive.
 Simple destructor called!
 Resource has been freed!
-```
 
-## 右值引用与移动语义
+## move
 
-### 左值和右值
+1.右值引用
+**左值(value)是可获取其地址的一个量**，例如一个有名称的变量。由于经常出现在赋值语句的左边，因此将其称作左值。另外，**所有不是左值的量都是右值(rvalue)**，例如**字面量、临时对象或临时值**。通常右值位于赋值运算符的右边。
+int a=4 \* 2;
+在这条语句中，a 是左值，它具有名称，它的地址为&a。右侧表达式4*2 的结果是右值。它是一个临时值,将在语句执行完毕时销毁。
+右值引用是一个对右值(rvalue)的引用。特别地，这是一个当右值是临时对象时才适用的概念。右值引用允许开发者捕获将要销毁的临时对象，并对其资源进行重新利用。
 
-**左值（lvalue）是可获取其地址的一个量**，例如一个有名称的变量。由于经常出现在赋值语句的左边，因此将其称作左值。
+右值引用的目的是在涉及临时对象时提供可选用的特定函数。由于知道临时对象会被销毁，通过右值引用，某些涉及复制大量值的操作可通过简单地复制指向这些值的指针来实现。
 
-**所有不是左值的量都是右值（rvalue）**，例如**字面量、临时对象或临时值**。通常右值位于赋值运算符的右边。
+函数可将&&作为参数说明的一部分(例如 type&&name),以指定右值引用参数。通常,临时对象被当作 const type&，但当函数重载使用了右值引用时，可以解析临时对象，用于该函数重载。
 
-```cpp
-int a = 4 * 2;
-```
-
-在这条语句中，a 是左值，它具有名称，它的地址为 &a。右侧表达式 4*2 的结果是右值。它是一个临时值，将在语句执行完毕时销毁。
-
-### 右值引用
-
-右值引用是一个对右值（rvalue）的引用。特别地，这是一个当右值是临时对象时才适用的概念。右值引用允许开发者捕获将要销毁的临时对象，并对其资源进行重新利用。
-
-函数可将 && 作为参数说明的一部分（例如 type&& name），以指定右值引用参数。
-
-```cpp
+```c++
 std::string str1 = "Hello";
 std::string str2 = std::move(str1); // str1 的内容被移动到 str2，而不是复制
 ```
 
-### 移动构造函数示例
+`std::move` 将 `str1` 转换为右值引用，从而触发移动构造函数，将 `str1` 的内部数据直接转移给 `str2`，避免了深度复制。
 
 假设有一个类 `LargeData`，它包含大量的数据：
 
@@ -332,7 +281,7 @@ private:
 };
 ```
 
-移动构造函数通过简单地复制指针 `data`，而不是复制整个数据数组，实现了高效的资源转移。
+在这里，移动构造函数通过简单地复制指针 `data`，而不是复制整个数据数组，实现了高效的资源转移。
 
 ```cpp
 LargeData createLargeData() {
@@ -345,39 +294,53 @@ int main() {
 }
 ```
 
-### std::move 的使用
+在这个例子中，`createLargeData` 返回一个临时的 `LargeData` 对象，通过右值引用和移动语义，临时对象的资源被高效地移动到 `ld`，避免了大量数据的复制操作。
 
-std::move 可将左值转换为右值，强迫编译器调用移动版本的函数：
+std::move可将左值转换为右值，强迫编译器调用 handleMessage函数的右值引用版本
 
-```cpp
+```c++
 handleMessage(std::move(b)); // Calls handleMessage(string&& value)
 ```
 
-**重要**：因为有名称的变量是左值。因此，在函数中，右值引用参数本身是一个左值，原因是它具有名称！如果希望将这个左值引用参数作为右值传递给另一个函数，则需要使用 std::move 将左值转换为右值。
+因为有名称的变量是左值。因此，在 handleMessage函数中，右值引用参数 message 本身是一个左值，原因是它具有名称! 如果希望将这个左值引用参数，作为右值传递给另一个函数，则需要使用 std:move将左值转换为右值。例如，假设要添加以下函数，使用右值引用参数:
 
-```cpp
-void helper(std::string&& message);
+```c++
+void helper(std::string&& message)
+```
 
+如果按如下方式调用，则无法编译:
+
+```c++
 void handleMessage(std::string&& message) {
-    helper(std::move(message)); // 必须使用 std::move
+    helper(message);
 }
 ```
 
-### 常见错误
+helper函数需要右值引用，而 handleMessage函数传递 message，message 具有名称，是左值，导致编译错误。正确的方式是使用std::move():
 
-```cpp
-MyClass a("Hello");
-MyClass&& r = std::move(a); // 右值引用赋给右值引用变量 r，但 r 作为变量名，是一个左值。
-MyClass b(r); // 错误：调用的是复制构造函数，而不是移动构造函数
+```c++
+void handleMessaqe(std::string&& message)
+{
+    helper(std::move(message)) ;
+}
+```
+
+`std::move` 的返回的是一个右值引用。
+
+`std::move` 并不真的"移动"对象，而是将一个左值转换为右值引用，允许调用移动构造函数或移动赋值运算符。
+
+```c++
+MyClass b(std::move(a));
+```
+
+`std::move(a)` 将 `a` 转换为右值引用，触发 `MyClass` 的移动构造函数。
+
+错误：
+
+```c++
+ MyClass a("Hello");
+ MyClass&& r = std::move(a); // 右值引用赋给右值引用变量 r，但 r 作为变量名，是一个左值。
+ MyClass b(r); // 错误：调用的是复制构造函数，而不是移动构造函数
 ```
 
 虽然 `r` 是一个右值引用，但是 `r` 作为一个具名变量是一个左值，因此 `MyClass b(r);` 调用了复制构造函数，而不是移动构造函数。
-
-## 总结
-
-- **unique_ptr**：独占所有权，不可复制，只能移动，适合单一所有者场景
-- **shared_ptr**：共享所有权，引用计数，适合多个所有者共享资源
-- **weak_ptr**：不拥有资源，用于打破循环引用，检查资源是否存活
-- **std::move**：将左值转换为右值引用，触发移动语义
-- 优先使用 make_unique 和 make_shared 创建智能指针
-- 避免从原始指针创建多个 shared_ptr
