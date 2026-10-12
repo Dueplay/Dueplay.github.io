@@ -1,0 +1,235 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>Redis 完全指南 · Dueplay</title><meta name="description" content="Redis 核心功能和数据类型详解，包括基本命令、列表、集合、有序集合、哈希、发布订阅、位图、事务和持久化"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/redis-guide/"><meta property="og:type" content="article"><meta property="og:title" content="Redis 完全指南 · Dueplay"><meta property="og:description" content="Redis 核心功能和数据类型详解，包括基本命令、列表、集合、有序集合、哈希、发布订阅、位图、事务和持久化"><meta property="og:url" content="https://dueplay.github.io/posts/redis-guide/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post" class="has-post-toc"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">Redis 完全指南</h1> <h4 class="page-info"> <span>Categories: Database / Redis</span> <time datetime="2024-12-03T00:00:00.000Z">2024-12-03</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m2 0h1m2 0h1m2 0h1m1 0h4m1 0h7M1 2.5h1m5 0h1m1 0h1m2 0h3m1 0h1m2 0h1m3 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h5m1 0h1m1 0h4m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m2 0h3m6 0h2m2 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h1m5 0h5m3 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h2m1 0h1m1 0h1m1 0h1m3 0h1m2 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h2m2 0h1m1 0h2m1 0h2m1 0h1M1 9.5h2m1 0h1m2 0h2m2 0h1m2 0h2m1 0h1m3 0h1m1 0h3m1 0h2M4 10.5h1m1 0h1m1 0h1m2 0h2m1 0h1m2 0h1m3 0h3m2 0h1m2 0h1M2 11.5h2m1 0h1m1 0h2m1 0h2m5 0h2m1 0h4m1 0h4M3 12.5h4m2 0h1m4 0h1m1 0h2m1 0h4m4 0h2M3 13.5h1m1 0h1m1 0h2m4 0h2m2 0h8m1 0h1m1 0h2M5 14.5h1m2 0h1m2 0h3m1 0h1m4 0h3M2 15.5h3m1 0h5m2 0h1m1 0h1m1 0h1m5 0h1m1 0h5M2 16.5h1m1 0h2m2 0h1m4 0h3m2 0h4m4 0h1m1 0h1M3 17.5h2m1 0h3m1 0h3m4 0h2m1 0h1m1 0h1m5 0h1M2 18.5h5m4 0h1m3 0h1m1 0h1m1 0h1m3 0h2m1 0h1m2 0h1M1 19.5h1m2 0h1m2 0h1m1 0h3m3 0h1m3 0h1m4 0h2m2 0h2M3 20.5h2m3 0h2m2 0h1m2 0h1m2 0h1m4 0h1m4 0h2M1 21.5h1m3 0h1m1 0h2m1 0h8m2 0h6m1 0h1M9 22.5h2m1 0h3m5 0h2m3 0h1m1 0h3M1 23.5h7m1 0h2m1 0h3m2 0h2m2 0h1m1 0h1m1 0h1m2 0h1M1 24.5h1m5 0h1m2 0h1m1 0h4m3 0h1m1 0h1m3 0h4M1 25.5h1m1 0h3m1 0h1m4 0h3m3 0h1m2 0h5m2 0h1M1 26.5h1m1 0h3m1 0h1m1 0h4m5 0h6m1 0h4M1 27.5h1m1 0h3m1 0h1m3 0h2m2 0h1m1 0h1m1 0h2m4 0h3m1 0h1M1 28.5h1m5 0h1m1 0h1m1 0h1m1 0h9m1 0h2m3 0h1M1 29.5h7m1 0h5m1 0h1m1 0h2m2 0h1m1 0h4m1 0h1"/></svg>
+</div> </div> </h4> <h2 id="redis-基础">Redis 基础</h2>
+<p>启动 Redis 服务端，conf 默认是在 /etc/redis/ 中，默认是 6379 端口</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">redis-server</span><span style="color:#032F62"> /path/redis.conf</span></span></code></pre></div>
+<p>启动客户端</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">redis-cli</span><span style="color:#005CC5"> -h</span><span style="color:#032F62"> ip</span><span style="color:#005CC5"> -p</span><span style="color:#032F62"> port</span></span></code></pre></div>
+<h2 id="基本命令">基本命令</h2>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 设置</span></span>
+<span class="line"><span style="color:#005CC5">set</span><span style="color:#032F62"> k</span><span style="color:#032F62"> v</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 查询</span></span>
+<span class="line"><span style="color:#6F42C1">get</span><span style="color:#032F62"> k</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 删除</span></span>
+<span class="line"><span style="color:#6F42C1">del</span><span style="color:#032F62"> k</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">keys</span><span style="color:#032F62"> pattern</span><span style="color:#24292E"> </span></span>
+<span class="line"><span style="color:#6A737D"># 查看所有的 kv</span></span>
+<span class="line"><span style="color:#6F42C1">keys</span><span style="color:#005CC5"> *</span><span style="color:#24292E"> </span></span>
+<span class="line"><span style="color:#6A737D"># 判断 key 是否存在</span></span>
+<span class="line"><span style="color:#6F42C1">exists</span><span style="color:#032F62"> key</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 删除所有</span></span>
+<span class="line"><span style="color:#6F42C1">flushall</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 已二进制的形式存储，不支持中文，需要支持中文要在启动时加 --raw 以原始的形式来显示内容。</span></span>
+<span class="line"><span style="color:#6F42C1">redis-cli</span><span style="color:#005CC5"> --raw</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 查看 key 的过期时间，输出 -1 表示未设置过期时间</span></span>
+<span class="line"><span style="color:#6F42C1">TTL</span><span style="color:#032F62"> key</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 设置 key 的过期时间，单位为 s。过期后 get key 无输出，keys 也没法看到</span></span>
+<span class="line"><span style="color:#6F42C1">expire</span><span style="color:#032F62"> key</span><span style="color:#032F62"> seconds</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 设置一个带有过期时间的 kv</span></span>
+<span class="line"><span style="color:#6F42C1">setex</span><span style="color:#032F62"> key</span><span style="color:#032F62"> seconds</span><span style="color:#032F62"> value</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># key 不存在时设置，存在则不做操作</span></span>
+<span class="line"><span style="color:#6F42C1">setnx</span><span style="color:#032F62"> key</span><span style="color:#032F62"> value</span></span></code></pre></div>
+<h2 id="列表-list">列表 List</h2>
+<p>用来存储和操作一组有顺序的数据，类似数组</p>
+<p><code>LPUSH</code> 和 <code>RPUSH</code> 将元素插入到头部和尾部</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># lpush/rpush 列表名 元素1 元素n，元素按照从左到右的顺序依次插入到头部/尾部</span></span>
+<span class="line"><span style="color:#6F42C1">lpush</span><span style="color:#032F62"> letter</span><span style="color:#032F62"> a</span></span></code></pre></div>
+<h3 id="获取列表内容">获取列表内容</h3>
+<p><code>LRANGE key start stop</code></p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 列表名 起始 pos 结尾 pos </span></span>
+<span class="line"><span style="color:#6A737D"># pos 以 0 开始，-1 表示最后一个元素</span></span>
+<span class="line"><span style="color:#6F42C1">lrange</span><span style="color:#032F62"> letter</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">127.0.0.1:10080</span><span style="color:#24292E">> </span><span style="color:#032F62">rpush</span><span style="color:#032F62"> letter</span><span style="color:#032F62"> b</span><span style="color:#032F62"> c</span><span style="color:#032F62"> d</span></span>
+<span class="line"><span style="color:#6F42C1">4</span></span>
+<span class="line"><span style="color:#6F42C1">127.0.0.1:10080</span><span style="color:#24292E">> </span><span style="color:#032F62">lrange</span><span style="color:#032F62"> letter</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -1</span></span>
+<span class="line"><span style="color:#6F42C1">a</span></span>
+<span class="line"><span style="color:#6F42C1">b</span></span>
+<span class="line"><span style="color:#6F42C1">c</span></span>
+<span class="line"><span style="color:#6F42C1">d</span></span>
+<span class="line"><span style="color:#6F42C1">127.0.0.1:10080</span><span style="color:#24292E">> </span><span style="color:#032F62">lpush</span><span style="color:#032F62"> letter</span><span style="color:#032F62"> x</span><span style="color:#032F62"> y</span><span style="color:#032F62"> z</span></span>
+<span class="line"><span style="color:#6F42C1">7</span></span>
+<span class="line"><span style="color:#6F42C1">127.0.0.1:10080</span><span style="color:#24292E">> </span><span style="color:#032F62">lrange</span><span style="color:#032F62"> letter</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -1</span></span>
+<span class="line"><span style="color:#6F42C1">z</span></span>
+<span class="line"><span style="color:#6F42C1">y</span></span>
+<span class="line"><span style="color:#6F42C1">x</span></span>
+<span class="line"><span style="color:#6F42C1">a</span></span>
+<span class="line"><span style="color:#6F42C1">b</span></span>
+<span class="line"><span style="color:#6F42C1">c</span></span>
+<span class="line"><span style="color:#6F42C1">d</span></span></code></pre></div>
+<h3 id="删除元素">删除元素</h3>
+<p><code>LPOP</code> 和 <code>RPOP</code> 从列表头部或者尾部删除元素</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 删除前面 n 个</span></span>
+<span class="line"><span style="color:#6F42C1">LPOP</span><span style="color:#032F62"> key</span><span style="color:#032F62"> n</span></span>
+<span class="line"><span style="color:#6F42C1">RPOP</span><span style="color:#032F62"> key</span><span style="color:#032F62"> n</span></span></code></pre></div>
+<h3 id="其他操作">其他操作</h3>
+<p><code>LLEN</code> 查看列表长度</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">LLEN</span><span style="color:#032F62"> key</span><span style="color:#24292E"> </span></span></code></pre></div>
+<p><code>LTRIM</code> 删除列表中指定范围以外的元素，只保留 [start, stop] 之间的元素</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">LTRIM</span><span style="color:#032F62"> key</span><span style="color:#032F62"> start</span><span style="color:#032F62"> stop</span></span></code></pre></div>
+<h2 id="集合-set">集合 Set</h2>
+<p>List 中元素可以重复，Set 中元素不能，且不具有顺序。</p>
+<p>相关命令以 S 开头</p>
+<h3 id="sadd-添加元素">SADD 添加元素</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># sadd key 元素1 ... 元素n</span></span>
+<span class="line"><span style="color:#6F42C1">sadd</span><span style="color:#032F62"> course</span><span style="color:#032F62"> redis</span><span style="color:#032F62"> os</span><span style="color:#032F62"> mysql</span></span></code></pre></div>
+<h3 id="smembers-查看集合中元素">SMEMBERS 查看集合中元素</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># smembers key</span></span>
+<span class="line"><span style="color:#6F42C1">smembers</span><span style="color:#032F62"> course</span></span></code></pre></div>
+<h3 id="sismember-判断元素是否在集合中">SISMEMBER 判断元素是否在集合中</h3>
+<p>输出 0 为 false，1 为 true</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">sismember</span><span style="color:#032F62"> course</span><span style="color:#032F62"> member</span></span></code></pre></div>
+<h3 id="srem-删除集合中元素">SREM 删除集合中元素</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">srem</span><span style="color:#032F62"> key</span><span style="color:#032F62"> member1</span><span style="color:#032F62"> member2...</span></span></code></pre></div>
+<h3 id="集合运算">集合运算</h3>
+<p>交：SINTER</p>
+<p>并：SUNION</p>
+<p>差：SDIFF</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">SINTER/SUNION/SDIFF</span><span style="color:#032F62"> key</span><span style="color:#032F62"> key</span></span></code></pre></div>
+<h2 id="有序集合-sortedsetzset">有序集合 SortedSet，ZSet</h2>
+<p>有序集合中的每一个元素都会关联浮点类型的分数，然后按照这个分数对集合中元素进行从小到大的排序。分数相同按照字典序排序</p>
+<p>有序集合的成员是唯一的，但是关联的分数可以重复。</p>
+<p>相关命令以 Z 开头</p>
+<h3 id="zadd-添加元素">ZADD 添加元素</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># zadd key 元素1 ... 元素n</span></span>
+<span class="line"><span style="color:#6A737D"># 元素由一个分数为一个成员组成，成员在前。</span></span>
+<span class="line"><span style="color:#6F42C1">zadd</span><span style="color:#032F62"> grade</span><span style="color:#005CC5"> 99</span><span style="color:#032F62"> gxj</span><span style="color:#005CC5"> 100</span><span style="color:#032F62"> wsq</span><span style="color:#005CC5"> 95</span><span style="color:#032F62"> zs</span><span style="color:#005CC5"> 98</span><span style="color:#032F62"> ls</span></span></code></pre></div>
+<h3 id="zrange-查看集合中成员">ZRANGE 查看集合中成员</h3>
+<p>[WITHSCORES] 分数同时输出</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># ZRANGE key start stop [WITHSCORES]</span></span>
+<span class="line"><span style="color:#6F42C1">ZRANGE</span><span style="color:#032F62"> grade</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">ZRANGE</span><span style="color:#032F62"> grade</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> -1</span><span style="color:#032F62"> WITHSCORES</span></span></code></pre></div>
+<h3 id="zscore-查看某个成员的分数">ZSCORE 查看某个成员的分数</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># zscore key member</span></span>
+<span class="line"><span style="color:#6F42C1">zscore</span><span style="color:#032F62"> grade</span><span style="color:#032F62"> gxj</span></span></code></pre></div>
+<h3 id="zrank-查看某个成员的-index">ZRANK 查看某个成员的 index</h3>
+<p>从 0 开始</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># zrank key member</span></span>
+<span class="line"><span style="color:#6F42C1">zrank</span><span style="color:#032F62"> grade</span><span style="color:#032F62"> gxj</span></span></code></pre></div>
+<h3 id="zrevrank-查看某个成员的排名">ZREVRANK 查看某个成员的排名</h3>
+<p>REV 表示 reverse</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># zrevrank key member</span></span>
+<span class="line"><span style="color:#6F42C1">zrevrank</span><span style="color:#032F62"> grade</span><span style="color:#032F62"> gxj</span></span></code></pre></div>
+<h3 id="zrem-删除某个成员">ZREM 删除某个成员</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">ZREM</span><span style="color:#032F62"> key</span><span style="color:#032F62"> member</span></span></code></pre></div>
+<h2 id="哈希-hash">哈希 Hash</h2>
+<p>字符类型的字段和值的映射表，kv 的集合，适合用于存储对象。将对象表示为一组 kv</p>
+<p>命令以 H 开头</p>
+<h3 id="hset-添加一个键值对">HSET 添加一个键值对</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># HSET key field value [field value ...]</span></span>
+<span class="line"><span style="color:#6F42C1">HSET</span><span style="color:#032F62"> person</span><span style="color:#032F62"> name</span><span style="color:#032F62"> gxj</span></span>
+<span class="line"><span style="color:#6F42C1">HSET</span><span style="color:#032F62"> person</span><span style="color:#032F62"> age</span><span style="color:#005CC5"> 24</span></span></code></pre></div>
+<h3 id="hget-获取一个键值对">HGET 获取一个键值对</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># HGET key field</span></span>
+<span class="line"><span style="color:#6A737D"># 获取 person 中的 name</span></span>
+<span class="line"><span style="color:#6F42C1">HGET</span><span style="color:#032F62"> person</span><span style="color:#032F62"> name</span></span>
+<span class="line"><span style="color:#6A737D"># 获取 person 中的 age</span></span>
+<span class="line"><span style="color:#6F42C1">HGET</span><span style="color:#032F62"> person</span><span style="color:#032F62"> age</span></span></code></pre></div>
+<h3 id="hgetall-获取哈希中的所有键值对">HGETALL 获取哈希中的所有键值对</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">HGETALL</span><span style="color:#032F62"> key</span></span>
+<span class="line"><span style="color:#6F42C1">HGETALL</span><span style="color:#032F62"> person</span></span></code></pre></div>
+<h3 id="hdel-删除哈希中的某个键值对">HDEL 删除哈希中的某个键值对</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">HDEL</span><span style="color:#032F62"> key</span><span style="color:#032F62"> field</span></span>
+<span class="line"><span style="color:#6F42C1">hdel</span><span style="color:#032F62"> person</span><span style="color:#032F62"> age</span></span></code></pre></div>
+<h3 id="hexists-判断某个键值对是否存在">HEXISTS 判断某个键值对是否存在</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">HEXISTS</span><span style="color:#032F62"> key</span><span style="color:#032F62"> field</span></span>
+<span class="line"><span style="color:#6F42C1">hexists</span><span style="color:#032F62"> person</span><span style="color:#032F62"> name</span></span>
+<span class="line"><span style="color:#6F42C1">hexists</span><span style="color:#032F62"> person</span><span style="color:#032F62"> age</span></span></code></pre></div>
+<h3 id="其他操作-1">其他操作</h3>
+<p>HKEYS 获取哈希中的所有键</p>
+<p>HLEN 获取哈希中的所有 kv 的数量</p>
+<h2 id="发布订阅">发布订阅</h2>
+<p><code>publish channel message</code> 发布消息，将消息发送到指定的频道。</p>
+<p><code>subscribe channel</code> 订阅频道，接受消息。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 客户端1</span></span>
+<span class="line"><span style="color:#6F42C1">subscribe</span><span style="color:#032F62"> cqu</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 客户端2</span></span>
+<span class="line"><span style="color:#6F42C1">subscribe</span><span style="color:#032F62"> cqu</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 客户端3</span></span>
+<span class="line"><span style="color:#6F42C1">publish</span><span style="color:#032F62"> cqu</span><span style="color:#032F62"> hello</span></span></code></pre></div>
+<p>局限性：消息无法持久化，无法记录历史消息等。</p>
+<h2 id="消息队列-stream">消息队列 Stream</h2>
+<p>轻量级的消息队列，可以解决发布订阅的局限性。</p>
+<p>命令为 X 开头</p>
+<h2 id="位图-bitmap">位图 Bitmap</h2>
+<p>字符串 string 类型的拓展，本质上还是一个字符串。</p>
+<p>可以维护一些状态，比如用户的登录状态，是否点赞，签到情况等。</p>
+<p>命令以 BIT 开头</p>
+<h3 id="setbit-设置位">SETBIT 设置位</h3>
+<p>SETBIT key offset value, 将 offset 位置设置为 0/1</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">setbit</span><span style="color:#032F62"> online</span><span style="color:#005CC5"> 0</span><span style="color:#005CC5"> 1</span></span></code></pre></div>
+<h3 id="getbit-获取位">GETBIT 获取位</h3>
+<p>GETBIT key offset 获取位图中某个偏移量的值</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">getbit</span><span style="color:#032F62"> online</span><span style="color:#005CC5"> 0</span></span></code></pre></div>
+<h3 id="批量设置">批量设置</h3>
+<p>一次性设置多个 bit 的值</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 前四个为 1，后四个为 0</span></span>
+<span class="line"><span style="color:#005CC5">set</span><span style="color:#032F62"> online</span><span style="color:#032F62"> "\xF0"</span></span></code></pre></div>
+<h3 id="bitcount-统计">BITCOUNT 统计</h3>
+<p>BITCOUNT key 统计一个 key 的值里面有多少 bit 是 1</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">bitcount</span><span style="color:#032F62"> online</span></span></code></pre></div>
+<h3 id="bitpos-查找">BITPOS 查找</h3>
+<p>BITPOS key bit 获取第一个出现 0/1 的 pos</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">bitpos</span><span style="color:#032F62"> online</span><span style="color:#005CC5"> 0</span></span></code></pre></div>
+<h2 id="事务">事务</h2>
+<p>一次请求中执行多个命令。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">MULTI</span><span style="color:#6A737D"> # 开启一个事务，所有命令放入一个队列中</span></span>
+<span class="line"><span style="color:#6F42C1">SET</span></span>
+<span class="line"><span style="color:#6F42C1">LPUSH</span></span>
+<span class="line"><span style="color:#6F42C1">SADD</span></span>
+<span class="line"><span style="color:#6F42C1">EXEC/DISCARD</span><span style="color:#6A737D"> # EXEC 执行事务中的所有命令</span></span></code></pre></div>
+<p>Redis 中的事务不能保证所有命令都会成功。执行结果取决于事务中的命令。</p>
+<p>可以保证以下三点：</p>
+<ol>
+<li>
+<p>在发送 exec 命令之前，所有命令都会被放入到一个队列中缓存起来，不会立即执行。</p>
+</li>
+<li>
+<p>收到 exec 命令之后，事务开始执行，事务中任何一个命令执行失败，其他命令依然会被执行，不会因为某个命令的失败导致其他命令不会被执行这种情况。</p>
+</li>
+<li>
+<p>在事务执行的过程中，其他客户端提交的命令请求，不会被插入到事务的执行命令序列中。</p>
+</li>
+</ol>
+<h2 id="持久化">持久化</h2>
+<h3 id="1-rdbredis-database">1. RDB，Redis Database</h3>
+<p>某个时间点上 Redis 的完整数据副本（快照）。</p>
+<p>根据 conf 中的 save 参数自动保存快照</p>
+<p>save 时间 操作次数：时间内操作多少次触发快照。</p>
+<p>命令 save 主动触发快照。</p>
+<p>快照后的修改会丢失。</p>
+<p>适合用于备份</p>
+<h3 id="2-aofappend-only-file">2. AOF，Append-Only File</h3>
+<p>执行写命令的时候，不仅会把命令写入到内存，还会将命令写入到一个追加的文件中。追加文件：以日志的形式记录每一个写操作。重启时，通过重新执行 AOF 文件中命令重建内容。</p>
+<p>conf 中 appendonly yes/no 开启和关闭</p>
+<h2 id="主从复制">主从复制</h2>
+<p>将一台 Redis 服务器的数据复制到其他 Redis 服务器。主节点复制到从节点，单向复制，只能从主节点到从节点，只能有一个主节点。</p>
+<p>一般主节点负责写，从节点负责读。</p>
+<p>主节点通过异步的方式将变化的数据发给从节点，从节点收到主节点的数据后更新自己的数据，达成数据一致。</p>
+<h2 id="哨兵模式">哨兵模式</h2>
+<p>当一主多从的 Redis 集群中主节点宕机，需要手动配置将从节点变为主节点，没法自动实现故障转移</p>
+<ol>
+<li>
+<p>监控，Redis 节点是否正常</p>
+</li>
+<li>
+<p>通知，如果发现某个节点出了问题，哨兵就会通过发布订阅模式通知其他节点。</p>
+</li>
+<li>
+<p>自动故障转移。当主节点不能正常工作时，哨兵开始一个自动故障转移的操作，将一个从节点升级为主节点，其他从节点指向新的主节点。</p>
+</li>
+</ol>
+<p>注意：哨兵本身也是一个节点，也会有单点故障的问题。一般使用三个哨兵来保证高可用。三个哨兵会选出一个领导者，领导者来监控其他节点。领导者挂了，其他哨兵会重新选出一个领导者。</p>  </div> </article> <aside class="post-toc" id="J_post_toc" aria-label="On this page"> <div class="post-toc-inner"> <nav class="post-toc-nav" id="J_post_toc_nav"> <a class="post-toc-link" href="#redis-基础" data-toc-id="redis-基础">Redis 基础</a><a class="post-toc-link" href="#基本命令" data-toc-id="基本命令">基本命令</a><a class="post-toc-link" href="#列表-list" data-toc-id="列表-list">列表 List</a><a class="post-toc-link" href="#集合-set" data-toc-id="集合-set">集合 Set</a><a class="post-toc-link" href="#有序集合-sortedsetzset" data-toc-id="有序集合-sortedsetzset">有序集合 SortedSet，ZSet</a><a class="post-toc-link" href="#哈希-hash" data-toc-id="哈希-hash">哈希 Hash</a><a class="post-toc-link" href="#发布订阅" data-toc-id="发布订阅">发布订阅</a><a class="post-toc-link" href="#消息队列-stream" data-toc-id="消息队列-stream">消息队列 Stream</a><a class="post-toc-link" href="#位图-bitmap" data-toc-id="位图-bitmap">位图 Bitmap</a><a class="post-toc-link" href="#事务" data-toc-id="事务">事务</a><a class="post-toc-link" href="#持久化" data-toc-id="持久化">持久化</a><a class="post-toc-link" href="#主从复制" data-toc-id="主从复制">主从复制</a><a class="post-toc-link" href="#哨兵模式" data-toc-id="哨兵模式">哨兵模式</a> </nav> </div> </aside> </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="redis-guide" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/shell-commands/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>Shell常用命令详解</h3> <p>【2024-12-03】包含gcc、make、vim、tcpdump、netcat、gdb等常用Shell工具和命令的实用指南</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

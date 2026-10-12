@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>SQL 基础语法 - DDL · Dueplay</title><meta name="description" content="SQL 数据定义语言 DDL 的基础操作，包括数据库和表的创建、查询、删除等"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/sql-ddl/"><meta property="og:type" content="article"><meta property="og:title" content="SQL 基础语法 - DDL · Dueplay"><meta property="og:description" content="SQL 数据定义语言 DDL 的基础操作，包括数据库和表的创建、查询、删除等"><meta property="og:url" content="https://dueplay.github.io/posts/sql-ddl/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post" class="has-post-toc"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">SQL 基础语法 - DDL</h1> <h4 class="page-info"> <span>Categories: Database</span> <time datetime="2024-12-03T00:00:00.000Z">2024-12-03</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m2 0h1m2 0h1m1 0h2m1 0h4m1 0h7M1 2.5h1m5 0h1m1 0h1m2 0h2m1 0h2m2 0h1m3 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h5m4 0h3m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m2 0h3m2 0h1m3 0h2m2 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h1m4 0h3m1 0h2m3 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h2m1 0h1m1 0h1m1 0h1m3 0h1m2 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h2m2 0h1m2 0h1m1 0h2m1 0h1M1 9.5h2m1 0h1m2 0h2m2 0h1m2 0h4m3 0h1m1 0h3m1 0h2M1 10.5h1m4 0h1m2 0h1m1 0h2m4 0h1m3 0h3m2 0h1m2 0h1M3 11.5h1m1 0h3m2 0h2m2 0h1m2 0h2m1 0h4m1 0h4M4 12.5h3m2 0h1m4 0h3m2 0h4m4 0h2M1 13.5h1m3 0h1m1 0h1m5 0h3m2 0h7m1 0h1m1 0h2M4 14.5h2m2 0h7m5 0h3M2 15.5h1m1 0h2m1 0h1m1 0h3m1 0h3m7 0h1m1 0h5M1 16.5h1m2 0h2m7 0h3m2 0h4m4 0h1m1 0h1M3 17.5h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m1 0h1m5 0h1M3 18.5h2m1 0h1m1 0h2m1 0h1m3 0h1m1 0h1m1 0h1m3 0h2m1 0h1m2 0h1M1 19.5h1m3 0h3m1 0h3m2 0h1m4 0h1m4 0h2m2 0h2M3 20.5h2m3 0h2m1 0h2m1 0h1m3 0h1m4 0h1m4 0h2M1 21.5h1m2 0h1m1 0h3m1 0h1m1 0h2m1 0h3m2 0h6m1 0h1M9 22.5h1m2 0h3m5 0h2m3 0h1m1 0h3M1 23.5h7m1 0h1m2 0h4m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1M1 24.5h1m5 0h1m2 0h1m1 0h3m4 0h1m1 0h1m3 0h4M1 25.5h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m2 0h1m2 0h5M1 26.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h2m2 0h6m1 0h4M1 27.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m1 0h2m4 0h3m1 0h1M1 28.5h1m5 0h1m1 0h1m1 0h2m3 0h6m1 0h2m3 0h1M1 29.5h7m1 0h1m1 0h1m1 0h2m2 0h2m2 0h1m1 0h4m1 0h1"/></svg>
+</div> </div> </h4> <h2 id="数据库操作">数据库操作</h2>
+<h3 id="查询">查询</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D">-- 查询所有数据库</span></span>
+<span class="line"><span style="color:#24292E">show databases;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">-- 查询当前数据库</span></span>
+<span class="line"><span style="color:#D73A49">select</span><span style="color:#D73A49"> database</span><span style="color:#24292E">();</span></span></code></pre></div>
+<h3 id="创建">创建</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D">-- 创建数据库</span></span>
+<span class="line"><span style="color:#D73A49">create</span><span style="color:#D73A49"> database</span><span style="color:#24292E"> [if not exists] 数据库名;</span></span></code></pre></div>
+<h3 id="使用">使用</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">use</span><span style="color:#24292E"> 数据库名;</span></span></code></pre></div>
+<h3 id="删除">删除</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">drop</span><span style="color:#D73A49"> database</span><span style="color:#24292E"> [if exists] 数据库名;</span></span></code></pre></div>
+<p><strong>注意</strong>：schemas 可以替换上述的 database</p>
+<h2 id="表操作">表操作</h2>
+<h3 id="创建-1">创建</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">create</span><span style="color:#D73A49"> table</span><span style="color:#6F42C1"> 表名</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    字段1 字段类型 [约束] [comment 字段1注释],</span></span>
+<span class="line"><span style="color:#24292E">    字段n 字段类型 [约束] [comment 字段n注释]</span></span>
+<span class="line"><span style="color:#24292E">)[comment 表注释];</span></span></code></pre></div>
+<h3 id="约束">约束</h3>
+<p>约束作用于表中字段上的规则，用于限制存储在表中的数据。保证数据库中数据的正确性，有效性和完整性。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>约束</th><th>描述</th><th>关键字</th></tr></thead><tbody><tr><td>非空</td><td>限制该字段不能为 null</td><td>not null</td></tr><tr><td>唯一</td><td>保证字段的所有数据是唯一的</td><td>unique</td></tr><tr><td>主键</td><td>主键是一行数据的唯一标识，非空且唯一</td><td>primary key(auto_increment)</td></tr><tr><td>默认</td><td>未指定该字段的值，则采用默认值</td><td>default</td></tr><tr><td>外键</td><td>该字段的值一定是其他表中存在的，保证数据的一致性和完整性</td><td>foreign key</td></tr></tbody></table>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49">create</span><span style="color:#D73A49"> table</span><span style="color:#6F42C1"> tb_user</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    id </span><span style="color:#D73A49">int</span><span style="color:#D73A49"> primary key</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    username </span><span style="color:#D73A49">varchar</span><span style="color:#24292E">(</span><span style="color:#005CC5">20</span><span style="color:#24292E">) </span><span style="color:#D73A49">not null</span><span style="color:#D73A49"> unique</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#D73A49">    name</span><span style="color:#D73A49"> varchar</span><span style="color:#24292E">(</span><span style="color:#005CC5">10</span><span style="color:#24292E">) </span><span style="color:#D73A49">not null</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    age </span><span style="color:#D73A49">int</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    gender </span><span style="color:#D73A49">char</span><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">default</span><span style="color:#032F62"> '男'</span></span>
+<span class="line"><span style="color:#24292E">)</span></span></code></pre></div>
+<h2 id="数据类型">数据类型</h2>
+<h3 id="数值类型">数值类型</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>大小(byte)</th><th>有符号(SIGNED)范围</th><th>无符号(UNSIGNED)范围</th><th>描述</th><th>备注</th></tr></thead><tbody><tr><td>tinyint</td><td>1</td><td>(-128, 127)</td><td>(0, 255)</td><td>小整数值</td><td></td></tr><tr><td>smallint</td><td>2</td><td>(-32768, 32767)</td><td>(0, 65535)</td><td>大整数值</td><td></td></tr><tr><td>mediumint</td><td>3</td><td>(-8388608, 8388607)</td><td>(0, 16777215)</td><td>大整数值</td><td></td></tr><tr><td>int</td><td>4</td><td>(-2147483648, 2147483647)</td><td>(0, 4294967295)</td><td>大整数值</td><td></td></tr><tr><td>bigint</td><td>8</td><td>(-2^63, 2^63-1)</td><td>(0, 2^64-1)</td><td>极大整数值</td><td></td></tr><tr><td>float</td><td>4</td><td>(-3.402823466E+38, 3.402823466E+38)</td><td>0 和 (1.175494351E-38, 3.402823466E+38)</td><td>单精度浮点数值</td><td>float(5,2)：5 表示整个数字长度，2 表示小数位个数</td></tr><tr><td>double</td><td>8</td><td>更大范围</td><td>更大范围</td><td>双精度浮点数值</td><td>double(5,2)：5 表示整个数字长度，2 表示小数位个数</td></tr><tr><td>decimal</td><td></td><td></td><td></td><td>小数值(精度更高)</td><td>decimal(5,2)：5 表示整个数字长度，2 表示小数位个数</td></tr></tbody></table>
+<p>例子：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#24292E">age </span><span style="color:#D73A49">tinyint</span><span style="color:#24292E"> unsigned</span></span>
+<span class="line"><span style="color:#24292E">score double(</span><span style="color:#005CC5">3</span><span style="color:#24292E">,</span><span style="color:#005CC5">1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">金额 </span><span style="color:#D73A49">decimal</span></span></code></pre></div>
+<h3 id="字符串类型">字符串类型</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>大小</th><th>描述</th></tr></thead><tbody><tr><td>char</td><td>0-255 bytes</td><td>定长字符串</td></tr><tr><td>varchar</td><td>0-65535 bytes</td><td>变长字符串</td></tr><tr><td>tinyblob</td><td>0-255 bytes</td><td>不超过 255 个字符的二进制数据</td></tr><tr><td>tinytext</td><td>0-255 bytes</td><td>短文本字符串</td></tr><tr><td>blob</td><td>0-65535 bytes</td><td>二进制形式的长文本数据</td></tr><tr><td>text</td><td>0-65535 bytes</td><td>长文本数据</td></tr><tr><td>mediumblob</td><td>0-16777215 bytes</td><td>二进制形式的中等长度文本数据</td></tr><tr><td>mediumtext</td><td>0-16777215 bytes</td><td>中等长度文本数据</td></tr><tr><td>longblob</td><td>0-4294967295 bytes</td><td>二进制形式的极大文本数据</td></tr><tr><td>longtext</td><td>0-4294967295 bytes</td><td>极大文本数据</td></tr></tbody></table>
+<p><strong>char 与 varchar 的区别</strong>：</p>
+<ul>
+<li>char(10): 最多只能存 10 个字符，不足 10 个字符，占用 10 个字符空间</li>
+<li>varchar(10): 最多只能存 10 个字符，不足 10 个字符，按照实际长度存储</li>
+</ul>
+<p>例子：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#24292E">phone </span><span style="color:#D73A49">char</span><span style="color:#24292E">(</span><span style="color:#005CC5">11</span><span style="color:#24292E">),</span></span>
+<span class="line"><span style="color:#24292E">username </span><span style="color:#D73A49">varchar</span><span style="color:#24292E">(</span><span style="color:#005CC5">20</span><span style="color:#24292E">),</span></span></code></pre></div>
+<h3 id="时间日期类型">时间日期类型</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>大小(byte)</th><th>范围</th><th>格式</th><th>描述</th></tr></thead><tbody><tr><td>date</td><td>3</td><td>1000-01-01 至 9999-12-31</td><td>YYYY-MM-DD</td><td>日期值</td></tr><tr><td>time</td><td>3</td><td>-838:59:59 至 838:59:59</td><td>HH:MM:SS</td><td>时间值或持续时间</td></tr><tr><td>year</td><td>1</td><td>1901 至 2155</td><td>YYYY</td><td>年份值</td></tr><tr><td>datetime</td><td>8</td><td>1000-01-01 00:00:00 至 9999-12-31 23:59:59</td><td>YYYY-MM-DD HH:MM:SS</td><td>混合日期和时间值</td></tr><tr><td>timestamp</td><td>4</td><td>1970-01-01 00:00:01 至 2038-01-19 03:14:07</td><td>YYYY-MM-DD HH:MM:SS</td><td>混合日期和时间值，时间戳</td></tr></tbody></table>
+<p>例子：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SQL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#24292E">birthday </span><span style="color:#D73A49">date</span></span>
+<span class="line"><span style="color:#24292E">update_time </span><span style="color:#D73A49">datetime</span></span></code></pre></div>  </div> </article> <aside class="post-toc" id="J_post_toc" aria-label="On this page"> <div class="post-toc-inner"> <nav class="post-toc-nav" id="J_post_toc_nav"> <a class="post-toc-link" href="#数据库操作" data-toc-id="数据库操作">数据库操作</a><a class="post-toc-link is-child" href="#查询" data-toc-id="查询">查询</a><a class="post-toc-link is-child" href="#创建" data-toc-id="创建">创建</a><a class="post-toc-link is-child" href="#使用" data-toc-id="使用">使用</a><a class="post-toc-link is-child" href="#删除" data-toc-id="删除">删除</a><a class="post-toc-link" href="#表操作" data-toc-id="表操作">表操作</a><a class="post-toc-link is-child" href="#创建-1" data-toc-id="创建-1">创建</a><a class="post-toc-link is-child" href="#约束" data-toc-id="约束">约束</a><a class="post-toc-link" href="#数据类型" data-toc-id="数据类型">数据类型</a><a class="post-toc-link is-child" href="#数值类型" data-toc-id="数值类型">数值类型</a><a class="post-toc-link is-child" href="#字符串类型" data-toc-id="字符串类型">字符串类型</a><a class="post-toc-link is-child" href="#时间日期类型" data-toc-id="时间日期类型">时间日期类型</a> </nav> </div> </aside> </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="sql-ddl" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/vfs-structure/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>VFS 层结构体定义与实现</h3> <p>【2024-12-03】虚拟文件系统（VFS）层的结构体设计和实现原理</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

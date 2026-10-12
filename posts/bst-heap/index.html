@@ -1,0 +1,296 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>二叉搜索树与二叉堆 · Dueplay</title><meta name="description" content="二叉搜索树（BST）和二叉堆的原理、实现和应用"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/bst-heap/"><meta property="og:type" content="article"><meta property="og:title" content="二叉搜索树与二叉堆 · Dueplay"><meta property="og:description" content="二叉搜索树（BST）和二叉堆的原理、实现和应用"><meta property="og:url" content="https://dueplay.github.io/posts/bst-heap/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">二叉搜索树与二叉堆</h1> <h4 class="page-info"> <span>Categories: Data Structure</span> <time datetime="2024-03-20T00:00:00.000Z">2024-03-20</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m3 0h1m2 0h3m1 0h4m1 0h7M1 2.5h1m5 0h1m2 0h1m3 0h1m1 0h2m1 0h2m2 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h1m3 0h3m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m2 0h1m2 0h1m1 0h1m3 0h2m2 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h1m2 0h1m1 0h6m2 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m3 0h6m1 0h1m1 0h2m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h1m2 0h1m1 0h8M1 9.5h3m1 0h5m3 0h2m3 0h1m3 0h2m3 0h1M1 10.5h6m1 0h3m1 0h3m2 0h1m3 0h3m2 0h1m2 0h1M2 11.5h1m1 0h1m1 0h3m2 0h3m1 0h1m2 0h1m2 0h2m2 0h1m1 0h3M1 12.5h1m1 0h2m3 0h1m1 0h2m1 0h3m2 0h3m1 0h1m1 0h1m3 0h1M1 13.5h3m2 0h2m3 0h2m1 0h1m3 0h7m1 0h1m1 0h2M3 14.5h1m4 0h1m2 0h2m1 0h2m1 0h1m3 0h3m2 0h1m2 0h1M1 15.5h2m4 0h1m1 0h3m3 0h1m1 0h2m2 0h1m1 0h4m1 0h2M1 16.5h5m2 0h1m1 0h3m1 0h1m3 0h4m4 0h1m1 0h1M1 17.5h3m1 0h4m4 0h3m1 0h2m3 0h2m2 0h1m1 0h2M2 18.5h1m1 0h2m2 0h6m3 0h3m1 0h1m1 0h1m2 0h2m1 0h1M1 19.5h1m2 0h1m1 0h5m1 0h3m4 0h1m4 0h2m2 0h2M2 20.5h4m3 0h1m3 0h3m1 0h2m1 0h1m5 0h1m1 0h1M1 21.5h1m4 0h3m3 0h1m2 0h4m1 0h6M9 22.5h2m1 0h1m7 0h2m3 0h1m1 0h3M1 23.5h7m1 0h1m1 0h1m2 0h1m3 0h1m1 0h2m1 0h1m1 0h2m1 0h2M1 24.5h1m5 0h1m1 0h1m2 0h1m5 0h2m1 0h1m3 0h2M1 25.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m4 0h1m2 0h5M1 26.5h1m1 0h3m1 0h1m2 0h1m1 0h3m2 0h3m1 0h2m2 0h1m1 0h3M1 27.5h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h1m1 0h5m2 0h3m2 0h1M1 28.5h1m5 0h1m1 0h1m1 0h1m1 0h9m1 0h2m3 0h1M1 29.5h7m1 0h1m1 0h2m2 0h1m2 0h1m1 0h2m2 0h2m2 0h2"/></svg>
+</div> </div> </h4> <h2 id="二叉搜索树-bst">二叉搜索树 BST</h2>
+<p>二叉搜索树(Binary Search Tree)是一棵满足如下性质（BST 性质）的二叉树：</p>
+<ol>
+<li>任意结点的关键码 >= 它左子树中所有结点的关键码</li>
+<li>任意结点的关键码 &#x3C;= 它右子树中所有结点的关键码</li>
+</ol>
+<p>根据以上性质，二叉搜索树的<strong>中序遍历必然为一个有序序列</strong>。</p>
+<h3 id="建立-bst">建立 BST</h3>
+<p>为了避免越界，减少边界情况的特殊判断，一般在 BST 中额外插入两个保护结点：</p>
+<ul>
+<li>一个关键码为正无穷（一个很大的正整数）</li>
+<li>一个关键码为负无穷</li>
+</ul>
+<p>仅由这两个结点构成的 BST 就是一棵初始的空 BST，然后再将各个节点插入这颗初始的 BST。</p>
+<h3 id="检索">检索</h3>
+<p>检索关键码 val 是否存在，从根开始递归查找：</p>
+<ul>
+<li>若当前结点的关键码等于 val，则已经找到</li>
+<li>若关键码大于 val，递归检索左子树（或不存在）</li>
+<li>若关键码小于 val，递归检索右子树（或不存在）</li>
+</ul>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">bool</span><span style="color:#6F42C1"> checkValInBST</span><span style="color:#24292E">(</span><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> root</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> val</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#005CC5"> false</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root->val </span><span style="color:#D73A49">==</span><span style="color:#24292E"> val) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> true</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> root->val) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#6F42C1"> checkValInBST</span><span style="color:#24292E">(root->left, val);</span></span>
+<span class="line"><span style="color:#24292E">    } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#6F42C1"> checkValInBST</span><span style="color:#24292E">(root->right, val);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="插入">插入</h3>
+<p>插入 val 与检索 val 的过程类似：</p>
+<ul>
+<li>若检索发现存在，则放弃插入（或者把 val 对应结点的计数+1，视要求而定）</li>
+<li>若检索发现不存在（子树为空），直接在对应位置新建关键码为 val 的结点</li>
+</ul>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> insertIntoBST</span><span style="color:#24292E">(</span><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> root</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> val</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> TreeNode</span><span style="color:#24292E">(val);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> root->val) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 左子树不为空返回左子树本身，为空创建新节点</span></span>
+<span class="line"><span style="color:#24292E">        root->left </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> insertIntoBST</span><span style="color:#24292E">(root->left, val);</span></span>
+<span class="line"><span style="color:#24292E">    } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">        root->right </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> insertIntoBST</span><span style="color:#24292E">(root->right, val);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 迭代方法，找到要插入的位置</span></span>
+<span class="line"><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> insertIntoBST</span><span style="color:#24292E">(</span><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> root</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> val</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> TreeNode</span><span style="color:#24292E">(val);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    TreeNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">cur </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root, </span><span style="color:#D73A49">*</span><span style="color:#24292E">fa </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (cur </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        fa </span><span style="color:#D73A49">=</span><span style="color:#24292E"> cur;</span></span>
+<span class="line"><span style="color:#24292E">        cur </span><span style="color:#D73A49">=</span><span style="color:#24292E"> val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> cur->val </span><span style="color:#D73A49">?</span><span style="color:#24292E"> cur->left </span><span style="color:#D73A49">:</span><span style="color:#24292E"> cur->right;</span><span style="color:#6A737D"> // 查找要插入的位置</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> fa->val) </span></span>
+<span class="line"><span style="color:#24292E">        fa->left </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> TreeNode</span><span style="color:#24292E">(val);</span></span>
+<span class="line"><span style="color:#D73A49">    else</span></span>
+<span class="line"><span style="color:#24292E">        fa->right </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> TreeNode</span><span style="color:#24292E">(val);</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="前驱和后继">前驱和后继</h3>
+<ul>
+<li><strong>前驱</strong>：BST 中小于 val 的最大结点</li>
+<li><strong>后继</strong>：BST 中大于 val 的最小结点</li>
+</ul>
+<p>求前驱和后继也是基于检索的，先检索 val。以后继为例：</p>
+<ul>
+<li>如果检索到了 val，并且 val 存在右子树，则在右子树中一直往左走到底，即右子树上最左边的节点</li>
+<li>否则说明没找到 val 或者 val 没有右子树，此时前驱就在检索过程经过的结点中（即当前结点的所有祖先节点中大于 val 的最小节点，可以拿一个变量记录）</li>
+</ul>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 找一个节点的后继有两种情况</span></span>
+<span class="line"><span style="color:#6A737D">// 1. 该节点有右子树，那么后继则是右子树一路向左</span></span>
+<span class="line"><span style="color:#6A737D">// 2. 该节点没有右子树，那么后继存在于访问该节点的路径上，为大于该节点的最小节点</span></span>
+<span class="line"><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> inorderSuccessor</span><span style="color:#24292E">(</span><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> root</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> val</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">    TreeNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">ans </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 记录访问节点路径上大于节点的最小值</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (root->val </span><span style="color:#D73A49">></span><span style="color:#24292E"> val) {</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (ans </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#D73A49"> ||</span><span style="color:#24292E"> root->val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> ans->val) {</span></span>
+<span class="line"><span style="color:#24292E">                ans </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        </span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (root->val </span><span style="color:#D73A49">==</span><span style="color:#24292E"> val) {</span></span>
+<span class="line"><span style="color:#6A737D">            // case1, 有右子树，右子树上一路向左</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (root->right) {</span></span>
+<span class="line"><span style="color:#24292E">                root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root->right;</span></span>
+<span class="line"><span style="color:#D73A49">                while</span><span style="color:#24292E"> (root->left </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">                    root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root->left;</span></span>
+<span class="line"><span style="color:#24292E">                }</span></span>
+<span class="line"><span style="color:#D73A49">                return</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#6A737D">            // 没有右子树，则为 case2</span></span>
+<span class="line"><span style="color:#D73A49">            break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#6A737D">        // 查找该节点</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> root->val) root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root->left;</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E"> root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root->right;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> ans;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="删除">删除</h3>
+<p>从 BST 中删除关键码为 val 的结点，可以基于检索+求后继实现。</p>
+<p>首先检索 val，然后分为下面两种情况：</p>
+<p><strong>1. 删除节点左右子树有为空的</strong>，用不为空的一边顶替该节点，把子树和父结点相连就行了。也包含叶子节点的情况，左右子树都为空，也可以归于这类。</p>
+<p><strong>2. 删除节点左右子树都不为空</strong>，则寻找该节点其前驱或后继替代该节点。先删除后继，再用后继结点代替 val 的位置。后继的删除即是在节点的右子树上删除后继节点，属于第一种情况（因为后继是右子树一直往左走到底，所以它最多只会有一棵子树，其左子树为空）。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> deleteNode</span><span style="color:#24292E">(</span><span style="color:#6F42C1">TreeNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> root</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> key</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (root->val </span><span style="color:#D73A49">==</span><span style="color:#24292E"> key) {</span></span>
+<span class="line"><span style="color:#6A737D">        // case1. 左右子树有为 null 的</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (root->left </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> root->right;</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (root->right </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> root->left;</span></span>
+<span class="line"><span style="color:#24292E">        </span></span>
+<span class="line"><span style="color:#6A737D">        // case2. 找后继</span></span>
+<span class="line"><span style="color:#24292E">        TreeNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root->right;</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (next->left </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">            next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> next->left;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#6A737D">        // 用后继替代</span></span>
+<span class="line"><span style="color:#24292E">        root->val </span><span style="color:#D73A49">=</span><span style="color:#24292E"> next->val;</span></span>
+<span class="line"><span style="color:#6A737D">        // 转为在右子树上删除后继</span></span>
+<span class="line"><span style="color:#24292E">        root->right </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> deleteNode</span><span style="color:#24292E">(root->right, next->val);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (key </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> root->val) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 递归，在左子树上删除该节点</span></span>
+<span class="line"><span style="color:#24292E">        root->left </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> deleteNode</span><span style="color:#24292E">(root->left, key);</span></span>
+<span class="line"><span style="color:#24292E">    } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">        root->right </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> deleteNode</span><span style="color:#24292E">(root->right, key);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> root;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="时间复杂度分析">时间复杂度分析</h3>
+<p>查询/插入/求前驱/求后继/删除操作的时间复杂度：</p>
+<ul>
+<li>随机数据期望 O(树高) = O(log N)</li>
+<li>在非随机数据上，BST 容易退化为 O(N)，一般都要结合旋转操作来进行平衡</li>
+</ul>
+<h2 id="堆">堆</h2>
+<p>堆(Heap)是一种高效维护集合中最大或最小元素的数据结构。</p>
+<ul>
+<li><strong>大根堆</strong>：根节点最大的堆，用于维护和查询 max</li>
+<li><strong>小根堆</strong>：根节点最小的堆，用于维护和查询 min</li>
+</ul>
+<p>堆是一棵二叉树，并且满足堆性质（Heap property）：</p>
+<ul>
+<li>大根堆：任意结点的关键码 >= 它<strong>所有</strong>子结点的关键码</li>
+<li>小根堆：任意结点的关键码 &#x3C;= 它<strong>所有</strong>子结点的关键码</li>
+</ul>
+<h2 id="二叉堆">二叉堆</h2>
+<p>二叉堆是堆的一种简易实现，本质上是一棵满足堆性质的<strong>完全二叉树</strong>。</p>
+<h3 id="常见操作">常见操作</h3>
+<ul>
+<li>建堆 (build): O(N)</li>
+<li>查询最值 (get max/min): O(1)</li>
+<li>插入 (insert): O(log N) 树高，最多上浮树高次</li>
+<li>取出最值 (delete max/min): O(log N) 树高，最多下沉树高次</li>
+</ul>
+<h3 id="实现二叉堆">实现二叉堆</h3>
+<p>二叉堆一般使用一个一维数组来存储，利用完全二叉树的结点编号特性。</p>
+<p><strong>假设第一个元素存储在索引(下标)为 1 的位置</strong>：</p>
+<ul>
+<li>索引为 p 的结点的左孩子的索引为 p*2</li>
+<li>索引为 p 的结点的右孩子的索引为 p*2+1</li>
+<li>索引为 p 的结点的父亲的索引为 p/2（下取整）</li>
+</ul>
+<p><strong>假设第一个元素存储在索引(下标)为 0 的位置</strong>：</p>
+<ul>
+<li>索引为 p 的结点的左孩子的索引为 p*2+1</li>
+<li>索引为 p 的结点的右孩子的索引为 p*2+2</li>
+<li>索引为 p 的结点的父亲的索引为 (p-1)/2（下取整）</li>
+</ul>
+<h3 id="插入-insert">插入 (insert)</h3>
+<p>新元素一律插入到数组的尾部，插入到索引为 p 的位置，然后向上进行一次调整 HeapifyUp：</p>
+<ul>
+<li>若已到达根，停止</li>
+<li>若满足堆性质（heap[p] &#x3C;= heap[p/2]，大顶堆），停止</li>
+<li>否则交换 heap[p] 和 heap[p/2]，令 p=p/2，继续调整</li>
+</ul>
+<h3 id="取出堆顶-extract--delete-max">取出堆顶 (extract / delete max)</h3>
+<p>把堆顶（heap[0]）与堆尾（heap[n-1]）交换，删除堆尾（数组最后一个元素 O(1)），然后从根向下进行一次调整（Heapify Down）：</p>
+<ul>
+<li>每次与左、右子结点中较大的一个比较，检查堆性质，不满足则交换</li>
+<li>注意判断子结点是否存在</li>
+</ul>
+<h3 id="代码实现">代码实现</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 堆结点（key 用于比较的关键码，listNode 可以是任意的附带信息）</span></span>
+<span class="line"><span style="color:#D73A49">struct</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E"> {    </span></span>
+<span class="line"><span style="color:#D73A49">    int</span><span style="color:#24292E"> key;    </span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> listNode;    </span></span>
+<span class="line"><span style="color:#6F42C1">    Node</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> key</span><span style="color:#24292E">, </span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> listNode</span><span style="color:#24292E">) : </span><span style="color:#6F42C1">key</span><span style="color:#24292E">(key), </span><span style="color:#6F42C1">listNode</span><span style="color:#24292E">(listNode) {}</span></span>
+<span class="line"><span style="color:#24292E">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> BinaryHeap</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#D73A49">    bool</span><span style="color:#6F42C1"> empty</span><span style="color:#24292E">() {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> heap.</span><span style="color:#6F42C1">empty</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> push</span><span style="color:#24292E">(</span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> Node</span><span style="color:#D73A49">&#x26;</span><span style="color:#E36209"> node</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 插入到尾部</span></span>
+<span class="line"><span style="color:#24292E">        heap.</span><span style="color:#6F42C1">push_back</span><span style="color:#24292E">(node);</span></span>
+<span class="line"><span style="color:#6A737D">        // 当前插入位置向上调整</span></span>
+<span class="line"><span style="color:#D73A49">        int</span><span style="color:#24292E"> p </span><span style="color:#D73A49">=</span><span style="color:#24292E"> heap.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">() </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#6F42C1">        heapifyUp</span><span style="color:#24292E">(p);</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 返回堆顶元素，小顶堆维护的最小值</span></span>
+<span class="line"><span style="color:#6F42C1">    Node</span><span style="color:#6F42C1"> pop</span><span style="color:#24292E">() {</span></span>
+<span class="line"><span style="color:#24292E">        Node ans </span><span style="color:#D73A49">=</span><span style="color:#24292E"> heap[</span><span style="color:#005CC5">0</span><span style="color:#24292E">];</span></span>
+<span class="line"><span style="color:#6A737D">        // 末尾交换到头部，然后删除末尾 O(1)</span></span>
+<span class="line"><span style="color:#24292E">        heap[</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> heap[heap.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">() </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">];</span></span>
+<span class="line"><span style="color:#24292E">        heap.</span><span style="color:#6F42C1">pop_back</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#6A737D">        // 向下调整</span></span>
+<span class="line"><span style="color:#6F42C1">        heapifyDown</span><span style="color:#24292E">(</span><span style="color:#005CC5">0</span><span style="color:#24292E">);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> ans;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">    // 删除下标为 x 的元素</span></span>
+<span class="line"><span style="color:#6F42C1">    Node</span><span style="color:#6F42C1"> erase</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> x</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        Node ans </span><span style="color:#D73A49">=</span><span style="color:#24292E"> heap[x];</span></span>
+<span class="line"><span style="color:#24292E">        heap[x] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> heap[heap.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">() </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">];</span></span>
+<span class="line"><span style="color:#24292E">        heap.</span><span style="color:#6F42C1">pop_back</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#6A737D">        // 删除任意位置，需要上浮下沉都要考虑</span></span>
+<span class="line"><span style="color:#6F42C1">        heapifyDown</span><span style="color:#24292E">(x);</span></span>
+<span class="line"><span style="color:#6F42C1">        heapifyUp</span><span style="color:#24292E">(x);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> ans;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">private:</span></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> heapifyUp</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> p</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (p </span><span style="color:#D73A49">></span><span style="color:#005CC5"> 0</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">            int</span><span style="color:#24292E"> fa </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (p </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (heap[p].key </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> heap[fa].key) {</span><span style="color:#6A737D"> // 小顶堆</span></span>
+<span class="line"><span style="color:#6F42C1">                swap</span><span style="color:#24292E">(heap[p], heap[fa]);</span></span>
+<span class="line"><span style="color:#24292E">                p </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fa;</span></span>
+<span class="line"><span style="color:#24292E">            } </span><span style="color:#D73A49">else</span><span style="color:#D73A49"> break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> heapifyDown</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> p</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        int</span><span style="color:#24292E"> child </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> p </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (child </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> heap.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">()) {</span><span style="color:#6A737D"> // child 未出界说明 p 有孩子</span></span>
+<span class="line"><span style="color:#D73A49">            int</span><span style="color:#24292E"> otherChild </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> p </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#6A737D">            // child 指向更小的孩子</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (otherChild </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> heap.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">() </span><span style="color:#D73A49">&#x26;&#x26;</span><span style="color:#24292E"> heap[otherChild].key </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> heap[child].key) {</span></span>
+<span class="line"><span style="color:#24292E">                child </span><span style="color:#D73A49">=</span><span style="color:#24292E"> otherChild;</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#6A737D">            // 如果不满足小根堆，则交换</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (heap[p].key </span><span style="color:#D73A49">></span><span style="color:#24292E"> heap[child].key) {</span></span>
+<span class="line"><span style="color:#6F42C1">                swap</span><span style="color:#24292E">(heap[p], heap[child]);</span></span>
+<span class="line"><span style="color:#24292E">                p </span><span style="color:#D73A49">=</span><span style="color:#24292E"> child;</span></span>
+<span class="line"><span style="color:#24292E">                child </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> p </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">            } </span><span style="color:#D73A49">else</span><span style="color:#D73A49"> break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">    vector</span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E">Node</span><span style="color:#D73A49">></span><span style="color:#24292E"> heap;</span><span style="color:#6A737D"> // 数组实现二叉树</span></span>
+<span class="line"><span style="color:#24292E">};</span></span></code></pre></div>
+<h2 id="优先队列">优先队列</h2>
+<p>二叉堆是优先队列(Priority Queue)一种简单、常见的实现，但不是最优实现。</p>
+<p>理论上二叉堆可以支持 O(log N) 删除任意元素：</p>
+<ul>
+<li>只需要定位该元素在堆中的结点 p（可以通过在数值与索引之间建立映射得到）</li>
+<li>与堆尾交换，删除堆尾</li>
+<li>从 p 向上、向下各进行一次调整</li>
+</ul>
+<h3 id="c-priority_queue">C++ priority_queue</h3>
+<p>C++ 中的优先队列 priority_queue，默认是 less，大根堆。</p>
+<p>如果要实现小根堆，需要重载 operator &#x3C; 或者提供其他 compare，如 greater。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">bool</span><span style="color:#D73A49"> operator</span><span style="color:#6F42C1">&#x3C;</span><span style="color:#24292E"> (</span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node1</span><span style="color:#24292E">, </span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> node1->val </span><span style="color:#D73A49">></span><span style="color:#24292E"> node2->val;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Compare</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#6A737D">    // node1 > node2, 则 node2 的优先级更高</span></span>
+<span class="line"><span style="color:#D73A49">    bool</span><span style="color:#D73A49"> operator</span><span style="color:#6F42C1">()</span><span style="color:#24292E">(</span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node1</span><span style="color:#24292E">, </span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> node1->val </span><span style="color:#D73A49">></span><span style="color:#24292E"> node2->val;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 自定义 compare 需要把分配器 vector&#x3C;ListNode *> 也写一下</span></span>
+<span class="line"><span style="color:#24292E">priority_queue</span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E">ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">, vector</span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E">ListNode </span><span style="color:#D73A49">*></span><span style="color:#24292E">, Compare</span><span style="color:#D73A49">></span><span style="color:#24292E"> q;</span></span></code></pre></div>  </div> </article>  </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="bst-heap" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/algorithm-techniques/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>前缀和、差分、双指针与单调栈队列</h3> <p>【2024-03-18】常用算法技巧：前缀和、差分、双指针、单调栈和单调队列的原理与应用</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

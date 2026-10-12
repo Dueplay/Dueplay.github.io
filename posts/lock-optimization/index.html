@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>锁优化与布隆过滤器 · Dueplay</title><meta name="description" content="介绍锁优化技术、布隆过滤器的原理和应用场景，包括缓存穿透问题的解决方案、误判率分析以及在分布式系统中的实际应用"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/lock-optimization/"><meta property="og:type" content="article"><meta property="og:title" content="锁优化与布隆过滤器 · Dueplay"><meta property="og:description" content="介绍锁优化技术、布隆过滤器的原理和应用场景，包括缓存穿透问题的解决方案、误判率分析以及在分布式系统中的实际应用"><meta property="og:url" content="https://dueplay.github.io/posts/lock-optimization/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post" class="has-post-toc"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">锁优化与布隆过滤器</h1> <h4 class="page-info"> <span>Categories: System / Data Structure</span> <time datetime="2024-12-03T00:00:00.000Z">2024-12-03</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m5 0h2m3 0h3m2 0h7M1 2.5h1m5 0h1m1 0h1m1 0h1m3 0h4m4 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m4 0h1m2 0h1m3 0h2m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h7m2 0h1m4 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h1m1 0h3m2 0h5m1 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h2m2 0h5m1 0h1m1 0h1m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 8.5h3m2 0h1m5 0h1M1 9.5h5m1 0h4m1 0h5m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1M3 10.5h1m1 0h1m5 0h2m2 0h1m1 0h9m3 0h1M1 11.5h1m2 0h5m2 0h1m4 0h3m4 0h1m1 0h1M1 12.5h1m2 0h3m2 0h1m2 0h1m4 0h1m4 0h1m2 0h2m1 0h1M1 13.5h1m2 0h2m1 0h2m1 0h6m2 0h3m3 0h1m1 0h2M3 14.5h4m3 0h1m1 0h1m2 0h1m1 0h9m3 0h1M3 15.5h2m1 0h2m2 0h2m3 0h2m1 0h1m3 0h1m1 0h4M1 16.5h4m1 0h1m1 0h2m3 0h1m2 0h2m3 0h1m2 0h2m2 0h1M3 17.5h3m1 0h1m1 0h1m2 0h4m2 0h1m2 0h1m4 0h2M1 18.5h1m2 0h3m2 0h2m1 0h1m1 0h1m2 0h1m2 0h2m1 0h3m1 0h1m1 0h1M1 19.5h1m1 0h3m1 0h3m3 0h1m2 0h2m1 0h1m1 0h5m1 0h1M1 20.5h1m1 0h1m1 0h2m2 0h1m1 0h1m3 0h1m1 0h1m1 0h1m4 0h2m2 0h1M1 21.5h1m1 0h1m1 0h3m1 0h1m1 0h1m2 0h2m2 0h1m1 0h6m1 0h3M9 22.5h4m1 0h1m3 0h2m1 0h1m3 0h5M1 23.5h7m1 0h3m3 0h4m1 0h2m1 0h1m1 0h3M1 24.5h1m5 0h1m2 0h1m2 0h1m1 0h1m4 0h2m3 0h1m2 0h2M1 25.5h1m1 0h3m1 0h1m1 0h3m1 0h6m2 0h5m1 0h2M1 26.5h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h1m2 0h3m1 0h1m1 0h2m1 0h1M1 27.5h1m1 0h3m1 0h1m1 0h3m1 0h1m2 0h1m1 0h3m1 0h7M1 28.5h1m5 0h1m1 0h2m1 0h2m1 0h3m3 0h1m1 0h1m1 0h2m1 0h1M1 29.5h7m1 0h1m2 0h1m1 0h5m1 0h1m1 0h4m1 0h1"/></svg>
+</div> </div> </h4> <p>但如果多线程抢锁过于频繁，就会造成严重的性能下降。为了降低对锁的竞争，自然的想法就是，对主要的全局数据结构粒度拆分（比如 Java 的 ConcurrentHashMap 就是将哈希桶分成了多个段进行上锁）。减小锁的粒度</p>
+<p>分配器中最重要的数据结构就是空闲列表，我们可以将空闲列表拆分成多个，每个空闲列表使用单独的锁。这样可以缓解多线程的竞争问题，但却解决不了多核架构的另外一个问题——<strong>缓存震荡</strong>（cache sloshing）。</p>
+<h2 id="bloom-filter">bloom filter</h2>
+<h3 id="背景">背景</h3>
+<p>在平常生活中，包括在设计计算机软件时，我们经常要判断一个元素是否在一个集合中。比如在 FBI，一个嫌疑人的名字是否已经在嫌疑名单上；在网络爬虫里，一个网址是否被访问过等等。</p>
+<p>最直接的方法就是将集合中全部的元素存在计算机中，遇到一个新元素时，将它和集合中的元素直接比较即可。一般来讲，计算机中的集合是用哈希表（hash table）来存储的。<strong>它的好处是快速准确，缺点是浪费存储空间</strong>。那有没有 更优化的数据结构呢？</p>
+<h3 id="简介">简介</h3>
+<p>布隆过滤器（Bloom Filter）是1970年由布隆提出的。它实际上是<code>由一个很长的bit数组和一系列哈希函数组成的</code>。布隆过滤器可以用于检索一个元素是否在一个集合中。</p>
+<h3 id="原理">原理</h3>
+<p><strong>数组的每个元素都只占1bit空间，并且每个元素只能为0或1。</strong></p>
+<p>布隆过滤器还拥有k个哈希函数，当一个元素加入布隆过滤器时，会使用k个哈希函数对其进行k次计算,得到k个哈希值，并且根据得到的哈希值，在位数组中把对应下标的值置位1。</p>
+<p>判断某个数是否在布隆过滤器中，就对该元素进行k次哈希计算，得到的值在位数组中判断每个元素是否都为1，如果每个元素都为1，就说明这个值在布隆过滤器中**。**</p>
+<h3 id="false-positives-概率"><strong>False positives 概率</strong></h3>
+<h4 id="误差率">误差率</h4>
+<p>布隆过滤器的误差率是指由于hash冲突，导致原本不再布隆过滤器中的数据，查询时显示在里面。</p>
+<p>发现1，3，7号位均为1，此时需要去后台数查询</p>
+<h4 id="布隆过滤器使用场景">布隆过滤器使用场景</h4>
+<ol>
+<li>黑名单校验</li>
+<li>快速去重</li>
+<li>爬虫URL校验</li>
+<li>leveldb/rocksdb快速判断数据是否已经block中，避免频繁访问磁盘</li>
+<li>解决缓存穿透问题</li>
+</ol>
+<p>重点讲解一下缓存穿透</p>
+<h5 id="缓存穿透">缓存穿透</h5>
+<ol>
+<li>概念</li>
+</ol>
+<p>缓存穿透是指查询一个数据库中不一定存在的数据；正常流程是依据key去查询value，数据查询先进行缓存查询，如果key不存在或者key已经过期，再对数据库进行查询，并把查询到的对象，放进缓存。如果数据库查询对象为空，则不放进缓存。</p>
+<p>如果每次都查询一个不存在value的key，由于缓存中没有数据，所以每次都会去查询数据库，对db造成很大的压力。</p>
+<ol start="2">
+<li>解决方案
+<ol>
+<li>缓存空值</li>
+</ol>
+</li>
+</ol>
+<p>将数据库中的空值也缓存到缓存层中，这样查询该空值就不会再访问DB，而是直接在缓存层访问就行。</p>
+<ul>
+<li>缺点：空值过期时间不太好确定</li>
+</ul>
+<ol start="3">
+<li>使用布隆过滤器</li>
+</ol>
+<ul>
+<li>构建方法
+<ul>
+<li>使用redis的module加载外部so文件
+<ul>
+<li>优点：操作简单</li>
+<li>缺点：
+<ul>
+<li>需要高版本的redis</li>
+<li>容易形成大key</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>借助bitmap来实现，k个hash函数，创建n个bitmap(推荐)
+<ul>
+<li>优点：操作简单</li>
+<li>缺点：
+<ul>
+<li>由于redis的字符串要求最大为512M，所以需要拆分多个key</li>
+<li>扩容稍微复杂</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>可以自己本地来实现布隆过滤器的计算，计算完之后在存入redis
+<ul>
+<li>优点：自己操作更灵活</li>
+<li>缺点：
+<ul>
+<li>流程复杂</li>
+<li>需要额外服务重启或当机之后布隆过滤器丢失问题</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="优点">优点</h3>
+<ol>
+<li>节省内存空间</li>
+<li>插入和查询时间复杂度都为O(1)</li>
+</ol>
+<h3 id="缺点">缺点</h3>
+<ol>
+<li>布隆过滤器不支持删除</li>
+<li>由于哈希冲突的原因，可能会出现假阳性</li>
+</ol>  </div> </article> <aside class="post-toc" id="J_post_toc" aria-label="On this page"> <div class="post-toc-inner"> <nav class="post-toc-nav" id="J_post_toc_nav"> <a class="post-toc-link" href="#bloom-filter" data-toc-id="bloom-filter">bloom filter</a><a class="post-toc-link is-child" href="#背景" data-toc-id="背景">背景</a><a class="post-toc-link is-child" href="#简介" data-toc-id="简介">简介</a><a class="post-toc-link is-child" href="#原理" data-toc-id="原理">原理</a><a class="post-toc-link is-child" href="#false-positives-概率" data-toc-id="false-positives-概率">False positives 概率</a><a class="post-toc-link is-child" href="#优点" data-toc-id="优点">优点</a><a class="post-toc-link is-child" href="#缺点" data-toc-id="缺点">缺点</a> </nav> </div> </aside> </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="lock-optimization" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/linux-vfs-rtthread-dfs/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>Linux VFS 与 RT-Thread DFS 详解</h3> <p>【2024-12-03】Linux 虚拟文件系统（VFS）和 RT-Thread 设备文件系统（DFS）的架构与实现原理</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>C++ 多线程编程详解 · Dueplay</title><meta name="description" content="深入讲解 C++ 多线程编程的核心概念，包括线程创建、线程 ID、线程同步、线程局部存储等，涵盖 Linux pthread 和 C++11 标准库的使用方法。"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/cpp-threads/"><meta property="og:type" content="article"><meta property="og:title" content="C++ 多线程编程详解 · Dueplay"><meta property="og:description" content="深入讲解 C++ 多线程编程的核心概念，包括线程创建、线程 ID、线程同步、线程局部存储等，涵盖 Linux pthread 和 C++11 标准库的使用方法。"><meta property="og:url" content="https://dueplay.github.io/posts/cpp-threads/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post" class="has-post-toc"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">C++ 多线程编程详解</h1> <h4 class="page-info"> <span>Categories: C++ / 多线程 / 系统编程</span> <time datetime="2024-12-03T00:00:00.000Z">2024-12-03</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m3 0h1m1 0h1m1 0h1m1 0h4m2 0h7M1 2.5h1m5 0h1m1 0h1m1 0h1m3 0h4m4 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m5 0h1m2 0h2m1 0h2m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h3m1 0h3m2 0h1m4 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h1m3 0h1m3 0h4m1 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h2m1 0h2m2 0h1m2 0h1m1 0h1m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 8.5h3m3 0h1m4 0h1M1 9.5h5m1 0h4m1 0h1m1 0h5m2 0h2m1 0h1m1 0h1m1 0h1M1 10.5h1m1 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1m1 0h9m3 0h1M1 11.5h2m4 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m4 0h1m1 0h1M4 12.5h2m2 0h1m4 0h1m2 0h1m5 0h1m2 0h2m1 0h1M2 13.5h1m1 0h4m2 0h2m1 0h8m3 0h1m1 0h2M1 14.5h1m4 0h1m2 0h2m6 0h9m3 0h1M2 15.5h1m2 0h1m1 0h1m1 0h1m2 0h2m1 0h4m3 0h1m1 0h4M2 16.5h1m2 0h1m2 0h1m1 0h1m1 0h1m2 0h1m5 0h1m2 0h2m2 0h1M1 17.5h2m1 0h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h1m2 0h1m4 0h2M1 18.5h1m3 0h2m1 0h3m2 0h1m3 0h1m2 0h2m1 0h3m1 0h1m1 0h1M1 19.5h1m1 0h2m1 0h2m2 0h1m5 0h2m1 0h1m1 0h5m1 0h1M1 20.5h1m1 0h1m1 0h2m2 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h2m2 0h1M1 21.5h1m1 0h3m1 0h1m1 0h1m3 0h3m2 0h1m1 0h6m1 0h3M9 22.5h1m8 0h2m1 0h1m3 0h5M1 23.5h7m1 0h5m1 0h4m1 0h2m1 0h1m1 0h3M1 24.5h1m5 0h1m4 0h1m7 0h2m3 0h1m2 0h1M1 25.5h1m1 0h3m1 0h1m1 0h1m1 0h8m2 0h5m1 0h1m1 0h1M1 26.5h1m1 0h3m1 0h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h3m1 0h1m1 0h4M1 27.5h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h7M1 28.5h1m5 0h1m1 0h1m1 0h2m2 0h3m3 0h1m1 0h1m1 0h2m1 0h1M1 29.5h7m1 0h1m2 0h3m1 0h3m1 0h1m1 0h4m1 0h1"/></svg>
+</div> </div> </h4> <h1 id="线程">线程</h1>
+<h3 id="线程基本概念">线程基本概念</h3>
+<p>一个”<strong>进程</strong>”代表计算机中实际跑起来的一个程序，在现代操作系统的保护模式下，每个进程拥有自己独立的进程地址空间和上下文堆栈。但是就一个程序本身执行的操作来说，进程其实什么也不做（不执行任何进程代码），它只是提供一个大环境容器，在进程中实际的执行体是”<strong>线程</strong>”。</p>
+<p>线程是进程中实际执行代码的最小单元，它由操作系统安排调度（何时启动、何时运行和暂停以及何时消亡）。</p>
+<p><strong>一个进程至少得有一个线程</strong>，我们把这个线程称之为<strong>主线程</strong>。</p>
+<h4 id="主线程退出支线程也将退出吗">主线程退出，支线程也将退出吗？</h4>
+<p>在<strong>Windows</strong>系统中，当一个进程存在多个线程时，如果主线程执行结束了，那么这个时候即使支线程（也可以叫<strong>工作线程</strong>）还没完成相关的代码执行，支线程也会退出，也就是说，主线程一旦退出整个进程也就结束了。解决这一问题的方案很多，核心就是让主线程不要退出，或者至少在工作线程完成工作之前主线程不要退出。常见的解决方案有主线程启动一个循环或者主线程等待工作线程退出后再退出。</p>
+<p>在<strong>Linux</strong>系统中，如果主线程退出，工作线程一般不会受到影响，还会继续运行下去，但是此时这个进程就会变成所谓的<strong>僵尸进程</strong>，这是一种不好的做法，实际开发中应该避免产生僵尸进程。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span># ps -ef 命令查看系统进程列表时，带有&#x3C;defunct>字样的进程即僵尸进程</span></span></code></pre></div>
+<h4 id="某个线程崩溃会导致进程退出吗">某个线程崩溃，会导致进程退出吗？</h4>
+<p>这是一个常见的面试题，还有一种问法是：<strong>进程中某个线程崩溃，是否会对其他线程造成影响？</strong></p>
+<p>一般来说，每个线程都是独立执行的单位，每个线程都有自己的上下文堆栈，一个线程的崩溃不会对其他线程造成影响。但是通常情况下，一个线程崩溃会产生一个进程内的错误，例如在Linux操作系统中，可能会产生一个<strong>Segment Fault</strong>错误，这个错误会产生一个信号，操作系统默认对这个信号的处理就是结束进程，整个进程都被销毁了，这样的话这个进程中存在的其他线程自然也就不存在了。</p>
+<h3 id="线程的创建">线程的创建</h3>
+<h4 id="linux-线程创建">Linux 线程创建</h4>
+<p>Linux平台上使用pthread库中<strong>pthread_create</strong>这个API来创建线程，其函数签名如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>int pthread_create(pthread_t *thread, </span></span>
+<span class="line"><span>				   const pthread_attr_t *attr,</span></span>
+<span class="line"><span>                   void *(*start_routine) (void *), </span></span>
+<span class="line"><span>                   void *arg);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void* threadfunc(void* arg)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	while (1)</span></span>
+<span class="line"><span>	{</span></span>
+<span class="line"><span>		sleep(1);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>		printf("I am New Thread!\n");</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	return NULL;</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span>pthread_create(&#x26;threadid, NULL, threadfunc, NULL);</span></span></code></pre></div>
+<ul>
+<li>参数<strong>thread</strong>，是一个输出参数，如果线程创建成功，通过这个参数可以得到创建成功的线程ID。</li>
+<li>参数<strong>attr</strong>指定了该线程的属性，一般设置为NULL，表示使用默认属性， 属性可以指定线程堆栈等信息。</li>
+<li>参数<strong>start_routine</strong>指定了线程函数，这里需要注意的是这个函数的调用方式必须是**__cdecl**调用，这是C/C++中定义函数时默认的调用方式。</li>
+</ul>
+<p>也就是说，如下函数的调用方式是等价的：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>//代码片段1：不显式指定函数调用方式，其调用方式为默认的__cdecl</span></span>
+<span class="line"><span>void* start_routine (void* args)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>//代码片段2：显式指定函数调用方式为默认的__cdecl，等价于代码片段1</span></span>
+<span class="line"><span>void* __cdecl start_routine (void* args)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<ul>
+<li>数<strong>arg</strong>，通过这一参数可以在创建线程时将某个参数传入线程函数中，由于这是一个<strong>void</strong>*类型，可以方便我们最大化地传入任意多的信息给线程函数。</li>
+<li>返回值：如果成功创建线程，返回<strong>0</strong>；如果创建失败，则返回响应的错误码，常见的错误码有<strong>EAGAIN</strong>、<strong>EINVAL</strong>、<strong>EPERM</strong>。</li>
+</ul>
+<h4 id="c11提供的stdthread类">C++11提供的std::thread类</h4>
+<p>无论是Linux还是Windows上创建线程的API，都有一个非常不方便的地方，就是线程函数的签名必须是固定的格式（参数个数和类型、返回值类型都有要求）。C++11新标准引入了一个新的类<strong>std::thread</strong>（需要包含头文件<thread>），使用这个类可以将任何签名形式的函数作为线程函数。以下代码分别创建两个线程，线程函数签名不一样：</thread></p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;stdio.h></span></span>
+<span class="line"><span>#include &#x3C;thread></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void threadproc1()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    while (true)</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>        printf("I am New Thread 1!\n");</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void threadproc2(int a, int b)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    while (true)</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>        printf("I am New Thread 2!\n");</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int main()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    //创建线程t1</span></span>
+<span class="line"><span>    std::thread t1(threadproc1);</span></span>
+<span class="line"><span>    //创建线程t2</span></span>
+<span class="line"><span>    std::thread t2(threadproc2, 1, 2);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	//让主线程不要提前退出</span></span>
+<span class="line"><span>    while (true)</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>    return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>当然， <strong>std::thread</strong>在使用上容易犯一个错误，即<strong>std::thread</strong>对象在线程函数运行期间必须是有效的。比如</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;stdio.h></span></span>
+<span class="line"><span>#include &#x3C;thread></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void threadproc()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    while (true)</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>        printf("I am New Thread!\n");</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void func()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    std::thread t(threadproc);</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int main()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    func();</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>    //让主线程不要提前退出</span></span>
+<span class="line"><span>    while (true)</span></span>
+<span class="line"><span>    {</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>    return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>上述代码在<strong>main</strong>函数中调用<strong>func</strong>函数，在<strong>func</strong>函数中创建了一个线程，乍一看代码好像没什么问题，但是实际运行时程序会产生崩溃。崩溃的原因是，当<strong>func</strong>函数调用结束后，<strong>func</strong>中局部变量<strong>t</strong>（<strong>线程对象</strong>）被销毁了，而此时<strong>线程函数</strong>仍然在运行。使用<strong>std::thread</strong>类时，<strong>必须保证线程函数运行期间，其线程对象有效</strong>。这是一个很容易犯的错误，解决这个问题的方法是，<strong>std::thread</strong>对象提供了一个<strong>detach</strong>方法，这个方法让<strong>线程对象</strong>与<strong>线程函数</strong>脱离关系，这样即使<strong>线程对象</strong>被销毁，仍然不影响<strong>线程函数</strong>的运行。我们只需要在<strong>func</strong>函数中调用<strong>detach</strong>方法即可，代码如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>void func()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    std::thread t(threadproc);</span></span>
+<span class="line"><span>    t.detach();</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>然而，在实际开发中，并不推荐这么做，原因是我们可能需要使用<strong>线程对象</strong>去控制和管理线程的运行和生命周期。所以，我们的代码应该尽量保证<strong>线程对象</strong>在线程运行期间有效，而不是单纯地调用<strong>detach</strong>方法使线程对象与线程函数的运行分离。</p>
+<h3 id="线程id">线程ID</h3>
+<p>一个线程创建成功以后，我们可以拿到一个线程ID，线程ID是在整个操作系统范围内是唯一的。我们可以使用线程ID来标识和区分线程，例如在日志文件中，输出日志的同时将输出日志的线程ID一起输出，这样可以方便我们判断和排查问题。创建线程时可以通过<strong>pthread_create</strong>函数的第一个参数<strong>thread</strong> （Linux平台）得到线程的ID。大多数时候，我们需要在当前调用线程中获取当前线程的ID，在Linux平台上可以调用<strong>pthread_self</strong>函数</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>pthread_t pthread_self(void);</span></span></code></pre></div>
+<p>pthread_t是一个32位无符号整型值。</p>
+<h4 id="pstack命令">pstack命令</h4>
+<p>Linux系统中可以通过<strong>pstack</strong>命令查看一个进程的线程数量和每个线程的调用堆栈情况。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>pstack pid</span></span></code></pre></div>
+<p><strong>pid</strong>设置为要查看的进程的ID即可</p>
+<blockquote>
+<p>注意：<strong>pstack</strong>命令查看的程序必须携带调试符号，且所使用的用户必须具有相应的查看权限。</p>
+</blockquote>
+<h4 id="利用pstack命令排查linux进程cpu使用率过高的问题">利用pstack命令排查Linux进程CPU使用率过高的问题</h4>
+<p>在实际开发中，我们经常需要去排查和定位一个进程CPU占用率过高的问题，如何排查呢？这里可以使用Linux <strong>top</strong>和<strong>pstack</strong>命令结合使用来排查。</p>
+<blockquote>
+<p>top命令的-H选项的作用是显示每个一个进程的各个线程运行状态（线程模式）。top命令第一栏虽然输出还叫PID，但此时显示的实际是每个线程的线程ID</p>
+</blockquote>
+<p>在pstack输出的各个线程中，只要逐一对照我们的程序源码来梳理下该线程中是否有大多数时间都处于空转的逻辑，然后修改和优化这些逻辑就可以解决CPU使用率过高的问题了，一般情况下，不工作的线程应尽量使用锁对象让其挂起，而不是空转，这样可以提高系统资源利用率</p>
+<h4 id="linux系统线程id的本质">Linux系统线程ID的本质</h4>
+<p>Linux系统中有三种方式可以获取一个线程的ID：</p>
+<p><strong>方法一</strong></p>
+<p>调用<strong>pthread_create</strong>函数时，第一个参数在函数调用成功后可以得到线程ID：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;pthread.h></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>pthread_t tid;</span></span>
+<span class="line"><span>pthread_create(&#x26;tid, NULL, thread_proc, NULL);</span></span></code></pre></div>
+<p><strong>方法二</strong></p>
+<p>在需要获取ID的线程中调用**pthread_self()**函数获取。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;pthread.h></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>pthread_t tid = pthread_self();</span></span></code></pre></div>
+<p><strong>方法三</strong></p>
+<p>通过系统调用获取线程ID。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;sys/syscall.h></span></span>
+<span class="line"><span>#include &#x3C;unistd.h></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int tid = syscall(SYS_gettid);</span></span></code></pre></div>
+<p><strong>方法一</strong>和<strong>方法二</strong>获取的线程ID结果是一样的，这是一个<strong>pthread_t</strong>类型，输出时本质上是一块内存空间地址, struct pthread的起始地址。</p>
+<p>由于不同的进程可能有同样地址的内存块，因此<strong>方法一</strong>和<strong>方法二</strong>获取的线程ID可能不是全系统唯一的，一般是一个很大的数字（内存地址）。而<strong>方法三</strong>获取的线程ID是系统范围内全局唯一的，一般是一个不会太大的整数，这个数字也是就是所谓的LWP （Light Weight Process，轻量级进程，早期的Linux系统的线程是通过进程来实现的，这种线程被称为轻量级进程）的ID。</p>
+<h4 id="c11的获取当前线程id的方法">C++11的获取当前线程ID的方法</h4>
+<p>C++11的线程库可以使用<strong>std::this_thread</strong>类的<strong>get_id</strong>获取当前线程的ID，这是一个类静态方法。</p>
+<p>当然也可以使用<strong>std::thread</strong>的<strong>get_id</strong>获取指定线程的ID，这是一个类实例方法。</p>
+<p>但是<strong>get_id</strong>方法返回的是一个包装类型为<strong>std::thread::id</strong>的对象，不可以直接强转成整型，C++11线程库也没有为该对象提供任何转换成整型的接口。所以，我们一般使用<strong>std::cout</strong>这样的输出流来输出，或者先转换为<strong>std::ostringstream</strong>对象，再转换成字符串类型，然后把字符串类型转换成我们需要的整型。这一点，算是C++11线程库获取线程ID一个不太方便的地方。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>	//先将std::thread::id转换成std::ostringstream对象</span></span>
+<span class="line"><span>    std::ostringstream oss;</span></span>
+<span class="line"><span>    oss &#x3C;&#x3C; main_thread_id;</span></span>
+<span class="line"><span>    //再将std::ostringstream对象转换成std::string</span></span>
+<span class="line"><span>    std::string str = oss.str();</span></span>
+<span class="line"><span>    std::cout &#x3C;&#x3C; "main thread id: " &#x3C;&#x3C; str &#x3C;&#x3C; std::endl;</span></span>
+<span class="line"><span>    //最后将std::string转换成整型值</span></span>
+<span class="line"><span>    unsigned long long threadid = std::stoull(str);</span></span>
+<span class="line"><span></span></span></code></pre></div>
+<h3 id="等待线程结束">等待线程结束</h3>
+<h4 id="linux下等待线程结束">Linux下等待线程结束</h4>
+<p>Linux线程库提供了<strong>pthread_join</strong>函数，用来等待某线程的退出并接收它的返回值。这种操作被称为<strong>汇接</strong>（join），<strong>pthread_join</strong>函数签名如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>int pthread_join(pthread_t thread, void** retval);</span></span></code></pre></div>
+<ul>
+<li>参数<strong>thread</strong>，需要等待的线程ID。</li>
+<li>参数<strong>retval</strong>，输出参数，用于接收等待退出的线程的退出码（<strong>Exit Code</strong>），线程退出码可以通过调用<strong>pthread_exit</strong>退出线程时指定，也可以在线程函数中通过<strong>return</strong>语句返回。 <strong>pthread_exit</strong>函数的签名如下：</li>
+</ul>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;pthread.h></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void pthread_exit(void* value_ptr); </span></span></code></pre></div>
+<p>参数<strong>value_ptr</strong>的值可以通过<strong>pthread_join</strong>函数的第二个参数得到，如果不需要使用这个参数，可以设置为NULL。</p>
+<p><strong>pthread_join函数等待目标线程退出期间会挂起当前线程（调用pthread_join的线程）</strong>，被挂起的线程处于等待状态，不会消耗任何CPU时间片。直到目标线程退出后，调用pthread_join的线程会被唤醒，继续执行接下来的逻辑。</p>
+<h4 id="c11提供的等待线程结果函数">C++11提供的等待线程结果函数</h4>
+<p>C++11的<strong>std::thread</strong>既然统一了Linux和Windows的线程创建函数，那么它应该也提供等待线程退出的接口，确实如此，<strong>std::thread</strong>的<strong>join</strong>方法就是用来等待线程退出的函数。当然使用这个函数时，必须保证该线程还处于运行中状态，也就是说等待的线程必须是可以”<strong>join</strong>” 的，<strong>如果需要等待的线程已经退出，此时调用join方法，程序会产生崩溃</strong>。因此，C++11的线程库同时提供了一个<strong>joinable</strong>方法来判断某个线程是否可以join，如果不确定当前线程是否可以”join”，可以先调用<strong>joinable</strong>函数判断一下是否可以”join”。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>std::thread t(FileThreadFunc);</span></span>
+<span class="line"><span>    if (t.joinable())</span></span>
+<span class="line"><span>        t.join();</span></span></code></pre></div>
+<h3 id="线程函数传c类实例指针惯用法">线程函数传C++类实例指针惯用法</h3>
+<p>如果使用C++面向对象的方式对线程函数进行封装，那么线程函数就不能是类的实例方法，即必须是类的静态方法。那么，为什么不能是类的实例方法呢？我们以Linux的线程函数签名为例：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>void* threadFunc(void* arg);</span></span></code></pre></div>
+<p>假设我们将线程的基本功能封装到一个 <strong>Thread</strong> 类中，部分代码如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>class Thread</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>public:</span></span>
+<span class="line"><span>    Thread();</span></span>
+<span class="line"><span>    ~Thread();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    void start();</span></span>
+<span class="line"><span>    void stop();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    void* threadFunc(void* arg);</span></span>
+<span class="line"><span>};</span></span></code></pre></div>
+<p>由于<strong>threadFunc</strong>是一个类实例方法，无论是类的实例方法还是静态方法，C++编译器在编译时都会将这些函数”翻译”成全局函数，即去掉类的域限制。对于实例方法，为了保证类方法的正常功能，C++编译器在翻译时，会将类的实例对象地址（也就是this指针）作为第一个参数传递给该方法，也就是说，翻译后的<strong>threadFunc</strong>的签名变成了如下形式（伪代码）：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>void* threadFunc(Thread* this, void* arg);</span></span></code></pre></div>
+<p>这样的话，就不符合线程函数签名要求了。<strong>因此如果使用类方法作为线程函数则只能是类的静态方法而不能是类的实例方法</strong>。</p>
+<p>当然，如果是使用C++11的<strong>std::thread</strong>类就没有这个限制，即使类成员函数是类的实例方法也可以，但是必须显式地将线程函数所属的类对象实例指针（在类的内部就是<strong>this</strong>指针）作为构造函数参数传递给<strong>std::thread</strong>，还是需要传递类的this指针，这在本质上是一样的。</p>
+<p>综上所述，如果不使用C++11的语法，那么线程函数只能使用类的静态方法，且函数签名必须符合线程函数的签名要求。如果是类的静态方法，那么就没法访问类的实例方法了，为了解决这个问题，我们在实际开发中往往会在创建线程时将当前对象的地址（<strong>this</strong>指针）传递给线程函数，然后在线程函数中，将该指针转换成原来的类实例，再通过这个实例就可以访问类的所有方法了。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>pthread_create(&#x26;m_hThread,NULL,&#x26;_ThreadEntry , this); //使用显式的 &#x26;</span></span>
+<span class="line"><span>pthread_create(&#x26;m_hThread,NULL,_ThreadEntry , this); // 隐式的函数指针转换</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void* CThread::_ThreadEntry(void* pParam)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	CThread *pThread = (CThread *)pParam;</span></span>
+<span class="line"><span>    </span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>那么类的实例方法就一定不能作为线程函数了吗？不一定，在C++11语法中我们可以使用<strong>std::bind</strong>这一工具来给线程函数绑定一个this指针，这样就能使用类实例方法作为线程函数了，</p>
+<h3 id="线程局部储存">线程局部储存</h3>
+<p>线程独有的：线程栈，TLS，线程ID，寄存器，信号屏蔽字，优先级</p>
+<p><strong>堆内存是进程共享的资源</strong>，所有线程都可以访问和操作堆中的数据</p>
+<p>对于一个存在多个线程的进程来说，有时候我们需要有一份数据是每个线程都拥有一份的，也就是说每个线程自己操作自己的这份数据，这有点类似 C++ 类的实例属性，每个实例对象操作的都是自己的属性。我们把这样的数据称之为<strong>线程局部存储</strong>（<strong>Thread Local Storage</strong>，<strong>TLS</strong>），对应的存储区域叫做<strong>线程局部存储区</strong>。</p>
+<h4 id="linux-的线程局部存储">Linux 的线程局部存储</h4>
+<p>Linux 系统上的 NPTL （Native POSIX Threads Library，NPTL is the GNU C library POSIX threads implementation that is used on modern Linux systems）提供了一套函数接口来实现线程局部存储的功能：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>int pthread_key_create(pthread_key_t* key, void (*destructor)(void*));</span></span>
+<span class="line"><span>int pthread_key_delete(pthread_key_t key);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int pthread_setspecific(pthread_key_t key, const void* value);</span></span>
+<span class="line"><span>void* pthread_getspecific(pthread_key_t key);</span></span></code></pre></div>
+<p><strong>pthread_key_create</strong> 函数调用成功会返回 0 值，调用失败返回非 0 值，函数调用成功会为线程局部存储创建一个新键，用户通过参数 <strong>key</strong> 去设置（调用 <strong>pthread_setspecific</strong>）和获取（<strong>pthread_getspecific</strong>）数据，因为进程中的所有线程都可以使用返回的键，所以参数 <strong>key</strong> 应该指向一个全局变量。</p>
+<p>参数 <strong>destructor</strong> 是一个自定义函数指针，其签名是：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>void* destructor(void* value)</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    /*多是为了释放value指针指向的资源*/</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>线程终止时，如果 key 关联的值不是 NULL，那么 NTPL 会自动执行定义的 destructor 函数；如果无须析构，可以将 destructor 设置为 NULL。</p>
+<h4 id="c-11-的-thread_local-关键字">C++ 11 的 thread_local 关键字</h4>
+<p>C++ 11 标准提供了一个新的关键字 <strong>thread_local</strong> 来定义一个线程变量。使用方法如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>thread_local int g_mydata = 1;</span></span></code></pre></div>
+<p>有了这个关键字，使用线程局部存储的代码就可以同时在 Windows 和 Linux 上运行了。示例如下：</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>#include &#x3C;thread></span></span>
+<span class="line"><span>#include &#x3C;chrono></span></span>
+<span class="line"><span>#include &#x3C;iostream></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>thread_local int g_mydata = 1;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void thread_func1()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	while (true)</span></span>
+<span class="line"><span>	{</span></span>
+<span class="line"><span>		++g_mydata;</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>void thread_func2()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	while (true)</span></span>
+<span class="line"><span>	{</span></span>
+<span class="line"><span>		std::cout &#x3C;&#x3C; "g_mydata = " &#x3C;&#x3C; g_mydata &#x3C;&#x3C; ", ThreadID = " &#x3C;&#x3C; std::this_thread::get_id() &#x3C;&#x3C; std::endl;</span></span>
+<span class="line"><span>		std::this_thread::sleep_for(std::chrono::seconds(1));</span></span>
+<span class="line"><span>	}</span></span>
+<span class="line"><span>}</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>int main()</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>	std::thread t1(thread_func1);</span></span>
+<span class="line"><span>	std::thread t2(thread_func2);</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	t1.join();</span></span>
+<span class="line"><span>	t2.join();</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>	return 0;</span></span>
+<span class="line"><span>}</span></span></code></pre></div>
+<p>注意：</p>
+<ul>
+<li>对于线程变量，每个线程都会有该变量的一个拷贝，互不干扰，该局部变量一直都在，直到线程退出为止。</li>
+<li>系统的线程局部存储区域内存空间并不大，所以尽量不要利用这个空间存储大的数据块，如果不得不使用大的数据块，可以将大的数据块存储在堆内存中，再将该堆内存的地址指针存储在线程局部存储区域。</li>
+</ul>  </div> </article> <aside class="post-toc" id="J_post_toc" aria-label="On this page"> <div class="post-toc-inner"> <nav class="post-toc-nav" id="J_post_toc_nav"> <a class="post-toc-link" href="#线程基本概念" data-toc-id="线程基本概念">线程基本概念</a><a class="post-toc-link" href="#线程的创建" data-toc-id="线程的创建">线程的创建</a><a class="post-toc-link" href="#线程id" data-toc-id="线程id">线程ID</a><a class="post-toc-link" href="#等待线程结束" data-toc-id="等待线程结束">等待线程结束</a><a class="post-toc-link" href="#线程函数传c类实例指针惯用法" data-toc-id="线程函数传c类实例指针惯用法">线程函数传C++类实例指针惯用法</a><a class="post-toc-link" href="#线程局部储存" data-toc-id="线程局部储存">线程局部储存</a> </nav> </div> </aside> </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="cpp-threads" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/distributed-transactions/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>分布式事务实现方式详解</h3> <p>【2024-12-03】详细介绍分布式事务的概念、产生原因、应用场景以及常见的解决方案，包括XA协议两阶段提交、三阶段提交、基于消息的最终一致性和TCC编程模式</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

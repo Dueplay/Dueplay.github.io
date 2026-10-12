@@ -1,0 +1,398 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>链表常见题型与技巧 · Dueplay</title><meta name="description" content="链表的基本操作和常见面试题解法，包括反转、环形检测、归并等"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/linked-list/"><meta property="og:type" content="article"><meta property="og:title" content="链表常见题型与技巧 · Dueplay"><meta property="og:description" content="链表的基本操作和常见面试题解法，包括反转、环形检测、归并等"><meta property="og:url" content="https://dueplay.github.io/posts/linked-list/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">链表常见题型与技巧</h1> <h4 class="page-info"> <span>Categories: Data Structure</span> <time datetime="2024-03-10T00:00:00.000Z">2024-03-10</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m1 0h1m2 0h4m3 0h1m1 0h1m1 0h7M1 2.5h1m5 0h1m1 0h3m1 0h1m1 0h1m1 0h3m3 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m3 0h4m2 0h3m1 0h1m1 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m3 0h1m2 0h3m1 0h2m3 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m1 0h4m1 0h2m3 0h1m3 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h1m2 0h1m2 0h1m5 0h1m1 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M9 8.5h1m1 0h3m2 0h2m1 0h1m1 0h1M1 9.5h3m2 0h2m1 0h3m3 0h1m1 0h1m2 0h1m1 0h4m2 0h2M1 10.5h5m3 0h3m2 0h1m1 0h3m1 0h2m1 0h2m3 0h2M5 11.5h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m3 0h2m2 0h4m1 0h1M2 12.5h1m1 0h1m3 0h1m1 0h1m4 0h1m3 0h1m6 0h1M2 13.5h2m2 0h2m1 0h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m5 0h1M2 14.5h2m1 0h2m2 0h2m2 0h2m1 0h3m1 0h2m1 0h2m3 0h2M1 15.5h1m1 0h1m3 0h1m1 0h1m3 0h2m1 0h2m2 0h4m1 0h1m3 0h1M2 16.5h1m2 0h1m6 0h2m3 0h1m1 0h1m1 0h2m1 0h1M1 17.5h1m3 0h1m1 0h2m1 0h2m5 0h1m2 0h1m2 0h2m4 0h1M2 18.5h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h2m1 0h6m2 0h3M1 19.5h3m3 0h1m1 0h1m1 0h2m1 0h3m1 0h3m1 0h1m2 0h2m2 0h1M5 20.5h1m2 0h2m5 0h3m4 0h1m1 0h1M1 21.5h4m1 0h8m3 0h1m3 0h6m1 0h1M9 22.5h3m1 0h1m1 0h2m1 0h1m2 0h1m3 0h3m1 0h1M1 23.5h7m5 0h1m1 0h2m4 0h1m1 0h1m1 0h1m3 0h1M1 24.5h1m5 0h1m1 0h2m1 0h2m1 0h2m2 0h3m3 0h1M1 25.5h1m1 0h3m1 0h1m3 0h1m1 0h1m2 0h1m3 0h7M1 26.5h1m1 0h3m1 0h1m2 0h2m3 0h3m1 0h3m2 0h4m1 0h1M1 27.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m2 0h2M1 28.5h1m5 0h1m1 0h1m1 0h3m3 0h1m1 0h1m1 0h3m2 0h1M1 29.5h7m1 0h3m1 0h1m1 0h2m4 0h2m2 0h2m2 0h1"/></svg>
+</div> </div> </h4> <h2 id="链表基本操作">链表基本操作</h2>
+<h3 id="单链表">单链表</h3>
+<p><strong>插入</strong>：node 为要插入位置前的节点</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">newNode->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->next;</span></span>
+<span class="line"><span style="color:#24292E">node->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span></code></pre></div>
+<p><strong>删除</strong>：node 为要删除节点前的节点，即 node->next = deleteNode;</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">node->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->next->next;</span></span></code></pre></div>
+<h3 id="双链表">双链表</h3>
+<p><strong>插入</strong>：node 为要插入位置前的节点</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">newNode->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->next;</span></span>
+<span class="line"><span style="color:#24292E">newNode->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node;</span></span>
+<span class="line"><span style="color:#24292E">newNode->next->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span>
+<span class="line"><span style="color:#24292E">newNode->pre->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span></code></pre></div>
+<p><strong>删除</strong>：node 为要删除节点前的节点，即 node->next = deleteNode;</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">node->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->next->next;</span></span>
+<span class="line"><span style="color:#24292E">node->next->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node;</span></span></code></pre></div>
+<h3 id="单向循环链表">单向循环链表</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#6A737D">// 尾插法插入，tail = head;</span></span>
+<span class="line"><span style="color:#24292E">newNode->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail->next;</span></span>
+<span class="line"><span style="color:#24292E">tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span>
+<span class="line"><span style="color:#24292E">tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span></code></pre></div>
+<h3 id="双向循环链表">双向循环链表</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#24292E">head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">head->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#6A737D">// 尾插法插入，tail = head;</span></span>
+<span class="line"><span style="color:#24292E">newNode->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail->next;</span></span>
+<span class="line"><span style="color:#24292E">newNode->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail;</span></span>
+<span class="line"><span style="color:#24292E">tail->next->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span>
+<span class="line"><span style="color:#24292E">tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span>
+<span class="line"><span style="color:#24292E">tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> newNode;</span></span></code></pre></div>
+<h3 id="操作模板">操作模板</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 双链表，在 p 后面新建节点的操作模板</span></span>
+<span class="line"><span style="color:#6F42C1">Node</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> AddNode</span><span style="color:#24292E">(</span><span style="color:#6F42C1">Node</span><span style="color:#D73A49">*</span><span style="color:#E36209"> p</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> idx</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    Node</span><span style="color:#D73A49">*</span><span style="color:#24292E"> q </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">    q->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> p, q->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> p->next;</span></span>
+<span class="line"><span style="color:#24292E">    p->next->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> q, p->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> q;</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> q;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 双链表，删除节点 p 的操作模板</span></span>
+<span class="line"><span style="color:#D73A49">void</span><span style="color:#6F42C1"> DeleteNode</span><span style="color:#24292E">(</span><span style="color:#6F42C1">Node</span><span style="color:#D73A49">*</span><span style="color:#E36209"> p</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    p->pre->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> p->next;</span></span>
+<span class="line"><span style="color:#24292E">    p->next->pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> p->pre;</span></span>
+<span class="line"><span style="color:#D73A49">    delete</span><span style="color:#24292E"> p;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h2 id="常见题型">常见题型</h2>
+<h3 id="1-反转链表">1. 反转链表</h3>
+<p><strong>法一</strong>：原链表节点依次取下来然后头插法插入新链表。</p>
+<p><strong>法二</strong>：更改每个节点的 next 指针，第一个节点的 next 修改为 nullptr（没有保护节点的情况），第二个节点的 next 修改为指向前一个节点。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> reverseList</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 更改 next 指针指向前一个节点</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">last </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (head) {</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">head_next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">        head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> last;</span><span style="color:#6A737D"> // 修改 next 指向前一个</span></span>
+<span class="line"><span style="color:#24292E">        last </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">        head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head_next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> last;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="2-k-个一组翻转链表">2. K 个一组翻转链表</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Solution</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#6F42C1">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> reverseKGroup</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> k</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">dummy </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> ListNode</span><span style="color:#24292E">(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, head);</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">last </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummy, </span><span style="color:#D73A49">*</span><span style="color:#24292E">nextGroup </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">, </span><span style="color:#D73A49">*</span><span style="color:#24292E">end </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">            end </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> getEnd</span><span style="color:#24292E">(head, k);</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (end </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">            nextGroup </span><span style="color:#D73A49">=</span><span style="color:#24292E"> end->next;</span></span>
+<span class="line"><span style="color:#6A737D">            // 翻转 [head->end] 为 [head&#x3C;-end]</span></span>
+<span class="line"><span style="color:#6F42C1">            reverse</span><span style="color:#24292E">(head, end);</span></span>
+<span class="line"><span style="color:#6A737D">            // 连接上一组和下一组</span></span>
+<span class="line"><span style="color:#24292E">            last->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> end;</span></span>
+<span class="line"><span style="color:#24292E">            head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> nextGroup;</span></span>
+<span class="line"><span style="color:#6A737D">            // 迭代下一组</span></span>
+<span class="line"><span style="color:#24292E">            last </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">            head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> nextGroup;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> dummy->next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#6F42C1">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> getEnd</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">head</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> k</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> (</span><span style="color:#D73A49">int</span><span style="color:#24292E"> i </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span><span style="color:#24292E">; i </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> k </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">; i</span><span style="color:#D73A49">++</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">            head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#6A737D">    // 翻转 [head, end] 之间的链表</span></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> reverse</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">head</span><span style="color:#24292E">, </span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">end</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">==</span><span style="color:#24292E"> end) </span><span style="color:#D73A49">return</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> last </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">        head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">!=</span><span style="color:#24292E"> end) {</span></span>
+<span class="line"><span style="color:#24292E">            ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> headNext </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">            head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> last;</span></span>
+<span class="line"><span style="color:#24292E">            last </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">            head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> headNext;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        end->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> last;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">};</span></span></code></pre></div>
+<h3 id="3-环形链表">3. 环形链表</h3>
+<p><strong>快慢指针法</strong>，fast 一次走两步，slow 一次走一步。O(length) 时间，O(1) 空间。</p>
+<p>有环必定发生套圈（快慢指针相遇），无环不会发生套圈（快指针到达 null）。</p>
+<p>快慢指针还可以用来找链表的中间节点，当 fast 为 null 时，slow 指向中间节点。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">bool</span><span style="color:#6F42C1"> hasCycle</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head, </span><span style="color:#D73A49">*</span><span style="color:#24292E">slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (fast </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#D73A49"> &#x26;&#x26;</span><span style="color:#24292E"> fast->next </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fast->next->next;</span></span>
+<span class="line"><span style="color:#24292E">        slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slow->next;</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (fast </span><span style="color:#D73A49">==</span><span style="color:#24292E"> slow) {</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#005CC5"> true</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> false</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="4-找到环开始位置">4. 找到环开始位置</h3>
+<p>定义快慢指针，两者在 st 相遇时：r 为环的长度</p>
+<ul>
+<li>slow 指针所走：l + p</li>
+<li>fast 指针所走：l + p + k * r，k >= 1</li>
+</ul>
+<p>速度两倍关系：2(l + p) = l + p + k * r</p>
+<p>得到 l = k * r - p = (k-1)r + (r - p)</p>
+<p><strong>含义</strong>：从 head 走到 st，等于从 meet 走到 st，然后再绕几圈。</p>
+<p>此时开始让慢指针与 head 同时移动，必定在环的起始点相遇。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#6F42C1">detectCycle</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (fast </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#D73A49"> &#x26;&#x26;</span><span style="color:#24292E"> fast->next </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fast->next->next;</span></span>
+<span class="line"><span style="color:#24292E">        slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slow->next;</span></span>
+<span class="line"><span style="color:#6A737D">        // 相遇</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (fast </span><span style="color:#D73A49">==</span><span style="color:#24292E"> slow) {</span></span>
+<span class="line"><span style="color:#D73A49">            while</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">!=</span><span style="color:#24292E"> slow) {</span></span>
+<span class="line"><span style="color:#24292E">                head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">                slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slow->next;</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="5-双指针-first-和-second">5. 双指针 first 和 second</h3>
+<p>first = second + k，当 first 到达 null，second 指向倒数第 k 个节点。</p>
+<p>要删除倒数的第 k 个节点，可以添加一个保护头节点，然后 first = second + k + 1，first 为 null 时，second 指向要删除节点的前一个节点。</p>
+<h3 id="6-两个有序链表归并">6. 两个有序链表归并</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> mergeTwoLists</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> list1</span><span style="color:#24292E">, </span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> list2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list1 </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> list2;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list2 </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> list1;</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">head </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> ListNode</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (list1 </span><span style="color:#D73A49">&#x26;&#x26;</span><span style="color:#24292E"> list2) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (list1->val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> list2->val) {</span></span>
+<span class="line"><span style="color:#24292E">            tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list1;</span></span>
+<span class="line"><span style="color:#24292E">            list1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list1->next;</span></span>
+<span class="line"><span style="color:#24292E">        } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">            tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list2;</span></span>
+<span class="line"><span style="color:#24292E">            list2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list2->next;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail->next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list1) </span></span>
+<span class="line"><span style="color:#24292E">        tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list1;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list2) </span></span>
+<span class="line"><span style="color:#24292E">        tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> list2;</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 递归写法</span></span>
+<span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> mergeTwoLists</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> list1</span><span style="color:#24292E">, </span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> list2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list1 </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> list2;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list2 </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> list1;</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (list1->val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> list2->val) {</span></span>
+<span class="line"><span style="color:#24292E">        list1->next </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> mergeTwoLists</span><span style="color:#24292E">(list1->next, list2);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> list1;</span></span>
+<span class="line"><span style="color:#24292E">    } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">        list2->next </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> mergeTwoLists</span><span style="color:#24292E">(list2->next, list1);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> list2;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="合并多个有序链表">合并多个有序链表</h3>
+<p><strong>法1</strong>：两两合并为一个新的，然后再与剩下的合并。</p>
+<p><strong>法2</strong>：优先队列让 val 小的元素处于队头，维护当前每个链表没有被合并的元素的最前面一个，k 个链表就最多有 k 个满足这样条件的元素，每次在这些元素里面选取 val 属性最小的元素合并到答案中。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Compare</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#6A737D">    // node1 > node2，则 node2 的优先级更高</span></span>
+<span class="line"><span style="color:#D73A49">    bool</span><span style="color:#D73A49"> operator</span><span style="color:#6F42C1">()</span><span style="color:#24292E">(</span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node1</span><span style="color:#24292E">, </span><span style="color:#D73A49">const</span><span style="color:#6F42C1"> ListNode</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> node1->val </span><span style="color:#D73A49">></span><span style="color:#24292E"> node2->val;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">};</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Solution</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#6F42C1">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> mergeKLists</span><span style="color:#24292E">(</span><span style="color:#6F42C1">vector</span><span style="color:#24292E">&#x3C;</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E">></span><span style="color:#D73A49">&#x26;</span><span style="color:#E36209"> lists</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 维护一个优先队列，最小元素具有最高优先级，位于队头</span></span>
+<span class="line"><span style="color:#24292E">        priority_queue</span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E">ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">, vector</span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E">ListNode </span><span style="color:#D73A49">*></span><span style="color:#24292E">, Compare</span><span style="color:#D73A49">></span><span style="color:#24292E"> q;</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> (ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">list : lists) {</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (list </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span><span style="color:#6A737D"> // 队头入队</span></span>
+<span class="line"><span style="color:#24292E">                q.</span><span style="color:#6F42C1">push</span><span style="color:#24292E">(list);</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">dummyHead </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> ListNode</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummyHead;</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (</span><span style="color:#D73A49">!</span><span style="color:#24292E">q.</span><span style="color:#6F42C1">empty</span><span style="color:#24292E">()) {</span></span>
+<span class="line"><span style="color:#24292E">            ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">minNode </span><span style="color:#D73A49">=</span><span style="color:#24292E"> q.</span><span style="color:#6F42C1">top</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">            q.</span><span style="color:#6F42C1">pop</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">            tail->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> minNode;</span></span>
+<span class="line"><span style="color:#24292E">            tail </span><span style="color:#D73A49">=</span><span style="color:#24292E"> minNode;</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (minNode->next </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">                // 最小节点所在链表的下一个节点入队</span></span>
+<span class="line"><span style="color:#24292E">                q.</span><span style="color:#6F42C1">push</span><span style="color:#24292E">(minNode->next);</span></span>
+<span class="line"><span style="color:#24292E">            }</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> dummyHead->next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">};</span></span></code></pre></div>
+<h3 id="7-单个链表的排序">7. 单个链表的排序</h3>
+<p><strong>插入排序</strong>，O(n²)</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> sortList</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">    // 插入排序</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">return</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">pre </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">dummy </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> ListNode</span><span style="color:#24292E">(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, head);</span></span>
+<span class="line"><span style="color:#24292E">    head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">    dummy->next->next </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (head </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">tem </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">        head </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#24292E">        pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummy;</span></span>
+<span class="line"><span style="color:#6A737D">        // 找到要插入位置</span></span>
+<span class="line"><span style="color:#D73A49">        while</span><span style="color:#24292E"> (pre->next </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#24292E"> (pre->next->val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> tem->val) {</span></span>
+<span class="line"><span style="color:#24292E">                pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> pre->next;</span></span>
+<span class="line"><span style="color:#24292E">            } </span><span style="color:#D73A49">else</span></span>
+<span class="line"><span style="color:#D73A49">                break</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        tem->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> pre->next;</span></span>
+<span class="line"><span style="color:#24292E">        pre->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tem;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    pre </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummy->next;</span></span>
+<span class="line"><span style="color:#D73A49">    delete</span><span style="color:#24292E"> dummy;</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> pre;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<p><strong>归并排序</strong></p>
+<p>从链表中间分为左右两个链表，分别对左右链表进行排序（递归），再合并左右链表。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> sortList</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (</span><span style="color:#D73A49">!</span><span style="color:#24292E">head </span><span style="color:#D73A49">||</span><span style="color:#D73A49"> !</span><span style="color:#24292E">head->next) </span><span style="color:#D73A49">return</span><span style="color:#24292E"> head;</span><span style="color:#6A737D"> // 基本情况</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">mid </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> split</span><span style="color:#24292E">(head);</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">left </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> sortList</span><span style="color:#24292E">(head);</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">right </span><span style="color:#D73A49">=</span><span style="color:#6F42C1"> sortList</span><span style="color:#24292E">(mid);</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#6F42C1"> merge</span><span style="color:#24292E">(left, right);</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 合并两个有序链表的函数</span></span>
+<span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> merge</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> l1</span><span style="color:#24292E">, </span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> l2</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> dummyHead </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> ListNode</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">cur </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummyHead;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (l1 </span><span style="color:#D73A49">&#x26;&#x26;</span><span style="color:#24292E"> l2) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (l1->val </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> l2->val) {</span></span>
+<span class="line"><span style="color:#24292E">            cur->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> l1;</span></span>
+<span class="line"><span style="color:#24292E">            l1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> l1->next;</span></span>
+<span class="line"><span style="color:#24292E">        } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">            cur->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> l2;</span></span>
+<span class="line"><span style="color:#24292E">            l2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> l2->next;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">        cur </span><span style="color:#D73A49">=</span><span style="color:#24292E"> cur->next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    cur->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (l1 </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">) </span><span style="color:#D73A49">?</span><span style="color:#24292E"> l1 </span><span style="color:#D73A49">:</span><span style="color:#24292E"> l2;</span></span>
+<span class="line"><span style="color:#24292E">    cur </span><span style="color:#D73A49">=</span><span style="color:#24292E"> dummyHead->next;</span></span>
+<span class="line"><span style="color:#D73A49">    delete</span><span style="color:#24292E"> dummyHead;</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> cur;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 找到链表中点并断开的函数，返回后一半链表的开头</span></span>
+<span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> split</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    ListNode </span><span style="color:#D73A49">*</span><span style="color:#24292E">fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head, </span><span style="color:#D73A49">*</span><span style="color:#24292E">slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head, </span><span style="color:#D73A49">*</span><span style="color:#24292E">prev </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (fast </span><span style="color:#D73A49">&#x26;&#x26;</span><span style="color:#24292E"> fast->next) {</span></span>
+<span class="line"><span style="color:#24292E">        prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slow;</span></span>
+<span class="line"><span style="color:#24292E">        slow </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slow->next;</span></span>
+<span class="line"><span style="color:#24292E">        fast </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fast->next->next;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (prev) prev->next </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span><span style="color:#6A737D"> // 从 slow 处断开</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> slow;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>
+<h3 id="8-双链表实现-lru">8. 双链表实现 LRU</h3>
+<p>可以 O(1) 的平均时间复杂度删除和查询节点。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> LRUCache</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">public:</span></span>
+<span class="line"><span style="color:#6F42C1">    LRUCache</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> capacity</span><span style="color:#24292E">) : </span><span style="color:#6F42C1">capacity_</span><span style="color:#24292E">(capacity) {</span></span>
+<span class="line"><span style="color:#6A737D">        // 两个保护节点</span></span>
+<span class="line"><span style="color:#24292E">        head </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">        tail </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E">();</span></span>
+<span class="line"><span style="color:#24292E">        head->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail;</span></span>
+<span class="line"><span style="color:#24292E">        tail->prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#D73A49">    int</span><span style="color:#6F42C1"> get</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> key</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (nodes.</span><span style="color:#6F42C1">find</span><span style="color:#24292E">(key) </span><span style="color:#D73A49">==</span><span style="color:#24292E"> nodes.</span><span style="color:#6F42C1">end</span><span style="color:#24292E">()) </span><span style="color:#D73A49">return</span><span style="color:#D73A49"> -</span><span style="color:#005CC5">1</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        Node </span><span style="color:#D73A49">*</span><span style="color:#24292E">node </span><span style="color:#D73A49">=</span><span style="color:#24292E"> nodes[key];</span></span>
+<span class="line"><span style="color:#6A737D">        // 访问后节点放在链表末尾</span></span>
+<span class="line"><span style="color:#6F42C1">        remove</span><span style="color:#24292E">(node);</span></span>
+<span class="line"><span style="color:#6F42C1">        insert</span><span style="color:#24292E">(node);</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> node->val;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> put</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> key</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> value</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#6A737D">        // key 已经存在</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (nodes.</span><span style="color:#6F42C1">find</span><span style="color:#24292E">(key) </span><span style="color:#D73A49">!=</span><span style="color:#24292E"> nodes.</span><span style="color:#6F42C1">end</span><span style="color:#24292E">()) {</span></span>
+<span class="line"><span style="color:#24292E">            nodes[key]->val </span><span style="color:#D73A49">=</span><span style="color:#24292E"> value;</span></span>
+<span class="line"><span style="color:#6F42C1">            remove</span><span style="color:#24292E">(nodes[key]);</span></span>
+<span class="line"><span style="color:#6F42C1">            insert</span><span style="color:#24292E">(nodes[key]);</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">        } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">            Node </span><span style="color:#D73A49">*</span><span style="color:#24292E">node </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> new</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E">(key, value);</span></span>
+<span class="line"><span style="color:#6F42C1">            insert</span><span style="color:#24292E">(node);</span></span>
+<span class="line"><span style="color:#24292E">            nodes.</span><span style="color:#6F42C1">insert</span><span style="color:#24292E">({key, node});</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (nodes.</span><span style="color:#6F42C1">size</span><span style="color:#24292E">() </span><span style="color:#D73A49">></span><span style="color:#24292E"> capacity_) {</span></span>
+<span class="line"><span style="color:#24292E">            Node </span><span style="color:#D73A49">*</span><span style="color:#24292E">node </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head->next;</span></span>
+<span class="line"><span style="color:#6F42C1">            remove</span><span style="color:#24292E">(node);</span></span>
+<span class="line"><span style="color:#D73A49">            auto</span><span style="color:#24292E"> it </span><span style="color:#D73A49">=</span><span style="color:#24292E"> nodes.</span><span style="color:#6F42C1">find</span><span style="color:#24292E">(node->key);</span></span>
+<span class="line"><span style="color:#24292E">            nodes.</span><span style="color:#6F42C1">erase</span><span style="color:#24292E">(it);</span></span>
+<span class="line"><span style="color:#D73A49">            delete</span><span style="color:#24292E"> node;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">private:</span></span>
+<span class="line"><span style="color:#D73A49">    class</span><span style="color:#6F42C1"> Node</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#D73A49">    public:</span></span>
+<span class="line"><span style="color:#6F42C1">        Node</span><span style="color:#24292E">() </span><span style="color:#D73A49">=</span><span style="color:#D73A49"> default</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#6F42C1">        Node</span><span style="color:#24292E">(</span><span style="color:#D73A49">int</span><span style="color:#E36209"> key</span><span style="color:#24292E">, </span><span style="color:#D73A49">int</span><span style="color:#E36209"> value</span><span style="color:#24292E">) : </span><span style="color:#6F42C1">key</span><span style="color:#24292E">(key), </span><span style="color:#6F42C1">val</span><span style="color:#24292E">(value), </span><span style="color:#6F42C1">next</span><span style="color:#24292E">(</span><span style="color:#005CC5">nullptr</span><span style="color:#24292E">), </span><span style="color:#6F42C1">prev</span><span style="color:#24292E">(</span><span style="color:#005CC5">nullptr</span><span style="color:#24292E">) {}</span></span>
+<span class="line"><span style="color:#D73A49">        int</span><span style="color:#24292E"> key, val;</span></span>
+<span class="line"><span style="color:#24292E">        Node </span><span style="color:#D73A49">*</span><span style="color:#24292E">next, </span><span style="color:#D73A49">*</span><span style="color:#24292E">prev;</span></span>
+<span class="line"><span style="color:#24292E">    };</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> remove</span><span style="color:#24292E">(</span><span style="color:#6F42C1">Node</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        node->prev->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->next;</span></span>
+<span class="line"><span style="color:#24292E">        node->next->prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node->prev;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#D73A49">    void</span><span style="color:#6F42C1"> insert</span><span style="color:#24292E">(</span><span style="color:#6F42C1">Node</span><span style="color:#D73A49"> *</span><span style="color:#E36209">node</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">        tail->prev->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node;</span></span>
+<span class="line"><span style="color:#24292E">        node->prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail->prev;</span></span>
+<span class="line"><span style="color:#24292E">        node->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> tail;</span></span>
+<span class="line"><span style="color:#24292E">        tail->prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> node;</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">    </span></span>
+<span class="line"><span style="color:#D73A49">    int</span><span style="color:#24292E"> capacity_;</span></span>
+<span class="line"><span style="color:#24292E">    unordered_map</span><span style="color:#D73A49">&#x3C;int</span><span style="color:#24292E">, Node </span><span style="color:#D73A49">*></span><span style="color:#24292E"> nodes;</span></span>
+<span class="line"><span style="color:#24292E">    Node </span><span style="color:#D73A49">*</span><span style="color:#24292E">head </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">, </span><span style="color:#D73A49">*</span><span style="color:#24292E">tail </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">};</span></span></code></pre></div>
+<h3 id="9-删除链表中的重复元素">9. 删除链表中的重复元素</h3>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">CPP</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="cpp"><code><span class="line"><span style="color:#6A737D">// 删除链表中的重复元素</span></span>
+<span class="line"><span style="color:#D73A49">void</span><span style="color:#6F42C1"> deleteDuplicates</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> (</span><span style="color:#D73A49">!</span><span style="color:#24292E">head) </span><span style="color:#D73A49">return</span><span style="color:#24292E">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">    std</span><span style="color:#24292E">::unordered_set</span><span style="color:#D73A49">&#x3C;int></span><span style="color:#24292E"> seen;</span><span style="color:#6A737D">  // 存储已经遇到的元素</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> current </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> prev </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> nullptr</span><span style="color:#24292E">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (current) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (seen.</span><span style="color:#6F42C1">find</span><span style="color:#24292E">(current->val) </span><span style="color:#D73A49">!=</span><span style="color:#24292E"> seen.</span><span style="color:#6F42C1">end</span><span style="color:#24292E">()) {</span></span>
+<span class="line"><span style="color:#6A737D">            // 如果当前节点的值已经存在于 set 中，删除当前节点</span></span>
+<span class="line"><span style="color:#24292E">            prev->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current->next;</span></span>
+<span class="line"><span style="color:#D73A49">            delete</span><span style="color:#24292E"> current;</span></span>
+<span class="line"><span style="color:#24292E">            current </span><span style="color:#D73A49">=</span><span style="color:#24292E"> prev->next;</span></span>
+<span class="line"><span style="color:#24292E">        } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#6A737D">            // 如果当前节点的值没有存在于 set 中，加入 set 并继续遍历</span></span>
+<span class="line"><span style="color:#24292E">            seen.</span><span style="color:#6F42C1">insert</span><span style="color:#24292E">(current->val);</span></span>
+<span class="line"><span style="color:#24292E">            prev </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current;</span></span>
+<span class="line"><span style="color:#24292E">            current </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current->next;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#24292E">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// 删除链表中相邻的重复元素</span></span>
+<span class="line"><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#6F42C1"> delete_duplicates_adjacent</span><span style="color:#24292E">(</span><span style="color:#6F42C1">ListNode</span><span style="color:#D73A49">*</span><span style="color:#E36209"> head</span><span style="color:#24292E">) {</span></span>
+<span class="line"><span style="color:#24292E">    ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> current </span><span style="color:#D73A49">=</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#D73A49">    while</span><span style="color:#24292E"> (current </span><span style="color:#D73A49">&#x26;&#x26;</span><span style="color:#24292E"> current->next) {</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> (current->val </span><span style="color:#D73A49">==</span><span style="color:#24292E"> current->next->val) {</span></span>
+<span class="line"><span style="color:#24292E">            ListNode</span><span style="color:#D73A49">*</span><span style="color:#24292E"> temp </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current->next;</span></span>
+<span class="line"><span style="color:#24292E">            current->next </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current->next->next;</span></span>
+<span class="line"><span style="color:#D73A49">            delete</span><span style="color:#24292E"> temp;</span><span style="color:#6A737D">  // 释放内存</span></span>
+<span class="line"><span style="color:#24292E">        } </span><span style="color:#D73A49">else</span><span style="color:#24292E"> {</span></span>
+<span class="line"><span style="color:#24292E">            current </span><span style="color:#D73A49">=</span><span style="color:#24292E"> current->next;</span></span>
+<span class="line"><span style="color:#24292E">        }</span></span>
+<span class="line"><span style="color:#24292E">    }</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> head;</span></span>
+<span class="line"><span style="color:#24292E">}</span></span></code></pre></div>  </div> </article>  </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="linked-list" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/publish-new-post/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>如何在这个博客发布一篇新文章</h3> <p>【2026-10-02】从新建 Markdown、放入配图、本地预览，到推送代码后由 GitHub Actions 自动构建上线，完整走一遍这个博客发布新文章的流程。</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>

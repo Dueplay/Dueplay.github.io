@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><title>Shell常用命令详解 · Dueplay</title><meta name="description" content="包含gcc、make、vim、tcpdump、netcat、gdb等常用Shell工具和命令的实用指南"><meta name="author" content="Dueplay"><link rel="canonical" href="https://dueplay.github.io/posts/shell-commands/"><meta property="og:type" content="article"><meta property="og:title" content="Shell常用命令详解 · Dueplay"><meta property="og:description" content="包含gcc、make、vim、tcpdump、netcat、gdb等常用Shell工具和命令的实用指南"><meta property="og:url" content="https://dueplay.github.io/posts/shell-commands/"><meta property="og:site_name" content="Dueplay"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="alternate" type="application/rss+xml" title="Dueplay Feed" href="/feed.xml"><link rel="stylesheet" href="/_astro/Base.cPPnkASS.css">
+<link rel="stylesheet" href="/_astro/about.Cs6mfIOU.css"><script type="module" src="/_astro/page.BT_9kWGp.js"></script></head> <body id="post"> <div class="header-menu" id="J_header"> <ul class="header-item-container"> <li class="header-item-title"><a href="/" class="title">Dueplay</a></li> <li class="header-item-left"><a href="https://github.com/Dueplay" target="_blank" rel="noopener noreferrer">GitHub</a></li> <li class="header-item-left"><a href="/archive/">往期整理</a></li> <li class="header-item-left"><a href="/about/">About</a></li> <li class="header-item search-btn-container"> <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg> </button> </li> </ul> </div> <div class="entry-header"> <svg width="100%" height="200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Stay hungry, stay foolish."> <path id="svg-title-path" d="m0,110 h1600"> <animate attributeName="d" from="m0,110 h80" to="m0,110 h1600" dur="3000ms" repeatCount="1" fill="freeze" begin="0s"></animate> </path> <text font-size="36" font-weight="600" fill="#f3ebdb" x="50%" y="50%" text-anchor="middle" word-spacing="2" letter-spacing="1.2"> <textPath href="#svg-title-path" xlink:href="#svg-title-path">Stay hungry, stay foolish.</textPath> </text> </svg> <canvas id="J_firework_canvas" aria-hidden="true"></canvas> </div> <main id="main">  <div class="post-shell"> <article class="hentry"> <div class="entry-content heti"> <h1 class="post-title entry-title">Shell常用命令详解</h1> <h4 class="page-info"> <span>Categories: 工具</span> <time datetime="2024-12-03T00:00:00.000Z">2024-12-03</time> <div class="qr-text"> <div class="qr-code" role="img" aria-label="QR code for this page"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 31 31" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h31v31H0z"/><path stroke="#000000" d="M1 1.5h7m1 0h1m5 0h5m1 0h1m1 0h7M1 2.5h1m5 0h1m1 0h1m2 0h3m3 0h1m1 0h2m1 0h1m5 0h1M1 3.5h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1M1 4.5h1m1 0h3m1 0h1m1 0h3m1 0h2m2 0h1m1 0h1m3 0h1m1 0h3m1 0h1M1 5.5h1m1 0h3m1 0h1m2 0h2m1 0h1m1 0h5m3 0h1m1 0h3m1 0h1M1 6.5h1m5 0h1m1 0h3m2 0h1m2 0h1m1 0h2m2 0h1m5 0h1M1 7.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M11 8.5h2m2 0h2m1 0h2m1 0h1M1 9.5h2m2 0h3m3 0h1m1 0h1m4 0h1m1 0h1m3 0h1m1 0h4M2 10.5h2m4 0h2m4 0h6m3 0h7M1 11.5h4m1 0h2m2 0h2m2 0h1m1 0h2m1 0h1m4 0h1m4 0h1M1 12.5h1m1 0h2m4 0h2m2 0h1m1 0h5m2 0h3m1 0h1m1 0h2M4 13.5h1m2 0h3m2 0h2m2 0h1m1 0h2m1 0h2m1 0h1m3 0h1M1 14.5h1m1 0h2m3 0h1m2 0h1m1 0h1m1 0h5m3 0h7M1 15.5h1m5 0h4m1 0h5m2 0h1m2 0h2m2 0h2m1 0h1M1 16.5h2m2 0h2m2 0h2m2 0h1m1 0h1m1 0h3m1 0h1m1 0h1m4 0h2M3 17.5h1m3 0h1m4 0h2m3 0h2m1 0h1m1 0h1m5 0h1M1 18.5h2m2 0h1m3 0h1m2 0h2m1 0h3m4 0h5m1 0h2M3 19.5h3m1 0h1m1 0h5m1 0h2m1 0h1m2 0h2m4 0h1m1 0h1M5 20.5h2m4 0h1m3 0h1m2 0h1m4 0h1m4 0h2M1 21.5h5m1 0h1m1 0h3m4 0h1m1 0h1m2 0h6m2 0h1M9 22.5h1m2 0h1m2 0h2m1 0h4m3 0h1m3 0h1M1 23.5h7m3 0h2m2 0h2m2 0h3m1 0h1m1 0h3m1 0h1M1 24.5h1m5 0h1m1 0h1m2 0h2m1 0h1m1 0h5m3 0h1M1 25.5h1m1 0h3m1 0h1m1 0h3m1 0h1m3 0h2m1 0h7m1 0h2M1 26.5h1m1 0h3m1 0h1m2 0h3m1 0h4m6 0h1m4 0h1M1 27.5h1m1 0h3m1 0h1m2 0h1m1 0h1m3 0h2m2 0h1m1 0h1m3 0h4M1 28.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m2 0h1m1 0h1m1 0h2M1 29.5h7m1 0h5m3 0h2m2 0h1m1 0h4m1 0h1"/></svg>
+</div> </div> </h4> <h4 id="gcc">gcc</h4>
+<h5 id="编译流程">编译流程</h5>
+<p>源代码通过编译器编译生成汇编代码</p>
+<p>汇编代码通过汇编器翻译为机器码，生成目标文件</p>
+<p>链接器将目标文件与任何必需的库文件（如标准库）组合在一起，解析符号引用，生成最终的可执行文件。</p>
+<h5 id="单步执行编译过程">单步执行编译过程</h5>
+<p>运行预处理器，生成预处理后的代码</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">gcc</span><span style="color:#005CC5"> -E</span><span style="color:#032F62"> hello.c</span></span></code></pre></div>
+<p>运行编译器，生成汇编代码hello.s文件</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">gcc</span><span style="color:#005CC5"> -S</span><span style="color:#032F62"> hello.c</span></span></code></pre></div>
+<p>运行汇编器，生成目标文件hello .o文件</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">gcc</span><span style="color:#005CC5"> -c</span><span style="color:#032F62"> hello.s</span></span></code></pre></div>
+<p>运行链接器ld，链接目标文件到可执行文件,默认输出为a.out(assembler汇编程序的输出)</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">ld</span><span style="color:#032F62"> hello.o</span></span></code></pre></div>
+<p>在ld hello.o时，发生以下错误</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">ld:</span><span style="color:#032F62"> warning:</span><span style="color:#032F62"> cannot</span><span style="color:#032F62"> find</span><span style="color:#032F62"> entry</span><span style="color:#032F62"> symbol</span><span style="color:#032F62"> _start</span><span style="color:#24292E">; </span><span style="color:#6F42C1">defaulting</span><span style="color:#032F62"> to</span><span style="color:#005CC5"> 0000000000401000</span></span>
+<span class="line"><span style="color:#6F42C1">ld:</span><span style="color:#032F62"> hello.o:</span><span style="color:#032F62"> in</span><span style="color:#032F62"> function</span><span style="color:#032F62"> `</span><span style="color:#6F42C1">main':</span></span>
+<span class="line"><span style="color:#6F42C1">hello.c:(.text+0x13): undefined reference to `puts'</span></span></code></pre></div>
+<ol>
+<li><strong>未找到入口符号（entry symbol）</strong>：ld 发出警告说它找不到程序的入口点 <code>_start</code>，并默认使用了一个地址。在大多数情况下，可执行文件的入口点应该是 <code>main</code> 函数。你可以通过指定入口点来解决这个问题。</li>
+<li><strong><code>puts</code> 函数的未定义引用</strong>：ld 报告了 <code>undefined reference to 'puts'</code> 错误，这表示程序引用了 <code>puts</code> 函数，但没有找到该函数的定义。你需要链接标准C库以解决这个问题。</li>
+</ol>
+<p>要解决这两个问题，你可以使用以下命令：</p>
+<p>ld  hello.o -e main -lc</p>
+<ul>
+<li><code>-e main</code>：指定程序的入口点是 <code>main</code> 函数。</li>
+<li><code>-lc</code>：链接标准的C库（libc）以解决对 <code>puts</code> 等标准C库函数的引用问题。</li>
+</ul>
+<p><code>-static</code>：静态链接，不使用动态链接库。生成文件很大</p>
+<h4 id="用户相关">用户相关</h4>
+<p>useradd</p>
+<p>userdel</p>
+<h4 id="make">make</h4>
+<p>启用多线程编译，以加速编译过程。</p>
+<ul>
+<li><strong><code>make -j</code>（无数字）</strong>：
+<ul>
+<li>优点：尽可能快的编译速度，特别是在资源充足的环境下。</li>
+<li>缺点：可能会过载系统，尤其是在资源有限的机器上，影响其他应用或导致系统不稳定。</li>
+</ul>
+</li>
+<li><strong><code>make -jN</code>（N为数字，如 <code>make -j4</code>）</strong>：
+<ul>
+<li>优点：可以精确控制并行作业的数量，适当的选择可以优化编译速度和系统稳定性的平衡。</li>
+<li>缺点：需要手动确定最佳的作业数，可能不适应所有环境。</li>
+</ul>
+</li>
+<li><strong><code>make  -j$(nproc)</code></strong>：
+<ul>
+<li>优点：自动化地选择并行作业数，通常等于CPU核心数，适合大多数情况，既快速又不会过载系统。</li>
+<li>缺点：在某些特殊情况下，如高度依赖磁盘I/O的项目，可能并不是最佳选择，因为磁盘I/O可能成为瓶颈。</li>
+</ul>
+</li>
+</ul>
+<h4 id="vim">vim</h4>
+<p>1.全选文本剪切和删除</p>
+<p>在normal模式（Esc），</p>
+<p><code>ggvG</code>将光标移到文件的开头，然后选择整个文件。</p>
+<p><code>x</code> 剪切选中的文本</p>
+<p><code>d</code>删除选中的文本</p>
+<p>2.剪切行：按下 <code>dd</code> 键。这将删除并剪切当前行。</p>
+<p><code>yy</code> 来复制当前行，然后使用 <code>p</code> 将其粘贴、</p>
+<p>3.<code>set nowrap</code> 超出屏幕一行的文字不会换行</p>
+<p><code>set wrap</code> 取消不换行的设置</p>
+<p><code>set nu</code> 显示行号</p>
+<p>4.修改单个单词 <code>cw</code>  <code>ciw</code></p>
+<p>5.全部格式化 <code>gg=G</code></p>
+<h4 id="objdump查看二进制文件">objdump查看二进制文件</h4>
+<p>查看目标文件反汇编代码 <code>-d</code>反汇编的意思Disassembly</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">objdump</span><span style="color:#005CC5"> -d</span><span style="color:#032F62"> xx.o</span></span></code></pre></div>
+<h4 id="strace追踪执行的系统调用">strace追踪执行的系统调用</h4>
+<p>strace的输出位标准错误输出</p>
+<ul>
+<li>
+<p>主要的系统调用：execve, read, write</p>
+</li>
+<li>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>strace -f gcc a.c</span></span></code></pre></div>
+<p>(gcc 会启动其他进程)</p>
+<ul>
+<li>可以管道给编辑器 <code>vim -</code></li>
+<li>编辑器里还可以 <code>%!grep</code> (细节/技巧)</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">BASH</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1">strace</span><span style="color:#032F62"> ls</span><span style="color:#D73A49"> |</span><span style="color:#24292E">&#x26; </span><span style="color:#6F42C1">grep</span><span style="color:#005CC5"> -e</span><span style="color:#032F62"> read</span><span style="color:#005CC5"> -e</span><span style="color:#032F62"> write</span></span></code></pre></div>
+<p>可以实现系统调用的过滤等，-e read -e write只输出包含read，write的行</p>
+<p>grep反向匹配：使用 <code>-v</code> 选项查找不匹配模式的行。</p>
+<p>使用 <code>-o</code> 选项只显示匹配的文本，而不是整行。</p>
+<h4 id="输出重定向">输出重定向</h4>
+<ul>
+<li><strong>标准输入（STDIN）</strong>：通常表示为数字 <code>0</code>，</li>
+<li><strong>标准输出（STDOUT）</strong>：通常表示为数字 <code>1</code>，是大多数程序输出其执行结果的默认位置。</li>
+<li><strong>标准错误（STDERR）</strong>：表示为数字 <code>2</code>，用于输出错误信息。</li>
+</ul>
+<p>在命令行中，<code>></code> 符号用于重定向输出。<code>2>&#x26;1</code> 的意思是将标准错误（<code>2</code>）重定向到标准输出（<code>1</code>）的同一位置。这通常用于将程序的所有输出（包括错误和正常信息）合并到一个流中，便于进一步处理或记录。</p>
+<div class="highlight"><div class="highlight-header"><div class="highlight-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div><span class="highlight-lang">SHELL</span><button class="copy-btn" type="button">Copy</button></div><pre class="astro-code github-light" style="background-color:#fff;color:#24292e; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6A737D"># 标准输出重定向到file.txt </span></span>
+<span class="line"><span style="color:#005CC5">command</span><span style="color:#D73A49"> ></span><span style="color:#032F62"> file.txt</span><span style="color:#6A737D"> # 等同于command 1> file.txt， 1通常省略</span></span>
+<span class="line"><span style="color:#005CC5">command</span><span style="color:#D73A49"> ></span><span style="color:#032F62"> file.txt</span><span style="color:#D73A49"> 2>&#x26;1</span></span>
+<span class="line"><span style="color:#6A737D"># 有的时候我们不想看到输出信息，也不想保存输出信息，可以考虑dev下的null设备文件，所有写进去的数据都会被丢弃。</span></span>
+<span class="line"><span style="color:#005CC5">command</span><span style="color:#D73A49"> ></span><span style="color:#032F62"> /dev/null</span><span style="color:#D73A49"> 2>&#x26;1</span></span></code></pre></div>
+<p>这里的 <code>command</code> 可以是任何命令、脚本或程序。这个命令做了以下两件事：</p>
+<ol>
+<li><code>> file.txt</code> 将 <code>command</code> 的标准输出重定向到 <code>file.txt</code>。如果 <code>file.txt</code> 不存在，它将被创建；如果已存在，它将被覆盖。</li>
+<li><code>2>&#x26;1</code> 将 <code>command</code> 的标准错误重定向到标准输出的地方，即 <code>file.txt</code>。</li>
+</ol>
+<p>结果，无论 <code>command</code> 生成的是标准输出还是错误输出，所有内容都会被写入 <code>file.txt</code>。</p>
+<p>这种重定向在脚本编写和日志记录中非常有用，特别是当你需要捕获和分析一个命令的所有输出（包括错误）时。</p>
+<p>一个>符号表示清空文件重新写入，两个>符号表示往文件的后面追加。</p>  </div> </article>  </div> <div class="post-followup"> <div class="giscus-container"> <script src="https://giscus.app/client.js" data-repo="Dueplay/Dueplay.github.io" data-repo-id="R_kgDOLigysA" data-category="General" data-category-id="DIC_kwDOLigysM4DG0yM" data-mapping="specific" data-term="shell-commands" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="https://dueplay.github.io/css/comment.css" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script> </div> <a class="read-more" href="/posts/sorting-algorithms/" data-astro-prefetch> <div class="read-more-header"><div class="read-more-btn">Read More</div></div> <div class="read-more-content"> <h3>排序算法详解</h3> <p>【2024-12-03】详细介绍各种排序算法的原理、实现和时间复杂度分析</p> </div> </a> </div>  </main> <div id="search-modal" class="search-modal" aria-hidden="true" role="dialog" aria-label="Search"> <div class="search-container"> <div class="search-header"> <input type="search" id="search-input" class="search-input" placeholder="Search articles..." aria-label="Search articles" autocomplete="off"> <button class="search-close" id="search-close" aria-label="Close search"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></button> </div> <div id="search-results" class="search-results" role="listbox"></div> <div class="search-footer"> <div class="search-tips"> <kbd>/</kbd> to search <kbd>ESC</kbd> to close <kbd>↑↓</kbd> to navigate <kbd>Enter</kbd> to select
+</div> </div> </div> </div> <div class="footer-wrapper"> <footer> <a href="https://github.com/Dueplay" rel="nofollow noopener" target="_blank" class="social-icon" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.001 2C6.476 2 2.001 6.475 2.001 12c0 4.425 2.862 8.162 6.837 9.487.5.088.688-.212.688-.475 0-.237-.013-1.025-.013-1.862-2.512.462-3.162-.613-3.362-1.175-.113-.288-.6-1.175-1.025-1.413-.35-.187-.85-.65-.013-.662.788-.013 1.35.725 1.538 1.025.9 1.512 2.337 1.087 2.912.825.088-.65.35-1.088.638-1.338-2.225-.25-4.55-1.112-4.55-4.937 0-1.088.387-1.988 1.025-2.688-.1-.25-.45-1.275.1-2.65 0 0 .837-.262 2.75 1.025a9.28 9.28 0 0 1 2.5-.337c.85 0 1.7.112 2.5.337 1.912-1.3 2.75-1.025 2.75-1.025.55 1.375.2 2.4.1 2.65.637.7 1.025 1.587 1.025 2.688 0 3.837-2.338 4.687-4.563 4.937.363.313.675.913.675 1.85 0 1.338-.012 2.413-.012 2.75 0 .263.187.575.687.475A10.016 10.016 0 0 0 22.001 12c0-5.525-4.475-10-10-10Z"></path></svg></a>  <a href="/feed.xml" target="_blank" class="social-icon" aria-label="RSS"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3c9.941 0 18 8.059 18 18h-3C18 12.716 11.284 6 3 6V3Zm0 7c6.075 0 11 4.925 11 11h-3c0-4.418-3.582-8-8-8v-3Zm0 7a4 4 0 0 1 4 4H3v-4Z"></path></svg></a> </footer> </div> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.CeUbVNoz.js"></script> </body> </html>
