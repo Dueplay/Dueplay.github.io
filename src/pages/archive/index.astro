@@ -1,0 +1,109 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts } from '../../utils';
+
+const posts = await getPosts();
+
+// 获取所有分类
+const categories = new Map<string, number>();
+posts.forEach(post => {
+  post.data.categories?.forEach(cat => {
+    categories.set(cat, (categories.get(cat) || 0) + 1);
+  });
+});
+
+// 按文章数量排序
+const sortedCategories = Array.from(categories.entries())
+  .sort((a, b) => b[1] - a[1]);
+---
+
+<Base bodyId="page" active="archive">
+  <div class="archive-page">
+    <div class="archive-nav">
+      <a href="/archive/" class="nav-item active">分类</a>
+      <a href="/archive/timeline/" class="nav-item">时间线</a>
+    </div>
+
+    <h1>分类</h1>
+    <div class="category-grid">
+      {sortedCategories.map(([category, count]) => (
+        <a href={`/archive/category/${category}/`} class="category-card">
+          <h2>{category}</h2>
+          <span class="count">{count} 篇文章</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .archive-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .archive-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e8e4d9;
+  }
+
+  .nav-item {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover {
+    color: #1a1a1a;
+  }
+
+  .nav-item.active {
+    color: #1a1a1a;
+    border-bottom-color: #1a1a1a;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #1a1a1a;
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .category-card {
+    display: block;
+    padding: 1.5rem;
+    background: #fefdfb;
+    border: 1px solid #e8e4d9;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .category-card:hover {
+    border-color: #d4cdb8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .category-card h2 {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+  }
+
+  .category-card .count {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+</style>

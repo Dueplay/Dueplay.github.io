@@ -9,7 +9,7 @@ interface Props {
   description?: string;
   slogan?: string;
   bodyId: 'post-index' | 'post' | 'page';
-  active?: 'about';
+  active?: 'about' | 'archive';
   type?: 'website' | 'article';
   hasToc?: boolean;
 }
@@ -43,6 +43,7 @@ const isCJK = /[一-鿿]/.test(slogan);
       <ul class="header-item-container">
         <li class="header-item-title"><a href="/" class="title">{SITE.title}</a></li>
         <li class="header-item-left"><a href={SITE.github} target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li class:list={['header-item-left', { active: active === 'archive' }]}><a href="/archive/">往期整理</a></li>
         <li class:list={['header-item-left', { active: active === 'about' }]}><a href="/about/">About</a></li>
         <li class="header-item search-btn-container">
           <button id="search-btn" class="search-btn" aria-label="Search" title="Search (Press /)">

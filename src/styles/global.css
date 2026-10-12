@@ -318,7 +318,8 @@ kbd {
   margin-bottom: 1.5em;
   overflow: hidden;
   border-radius: 8px;
-  background-color: #15141b;
+  background-color: #f6f8fa;
+  border: 1px solid #e1e4e8;
   font-family: var(--font-mono);
   letter-spacing: 0;
 }
@@ -328,7 +329,8 @@ kbd {
   justify-content: space-between;
   align-items: center;
   padding: 5px 12px;
-  border-bottom: 0.5px solid rgba(237, 236, 238, 0.06);
+  border-bottom: 1px solid #e1e4e8;
+  background-color: #fff;
 }
 .highlight-dots { display: flex; gap: 6px; }
 .highlight-dots span { width: 8px; height: 8px; border-radius: 50%; transition: transform 0.2s ease; }
@@ -341,7 +343,7 @@ kbd {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: rgba(237, 236, 238, 0.64);
+  color: #6a737d;
   font-size: 11px;
   line-height: 1;
   letter-spacing: 0.04em;
@@ -354,29 +356,27 @@ kbd {
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: rgba(237, 236, 238, 0.62);
+  color: #586069;
   font-size: 11px;
   line-height: 1.7;
   cursor: pointer;
   transition: color 0.2s ease, background-color 0.2s ease;
 }
-.copy-btn:hover { color: #edecee; background-color: rgba(162, 119, 255, 0.12); }
-.copy-btn.is-copied { color: #27c93f; }
+.copy-btn:hover { color: #24292e; background-color: #f3f4f6; }
+.copy-btn.is-copied { color: #22863a; }
 .highlight pre {
   margin: 0;
   padding: 15px 18px 18px;
   overflow-x: auto;
   font-size: 14px;
   line-height: 1.75;
-  background-color: transparent !important;
-  color: #edecee;
 }
 .highlight pre code { font-family: var(--font-mono); white-space: pre; }
-.highlight pre ::selection { background-color: rgba(61, 55, 94, 0.8); }
+.highlight pre ::selection { background-color: rgba(173, 214, 255, 0.5); }
 .highlight pre::-webkit-scrollbar { height: 8px; }
-.highlight pre::-webkit-scrollbar-track { background: rgba(237, 236, 238, 0.06); }
-.highlight pre::-webkit-scrollbar-thumb { background: rgba(162, 119, 255, 0.32); border-radius: 999px; }
-.highlight pre::-webkit-scrollbar-thumb:hover { background: rgba(162, 119, 255, 0.45); }
+.highlight pre::-webkit-scrollbar-track { background: #f6f8fa; }
+.highlight pre::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 999px; }
+.highlight pre::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
 
 /* ---------- 文章目录 ---------- */
 #post .post-shell { position: relative; }

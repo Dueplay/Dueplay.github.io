@@ -1,0 +1,64 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostList from '../../../components/PostList.astro';
+import { getPosts } from '../../../utils';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const categories = new Set<string>();
+
+  posts.forEach(post => {
+    post.data.categories?.forEach(cat => categories.add(cat));
+  });
+
+  return Array.from(categories).map(category => ({
+    params: { category },
+  }));
+}
+
+const { category } = Astro.params;
+const posts = await getPosts();
+const categoryPosts = posts.filter(post =>
+  post.data.categories?.includes(category)
+);
+---
+
+<Base bodyId="post-index" active="archive">
+  <div class="category-header">
+    <h1>分类：{category}</h1>
+    <p>{categoryPosts.length} 篇文章</p>
+    <a href="/archive/" class="back-link">← 返回分类列表</a>
+  </div>
+  <PostList posts={categoryPosts} current={1} total={1} />
+</Base>
+
+<style>
+  .category-header {
+    max-width: 960px;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .category-header h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+  }
+
+  .category-header p {
+    color: #6b7280;
+    margin-bottom: 1rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover {
+    color: #1a1a1a;
+  }
+</style>

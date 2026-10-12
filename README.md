@@ -1,46 +1,75 @@
-# Dueplay.github.io
+# Dueplay 博客网站
 
-个人博客，基于 [Astro](https://astro.build) 构建。
+个人技术博客，记录学习笔记和技术总结。
 
 ## 本地开发
 
+### 启动开发服务器
+
 ```bash
-npm install
-npm run dev      # http://localhost:4321
-npm run build    # 输出到 dist/
+npm run dev
 ```
 
-## 写文章
+访问 http://localhost:4321/
 
-在 `src/content/posts/` 新建 Markdown 文件，文件名即文章链接 `/posts/<文件名>/`：
+### 构建生产版本
 
-```yaml
+```bash
+npm run build
+```
+
+### 预览构建结果
+
+```bash
+npm run preview
+```
+
+## 网站结构
+
+- **首页** (`/`) - 最新文章列表
+- **往期整理** (`/archive/`) - 按分类浏览
+  - 分类页 - 按技术类别查看文章
+  - 时间线 - 按时间归档浏览
+- **关于** (`/about/`) - 个人信息
+
+## 添加新文章
+
+在 `src/content/posts/` 目录下创建新的 `.md` 文件：
+
+```markdown
 ---
 title: 文章标题
-date: 2026-10-02
-description: 摘要（可选，不填则截取正文）
-categories: [Database]
-slogan: 顶部横幅标语（可选）
-draft: false
+date: 2024-01-01
+description: 文章描述
+categories: [Category]
 ---
+
+文章内容...
 ```
 
-图片放在 `public/images/`，正文里用 `/images/xxx.png` 引用。
+## 技术栈
 
-## 配置
+- Astro - 静态站点生成器
+- Markdown - 内容格式
+- CSS - 样式设计
 
-站点标题、标语、GitHub 链接、评论等都在 `src/site.config.ts`。
+## 已发布文章分类
 
-- **评论**：基于 giscus，评论存放在本仓库的 GitHub Discussions，样式在 `public/css/comment.css`。
-- **支持按钮**：填写 `sponsor.url` 后文章末尾会出现按钮。
+- **Database** - 数据库相关（MySQL, Redis, 隔离级别等）
+- **C++** - C++ 编程（智能指针, RAII 等）
+- **System** - 系统编程（线程, 进程等）
+- **Network** - 网络编程（Socket, IO 复用等）
+- **DevOps** - 开发运维（Docker, Git, CMake）
+- **Data Structure** - 数据结构与算法（排序, 哈希表等）
+- **Distributed System** - 分布式系统（分布式事务等）
 
-## 部署
+## 当前状态
 
-推送到 `master` 后，GitHub Actions（`.github/workflows/deploy.yml`）会构建并发布到 `gh-pages` 分支，GitHub Pages 从该分支提供服务。
+- ✅ 18 篇技术笔记已发布
+- ✅ 分类和归档功能完善
+- ✅ 个人简介页面完成
+- ✅ 开发服务器可用
 
-## 功能
+---
 
-- 首页文章列表与分页，横幅标语打字动画与鼠标光点特效
-- 文章页：分类与日期、悬停显示页面二维码、宽屏右侧吸顶目录（滚动高亮）、代码高亮与一键复制、图片点击放大、giscus 评论、Read More 推荐
-- 全站搜索（按 `/` 打开，方向键选择，回车跳转）
-- 向下滚动自动隐藏导航、RSS（`/feed.xml`）
+Made with ❤️ by Dueplay

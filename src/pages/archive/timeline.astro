@@ -1,0 +1,187 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPosts, formatDate } from '../../utils';
+
+const posts = await getPosts();
+
+// 按年月归档
+const archives = new Map<string, typeof posts>();
+posts.forEach(post => {
+  const year = post.data.date.getFullYear();
+  const month = post.data.date.getMonth() + 1;
+  const key = `${year}-${String(month).padStart(2, '0')}`;
+  if (!archives.has(key)) {
+    archives.set(key, []);
+  }
+  archives.get(key)!.push(post);
+});
+
+// 按时间倒序排序
+const sortedArchives = Array.from(archives.entries())
+  .sort((a, b) => b[0].localeCompare(a[0]));
+
+// 格式化年月
+function formatYearMonth(key: string) {
+  const [year, month] = key.split('-');
+  return `${year} 年 ${parseInt(month)} 月`;
+}
+---
+
+<Base bodyId="page" active="archive">
+  <div class="archive-page">
+    <div class="archive-nav">
+      <a href="/archive/" class="nav-item active">分类</a>
+      <a href="/archive/timeline/" class="nav-item">时间线</a>
+    </div>
+
+    <h1>历史归档</h1>
+    <div class="timeline-stats">
+      <span>共 {posts.length} 篇文章</span>
+    </div>
+
+    <div class="timeline">
+      {sortedArchives.map(([key, archivePosts]) => (
+        <div class="timeline-group">
+          <h2 class="timeline-date">{formatYearMonth(key)}</h2>
+          <ul class="timeline-list">
+            {archivePosts.map(post => (
+              <li class="timeline-item">
+                <time datetime={post.data.date.toISOString()}>
+                  {formatDate(post.data.date)}
+                </time>
+                <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .archive-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .archive-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e8e4d9;
+  }
+
+  .nav-item {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .nav-item:hover {
+    color: #1a1a1a;
+  }
+
+  .nav-item.active {
+    color: #1a1a1a;
+    border-bottom-color: #1a1a1a;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+  }
+
+  .timeline-stats {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+  }
+
+  .timeline {
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e8e4d9;
+  }
+
+  .timeline-group {
+    margin-bottom: 2rem;
+    padding-left: 2rem;
+  }
+
+  .timeline-date {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .timeline-date::before {
+    content: '';
+    position: absolute;
+    left: -2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid #fefdfb;
+  }
+
+  .timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    position: relative;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.25rem;
+    top: 0.875rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4cdb8;
+  }
+
+  .timeline-item time {
+    flex-shrink: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timeline-item a {
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .timeline-item a:hover {
+    color: #6b7280;
+  }
+</style>
